@@ -1,0 +1,8 @@
+# Python
+server/.venv/
+__pycache__/
+*.pyc
+
+
+# React (Node)
+client/node_modules/
