@@ -1,6 +1,13 @@
 import osmnx as ox
 import geopandas as gpd
-import functionSplitting as oxXL
+import mapping.functionSplitting as oxXL
+import matplotlib.cm as cm
+import matplotlib.colors as mcolors
+from JamesExampleStructure.backend.algorithms import dijkstra_algorithm as dijkstra
+from JamesExampleStructure.backend.algorithms import astar_algorithm as astar
+from JamesExampleStructure.backend.algorithms import yen_algorithm as yen
+import pandas as pd
+
 
 COORDS = (51.460498, -2.585757) # Bristol
 #COORDS = (51.541533, -1.905034)
@@ -123,49 +130,113 @@ G = ox.add_edge_speeds(G)
 G = ox.add_edge_travel_times(G)
 
 fig, ax = ox.plot_graph(G, show=False, close=False)
-fig.savefig(f"graphs/{TOWN}/{TOWN.lower().replace(" ", "-")}_no_pois.png", dpi=300)
+fig.savefig(f"mapping/graphs/{TOWN}/{TOWN.lower().replace(" ", "-")}_no_pois.png", dpi=300)
+
+#==============================
+
+nodes_gdf, edges_gdf = ox.graph_to_gdfs(G)
+
+edgesDict = oxXL.csv_to_dict("edges_table.csv")
+
+#distance, shortestPath = dijkstra.dijkstra(edgesDict, 104804, 13288882110, trace=False)
+
+nodesDict = oxXL.node_csv_to_dict("nodes_table.csv")
+
+heuristic = astar.ehf(nodesDict, 13288882110)
+
+#distance, shortestPath = astar.astar(edgesDict, 104804, 13288882110, heuristic, trace=False)
+
+paths = yen.yens(edgesDict, 104804, 13288882110, 3)
+
+def print_shortest_path_graph(shortestPath, algorithm:str, yen_iteration=""):
+    edgePath = oxXL.edge_path_to_csv_rule(shortestPath, "edges_table.csv")
+    wholeEdgeCSV = pd.read_csv("edges_table.csv")
+
+    edges_temp = edges_gdf.copy()
+    nodes_temp = nodes_gdf.copy()
+
+    edges_temp["edge_colour"] = "#FFFFFF"
+    nodes_temp["node_colour"] = "#FFFFFF"
+    nodes_temp["node_size"] = 15
+    nodes_temp["node_alpha"] = 0.4
+    edges_temp["edge_alpha"] = 0.4
+
+    for u, v, k in edgePath:
+        edges_temp.loc[(u, v, k), "edge_colour"] = "#0000FF"
+        edges_temp.loc[(v, u, k), "edge_colour"] = "#0000FF"
+        edges_temp.loc[(u, v, k), "edge_alpha"] = 1
+        edges_temp.loc[(v, u, k), "edge_alpha"] = 1
+
+    osmid = shortestPath[0]
+
+    nodes_temp.loc[osmid, "node_colour"] = "#FF0000"
+    nodes_temp.loc[osmid, "node_size"] = 35
+    nodes_temp.loc[osmid, "node_alpha"] = 1
+
+    osmid = shortestPath[len(shortestPath)-1]
+    nodes_temp.loc[osmid, "node_colour"] = "#FF0000"
+    nodes_temp.loc[osmid, "node_size"] = 35
+    nodes_temp.loc[osmid, "node_alpha"] = 1
+
+
+    #edges_temp = edges_temp.reset_index()
+    routeGraph = ox.graph_from_gdfs(nodes_temp, edges_temp)
+
+    edge_colors = [
+        data.get("edge_colour", "#FFFFFF")
+        for _, _, _, data in routeGraph.edges(keys=True, data=True)
+    ]
+
+    edge_alphas = [
+        data.get("edge_alpha", "#FFFFFF")
+        for _, _, _, data in routeGraph.edges(keys=True, data=True)
+    ]
+
+    node_colors = [
+        data.get("node_colour", "#FFFFFF")
+        for _, data in routeGraph.nodes(data=True)
+    ]
+    node_sizes = [
+        data.get("node_size", 20)
+        for _, data in routeGraph.nodes(data=True)
+    ]
+    node_alphas = [
+        data.get("node_alpha", 1)
+        for _, data in routeGraph.nodes(data=True)
+    ]
+
+    fig1, ax1 = ox.plot_graph(
+        routeGraph,
+        edge_color=edge_colors,
+        node_color=node_colors,
+        node_size=node_sizes,
+        node_alpha=node_alphas,
+        edge_alpha=edge_alphas,
+        show=False,
+        close=False
+    )
+
+    fig1.savefig(f"mapping/graphs/{TOWN}/{TOWN.lower().replace(" ", "-")}_{algorithm.lower()}{yen_iteration}_route.png", dpi=300)
+
+
+for path in paths:
+    print_shortest_path_graph(path, "yens", f"_{paths.index(path)+1}")
+
+#==============================
 
 for place in allPlaces:
-    features = ox.features_from_point(
-        center_point=COORDS,
-        tags=place[1],
-        dist=450,
-    )
-
-    if place[0] == "Amenities" and LIMIT_AMENITIES == True:
-        print("Old Amenities:", len(features))
-        if len(features) >= 80:
-            features = features.sample(n=80, random_state=42)
-        else:
-            features = features.copy()
-        print("New Amenities:", len(features))
-
-
-    features["centroid"] = features.geometry.centroid
-
-    features["nearest_node"] = ox.distance.nearest_nodes(
-        G,
-        X=features.centroid.x,
-        Y=features.centroid.y
-    )
-
-    features.plot(
-        ax=ax,
-        color=place[2],
-        label=place[0],
-        alpha=place[3],
-        markersize=place[4],
-    )
+    oxXL.addFeatureToGraph(G, ax, COORDS, place)
 
 ax.legend()
 
-fig.savefig(f"graphs/{TOWN}/{TOWN.lower().replace(" ", "-")}_pois_included.png", dpi=300)
+fig.savefig(f"mapping/graphs/{TOWN}/{TOWN.lower().replace(" ", "-")}_pois_included.png", dpi=300)
 print(f"==============================\nGraph saved to files\n==============================")
 
-for u, v, k, data in G.edges(keys=True, data=True):
-    data["speed_kph"] = 4.8
-
 G = ox.add_edge_travel_times(G)
+
+for u, v, k, data in G.edges(keys=True, data=True):
+    data["length"] = round(data["length"], 2)
+    data["travel_time"] = round(data["travel_time"], 3)
 
 nodes_gdf, edges_gdf = ox.graph_to_gdfs(G)
 
@@ -202,17 +273,14 @@ nodes_table = nodes_table.rename(columns={
 edges_table = edges_gdf.reset_index()[[
     "u", "v", "key",
     "length",
-    "speed_kph",
     "travel_time",
     "access_score",
 ]]
 
 edges_table = edges_table.rename(columns={
     "u":"from_node",
-    "v":"to_node"
+    "v":"to_node",
 })
-
-print(edges_table)
 
 def score_band(d):
     if d < 0.001:
@@ -240,33 +308,36 @@ def score_band(d):
 
 edges_gdf["score_band"] = edges_gdf["access_score"].apply(score_band)
 
-
-import matplotlib.cm as cm
-import matplotlib.colors as mcolors
-
 cmap = cm.get_cmap("RdYlGn")
 
-edges_gdf["edge_color"] = edges_gdf["score_band"].apply(
+edges_gdf["edge_colour"] = edges_gdf["score_band"].apply(
     lambda x: mcolors.to_hex(cmap(x))
 )
 
 fig, ax = ox.plot_graph(
     G,
-    edge_color=edges_gdf["edge_color"],
+    edge_color=edges_gdf["edge_colour"],
     edge_linewidth=2,
     show=False,
     close=False
 )
 
-fig.savefig(f"drinkingGraphs/fromWholeEdge.png", dpi=300)
+fig.savefig(f"mapping/drinkingGraphs/fromWholeEdge.png", dpi=300)
 G = ox.graph_from_gdfs(nodes_gdf, edges_gdf)
 ox.save_graphml(G, filepath="bristol.graphml")
 
-edges_table_out = edges_table.copy()
+edges_table_out = edges_table.copy()    
+
+edges_table_out.insert(0, "edge_id", range(len(edges_table_out)))
 
 edges_table_out.to_csv("edges_table.csv", index=False)
 
+nodes_table_out = nodes_table.copy()
+
+nodes_table_out.to_csv("nodes_table.csv", index=False)
+
 edges_gdf_out = edges_gdf.copy()
-edges_gdf_out["geometry"] = edges_gdf_out.geometry.to_wkt()
 
 edges_gdf_out.to_csv("edges.csv", index=False)
+
+edgesDict = oxXL.csv_to_dict("edges_table.csv")
