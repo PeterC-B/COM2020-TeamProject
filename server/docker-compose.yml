@@ -4,7 +4,7 @@ services:
         container_name: com2020-dev-db
         environment:
             POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: password
+            POSTGRES_PASSWORD: temp_password
             POSTGRES_DB: com2020_dev
         ports:
             - "5432:5432"
