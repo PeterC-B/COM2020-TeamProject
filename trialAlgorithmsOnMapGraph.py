@@ -1,10 +1,11 @@
-import mapping.functionSplitting as oxXl
+import graph_modification as oxXl
+import file_reading as fle
 import JamesExampleStructure.backend.algorithms.astar_algorithm as aStar
 import JamesExampleStructure.backend.algorithms.dijkstra_algorithm as dijkstra
 import JamesExampleStructure.backend.algorithms.yen_algorithm as yen
 
-edgesDict = oxXl.csv_to_dict("edges_table.csv")
-nodesDict = oxXl.node_csv_to_dict("nodes_table.csv")
+edgesDict = fle.edge_csv_to_dict("edges_table.csv")
+nodesDict = fle.node_csv_to_dict("nodes_table.csv")
 
 heuristic = aStar.ehf(nodesDict, 13288882110)
 

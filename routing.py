@@ -1,4 +1,5 @@
-import mapping.functionSplitting as oxXL
+import graph_modification as oxl
+import file_reading as fle
 import osmnx as ox
 import pandas as pd
 import networkx as nx
@@ -24,7 +25,7 @@ def print_shortest_path_graph(graph : nx.MultiDiGraph, shortestPath : list, edge
     '''
     # Convert the graph to the GeoDataFrames and find the list of edges the shortest path takes
     edges_gdf, nodes_gdf = ox.graph_to_gdfs(graph)
-    edgePath = oxXL.edge_path_to_csv_rule(shortestPath, edgesCSVPath)
+    edgePath = oxl.edge_path_to_csv_rule(shortestPath, edgesCSVPath)
 
     # Copy the GDFs and set the standard colour of nodes and edges to white, and being a little transparent
     edges_temp = edges_gdf.copy()
@@ -241,7 +242,7 @@ def plot_filled_graph(features : list, coords : tuple, radius : int, travel_type
     fig, ax = get_figure_and_axes(graph)
     
     for feature in features:
-        oxXL.addFeatureToGraph(graph, ax, coords, feature)
+        oxl.addFeatureToGraph(graph, ax, coords, feature)
     
     if(incLegend):
         ax.legend()

@@ -1,12 +1,13 @@
 import osmnx as ox
 import geopandas as gpd
-import mapping.functionSplitting as oxXL
+import graph_modification as oxl
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
 from JamesExampleStructure.backend.algorithms import dijkstra_algorithm as dijkstra
 from JamesExampleStructure.backend.algorithms import astar_algorithm as astar
 from JamesExampleStructure.backend.algorithms import yen_algorithm as yen
 from routing import *
+import file_reading as fle
 
 
 COORDS = (51.460498, -2.585757) # Bristol
@@ -136,11 +137,11 @@ fig.savefig(f"mapping/graphs/{TOWN}/{TOWN.lower().replace(" ", "-")}_no_pois.png
 
 nodes_gdf, edges_gdf = ox.graph_to_gdfs(G)
 
-edgesDict = oxXL.csv_to_dict("edges_table.csv")
+edgesDict = fle.edge_csv_to_dict("edges_table.csv")
 
 #distance, shortestPath = dijkstra.dijkstra(edgesDict, 104804, 13288882110, trace=False)
 
-nodesDict = oxXL.node_csv_to_dict("nodes_table.csv")
+nodesDict = fle.node_csv_to_dict("nodes_table.csv")
 
 heuristic = astar.ehf(nodesDict, 13288882110)
 
@@ -155,7 +156,7 @@ for path in paths:
 #==============================
 
 for place in allPlaces:
-    oxXL.addFeatureToGraph(G, ax, COORDS, place)
+    oxl.add_feature_to_graph(G, ax, COORDS, place)
 
 ax.legend()
 
@@ -188,7 +189,7 @@ nodes_gdf, edges_gdf = ox.graph_to_gdfs(G)
 #edges_m = edges_gdf.to_crs(epsg=27700)
 #amenities_m = amenities.to_crs(epsg=27700)
 
-edges_gdf = oxXL.addDistanceToDrinkingPlace(edges_gdf, COORDS)
+edges_gdf = oxl.add_distance_to_crime_spots(edges_gdf, COORDS)
 
 nodes_table = nodes_gdf.reset_index()[[
     "osmid",
@@ -270,4 +271,4 @@ edges_gdf_out = edges_gdf.copy()
 
 edges_gdf_out.to_csv("edges.csv", index=False)
 
-edgesDict = oxXL.csv_to_dict("edges_table.csv")
+edgesDict = fle.edge_csv_to_dict("edges_table.csv")
