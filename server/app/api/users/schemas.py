@@ -1,1 +1,0 @@
-# This will hold the request/response schemas for the users routes

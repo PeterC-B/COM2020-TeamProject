@@ -1,13 +1,15 @@
 # Create_app() function to initialize the Flask application
 
+from flask import Flask
+from flask_cors import CORS
+
 from app.api.users.routes import create_user_route_blueprint
 from app.config import Config
 from app.extensions import db, jwt, ma, migrate
 from app.repositories.user_repository import UserRepository
 from app.unit_of_work.sqlalchemy_uow import SqlAlchemyUnitOfWork
+from app.use_cases.users.list_users import ListUsers
 from app.use_cases.users.register_user import RegisterUser
-from flask import Flask
-from flask_cors import CORS
 
 
 def create_app():
@@ -33,7 +35,7 @@ def create_app():
     ma.init_app(app)
 
     # Register the models
-    from app.models import user_model
+    from app.models import user_account_model
 
     # Initialise the services
     session = db.session
@@ -45,9 +47,9 @@ def create_app():
 
     # Initialise the Use Cases
     register_user_uc = RegisterUser(uow, user_repo)
+    list_users_uc = ListUsers(user_repo)
 
     # Initialise the Routes
-    app.register_blueprint(create_user_route_blueprint(register_user_uc))
-
+    app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc))
 
     return app

@@ -2,12 +2,13 @@
 import uuid
 from datetime import datetime
 
-from app.extensions import db
 from sqlalchemy import UUID, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.extensions import db
 
-class UserAccount(db.Model):
+
+class UserAccountModel(db.Model):
     __tablename__ = 'user_account'
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

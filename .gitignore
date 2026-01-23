@@ -4,5 +4,5 @@ __pycache__/
 *.pyc
 
 
-# React (Node)
+# Vue (Node)
 client/node_modules/
