@@ -96,12 +96,12 @@ allPlaces = [
             "low_emission_zone"
         ]
     },
-    "#F03EF6",
+    "#FB95FF",
     0.4,
     20,
-    ], 
+    ]
 ]
 
 import routing as rt
 
-rt.plot_filled_graph(allPlaces, (51.460498, -2.585757), 450, "walk", True, False)
+rt.plot_filled_graph(allPlaces, (51.460498, -2.585757), 450, "walk", True, True)
