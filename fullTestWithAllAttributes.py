@@ -114,7 +114,7 @@ allPlaces = [
             "low_emission_zone"
         ]
     },
-    "#F03EF6",
+    "#FB88FF",
     0.4,
     20,
     ], 

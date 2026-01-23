@@ -6,6 +6,8 @@ import geopandas as gpd
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
 import matplotlib as mlt
+from pyproj import Transformer
+import numpy as np
 
 def print_shortest_path_graph(graph : nx.MultiDiGraph, shortestPath : list, edgesCSVPath : str, savingFilePath : str = "mapping/graphs/shortestPathGraph.img"):
     '''
@@ -102,7 +104,7 @@ def create_nodes_table(nodes_gdf : gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     :type nodes_gdf: gpd.GeoDataFrame
     :return: The created nodes table
     :rtype: GeoDataFrame
-    '''#
+    '''
     nodes_table = nodes_gdf.reset_index()[[
         "osmid",
         "x",
@@ -223,6 +225,7 @@ def plot_blank_graph(coords : tuple, radius : int, travel_type : str, saveToFile
     )
     graph = ox.add_edge_speeds(graph)
     graph = ox.add_edge_travel_times(graph)
+    graph = ox.add_node_elevations_raster(graph, "bristol_raster.tif")
 
     fig, ax = get_figure_and_axes(graph)
     
@@ -247,3 +250,10 @@ def plot_filled_graph(features : list, coords : tuple, radius : int, travel_type
         fig.savefig(filePath, dpi=300)
 
     return graph
+
+def create_graphml(graph : nx.MultiDiGraph):
+    ox.save_graphml(graph, "bristol_elevation.graphml")
+
+if __name__ == "__main__":
+    graph = plot_blank_graph((51.460498, -2.585757), 450, "walk")
+    create_graphml(graph)

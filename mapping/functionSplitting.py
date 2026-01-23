@@ -19,7 +19,7 @@ def addDistanceToDrinkingPlace(edges_gdf : gpd.GeoDataFrame, coords : tuple) -> 
         tags={"amenity":[
                 "bar", "biergarten", "pub", "casino", "nightclub", "gambling"
             ]},
-        dist=450
+        dist=450,
     )
 
     edges_m = edges_gdf.to_crs(epsg=27700)
@@ -143,9 +143,9 @@ def find_edge_path(nodePath: list, edgeTablePath : str) -> list:
         i += 1
     return edgePath
 
-def edge_path_to_csv_rule(nodePath: list, edgeTablePath : str) -> list:
+def edge_path_to_csv_rule(nodePath : list, edgeTablePath : str) -> list:
     '''
-    Docstring for edge_path_to_csv_rule
+    Converts the path of nodes into the path of edges in the shortest route. Returns it in a way that can be queried with the CSV file
 
     :param nodePath: A path of nodes that a route follows
     :type nodePath: list
