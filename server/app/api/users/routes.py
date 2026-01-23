@@ -2,6 +2,7 @@
 
 from flask import Blueprint, request
 
+from app.api.responses import created, ok
 from app.schemas.user.user_read import UserReadSchema
 from app.schemas.user.user_register import UserRegisterSchema
 
@@ -15,7 +16,10 @@ def create_user_route_blueprint(register_user_uc, list_users_uc):
         payload = UserRegisterSchema().load(request.get_json())
         # Call use case to perform the logic
         result = register_user_uc.execute(payload)
-        return {"message": "User registered successfully", "data": result}, 201
+        return created(
+            data={"user_id": result.user_id},
+            meta={"created": True},
+        )
     
     @bp.route("/list", methods=["GET"])
     def list_users():
@@ -24,7 +28,9 @@ def create_user_route_blueprint(register_user_uc, list_users_uc):
 
         # Validate output with Schema
         data = UserReadSchema(many=True).dump(result.items)
-
-        return {"message": "Users retrieved successfully", "data": data}, 200
-
+        meta = {
+            "total": result.total,
+        }
+        return ok(data=data, meta=meta)
+    
     return bp
