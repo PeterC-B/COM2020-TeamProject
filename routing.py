@@ -1,16 +1,12 @@
 import graph_modification as oxl
-import file_reading as fle
 import osmnx as ox
-import pandas as pd
 import networkx as nx
 import geopandas as gpd
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
-import matplotlib as mlt
-from pyproj import Transformer
-import numpy as np
 
-def print_shortest_path_graph(graph : nx.MultiDiGraph, shortestPath : list, edgesCSVPath : str, savingFilePath : str = "mapping/graphs/shortestPathGraph.img"):
+
+def print_shortest_path_graph(graph : nx.MultiDiGraph, shortestPath : list, edgesCSVPath : str, savingFilePath : str = "graphs/png/shortestPathGraph.img"):
     '''
     Takes the shortest path (in-order by nodes) and saves a graph to a specified locaion with the shortest path highlighted.
     
@@ -181,7 +177,7 @@ def add_crime_rating(edges_gdf : gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     )
     return edges_gdf
 
-def plot_crime_graph(graph : nx.MultiDiGraph, filePath : str = "mapping/graphs/crimeGraph.img"):
+def plot_crime_graph(graph : nx.MultiDiGraph, filePath : str = "graphs/png/crimeGraph.img"):
     '''
     Uses an algorithm to calculate crime spread across a graph and saves the crime heatmap as a picture
     
@@ -202,7 +198,7 @@ def plot_crime_graph(graph : nx.MultiDiGraph, filePath : str = "mapping/graphs/c
     )
     fig.savefig(filePath, dpi=300)
 
-def plot_blank_graph(coords : tuple, radius : int, travel_type : str, saveToFile : bool = False, filePath : str = f"mapping/graphs/blank_graph.png") -> nx.MultiDiGraph:
+def plot_blank_graph(coords : tuple, radius : int, travel_type : str, saveToFile : bool = False, filePath : str = f"graphs/png/blank_graph.png") -> nx.MultiDiGraph:
     '''
     Create and saves the blank graph centered around coordinates from OSM with a designated radius
     
@@ -242,7 +238,7 @@ def plot_filled_graph(features : list, coords : tuple, radius : int, travel_type
     fig, ax = get_figure_and_axes(graph)
     
     for feature in features:
-        oxl.addFeatureToGraph(graph, ax, coords, feature)
+        oxl.add_feature_to_graph(graph, ax, coords, feature)
     
     if(incLegend):
         ax.legend()
