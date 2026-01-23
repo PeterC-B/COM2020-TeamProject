@@ -3,6 +3,7 @@
 from flask import Flask
 from flask_cors import CORS
 
+from app.api.error_handlers import register_error_handlers
 from app.api.users.routes import create_user_route_blueprint
 from app.config import Config
 from app.extensions import db, jwt, ma, migrate
@@ -51,5 +52,8 @@ def create_app():
 
     # Initialise the Routes
     app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc))
+
+    # Import error handlers
+    register_error_handlers(app)
 
     return app
