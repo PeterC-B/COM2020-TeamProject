@@ -18,16 +18,47 @@ from utils.response_utils import format_error
 health_bp = Blueprint("health", __name__)
 
 @health_bp.route("/health/attributes", methods=["GET"])
-# Return the list of attributes and descriptions
+# Return the list of attributes and their descriptions
 def get_attributes():
-    pass
+    attributes = {
+        name: {
+            "description": meta.get("description", ""),
+            "normalised": meta.get("normalise", False),
+        }
+        for name, meta in HS_ATTRIBUTES.items()
+    }
+
+    return jsonify({"attributes": attributes})
 
 @health_bp.route("/health/weights/defaults", methods=["GET"])
 # Return the default weight configuration
 def get_default_weights():
-    pass
+    return jsonify({"default_weights": DEFAULT_WEIGHTS})
 
 @health_bp.route("/health/explain", methods=["POST"])
-#Return a breakdown of how each attribute contributed to the cost
 def explain_edge_cost():
-    pass
+    """
+    Return a breakdown of how each attribute contributed to the cost
+    Expects JSON:
+        {
+            "edge_data": {...},
+            "weights": {...}
+        }
+    """
+    data = request.get_json()
+
+    if not data:
+        return format_error("Missing JSON body")
+    
+    edge_data = data.get("edge_data")
+    weights = data.get("weights")
+
+    if edge_data is None:
+        return format_error("Missing 'edge_data' field")
+    
+    if weights is None:
+        return format_error("Missing 'weights' field")
+    
+    breakdown = explain_cost(edge_data, weights)
+
+    return jsonify({"breakdown": breakdown})
