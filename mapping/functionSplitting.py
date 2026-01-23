@@ -42,7 +42,7 @@ def addDistanceToDrinkingPlace(edges_gdf : gpd.GeoDataFrame, coords : tuple) -> 
 
     return edges_gdf
 
-def addFeatureToGraph(graph : nx.MultiDiGraph, line, coords : tuple, feature : list, limit_amenities : bool = True):
+def addFeatureToGraph(graph : nx.MultiDiGraph, line, coords : tuple, feature : list, limit_amenities : bool = True) -> gpd.GeoDataFrame:
     '''
     Adds all features given to a graph of an area
     
@@ -55,6 +55,8 @@ def addFeatureToGraph(graph : nx.MultiDiGraph, line, coords : tuple, feature : l
     :type feature: list
     :param limit_amenities: Are we limiting the amount of POIs to 80?
     :type limit_amenities: bool
+    :return: The update GDF of the graph
+    :rtype: gpd.GeoDataFrame
     '''
     features = ox.features_from_point(
         center_point=coords,

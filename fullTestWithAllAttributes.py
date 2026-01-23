@@ -6,7 +6,7 @@ import matplotlib.colors as mcolors
 from JamesExampleStructure.backend.algorithms import dijkstra_algorithm as dijkstra
 from JamesExampleStructure.backend.algorithms import astar_algorithm as astar
 from JamesExampleStructure.backend.algorithms import yen_algorithm as yen
-import pandas as pd
+from routing import *
 
 
 COORDS = (51.460498, -2.585757) # Bristol
@@ -147,76 +147,6 @@ heuristic = astar.ehf(nodesDict, 13288882110)
 #distance, shortestPath = astar.astar(edgesDict, 104804, 13288882110, heuristic, trace=False)
 
 paths = yen.yens(edgesDict, 104804, 13288882110, 3)
-
-def print_shortest_path_graph(shortestPath, algorithm:str, yen_iteration=""):
-    edgePath = oxXL.edge_path_to_csv_rule(shortestPath, "edges_table.csv")
-    wholeEdgeCSV = pd.read_csv("edges_table.csv")
-
-    edges_temp = edges_gdf.copy()
-    nodes_temp = nodes_gdf.copy()
-
-    edges_temp["edge_colour"] = "#FFFFFF"
-    nodes_temp["node_colour"] = "#FFFFFF"
-    nodes_temp["node_size"] = 15
-    nodes_temp["node_alpha"] = 0.4
-    edges_temp["edge_alpha"] = 0.4
-
-    for u, v, k in edgePath:
-        edges_temp.loc[(u, v, k), "edge_colour"] = "#0000FF"
-        edges_temp.loc[(v, u, k), "edge_colour"] = "#0000FF"
-        edges_temp.loc[(u, v, k), "edge_alpha"] = 1
-        edges_temp.loc[(v, u, k), "edge_alpha"] = 1
-
-    osmid = shortestPath[0]
-
-    nodes_temp.loc[osmid, "node_colour"] = "#FF0000"
-    nodes_temp.loc[osmid, "node_size"] = 35
-    nodes_temp.loc[osmid, "node_alpha"] = 1
-
-    osmid = shortestPath[len(shortestPath)-1]
-    nodes_temp.loc[osmid, "node_colour"] = "#FF0000"
-    nodes_temp.loc[osmid, "node_size"] = 35
-    nodes_temp.loc[osmid, "node_alpha"] = 1
-
-
-    #edges_temp = edges_temp.reset_index()
-    routeGraph = ox.graph_from_gdfs(nodes_temp, edges_temp)
-
-    edge_colors = [
-        data.get("edge_colour", "#FFFFFF")
-        for _, _, _, data in routeGraph.edges(keys=True, data=True)
-    ]
-
-    edge_alphas = [
-        data.get("edge_alpha", "#FFFFFF")
-        for _, _, _, data in routeGraph.edges(keys=True, data=True)
-    ]
-
-    node_colors = [
-        data.get("node_colour", "#FFFFFF")
-        for _, data in routeGraph.nodes(data=True)
-    ]
-    node_sizes = [
-        data.get("node_size", 20)
-        for _, data in routeGraph.nodes(data=True)
-    ]
-    node_alphas = [
-        data.get("node_alpha", 1)
-        for _, data in routeGraph.nodes(data=True)
-    ]
-
-    fig1, ax1 = ox.plot_graph(
-        routeGraph,
-        edge_color=edge_colors,
-        node_color=node_colors,
-        node_size=node_sizes,
-        node_alpha=node_alphas,
-        edge_alpha=edge_alphas,
-        show=False,
-        close=False
-    )
-
-    fig1.savefig(f"mapping/graphs/{TOWN}/{TOWN.lower().replace(" ", "-")}_{algorithm.lower()}{yen_iteration}_route.png", dpi=300)
 
 
 for path in paths:
