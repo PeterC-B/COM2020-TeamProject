@@ -1,0 +1,8 @@
+# Python
+server/.venv/
+__pycache__/
+*.pyc
+
+
+# Vue (Node)
+client/node_modules/
