@@ -1,0 +1,1 @@
+# Holds pure domain logic for user entities
