@@ -102,16 +102,31 @@ allPlaces = [
     ]
 ]
 
-import JamesExampleStructure.backend.algorithms.dijkstra_algorithm as dijk
+#import server.app.domain.routing.yen_algorithm as yen
+#import server.app.domain.routing.astar_algorithm as astar
+#import server.app.domain.routing.dijkstra_algorithm as dijk
 import routing as rt
 import file_reading as fle
+import osmnx as ox
 
-#rt.plot_blank_graph((51.460498, -2.585757), 450, "walk", True)
-graph = rt.plot_filled_graph(allPlaces, (51.460498, -2.585757), 450, "walk", True, True)
+graph = rt.plot_blank_graph((51.460498, -2.585757), 450, "walk", True)
+#graph = rt.plot_filled_graph(allPlaces, (51.460498, -2.585757), 450, "walk", True, True)
 
-edges_dict = fle.edge_csv_to_dict("graphs/csv/edges_table.csv")
-distance, shortestRoute= dijk.dijkstra(edges_dict, 104804, 13288882110, trace=False)
+#edges_dict = fle.edge_csv_to_dict("graphs/csv/edges_table.csv")
+#distance, shortestRoute= dijk.dijkstra(edges_dict, 104804, 13288882110, trace=False)
 
-print(shortestRoute)
+#print(shortestRoute)
 
 #rt.print_shortest_path_graph(graph, shortestRoute, "graphs/csv/edges_table.csv")
+
+nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
+
+edges_export = edges_gdf.reset_index().copy()
+edges_export["geometry"] = edges_export.geometry.to_wkt()
+
+edges_export = edges_export[[
+    "u", "v", "key",
+    "geometry"
+]]
+
+edges_export.to_csv("edges_geometry.csv", index=False)
