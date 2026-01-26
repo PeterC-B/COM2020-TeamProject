@@ -6,7 +6,7 @@ import matplotlib.cm as cm
 import matplotlib.colors as mcolors
 
 
-def print_shortest_path_graph(graph : nx.MultiDiGraph, shortestPath : list, edgesCSVPath : str, savingFilePath : str = "graphs/png/shortestPathGraph.img"):
+def print_shortest_path_graph(graph : nx.MultiDiGraph, shortestPath : list, edgesCSVPath : str, savingFilePath : str = "graphs/png/shortestPathGraph.png"):
     '''
     Takes the shortest path (in-order by nodes) and saves a graph to a specified locaion with the shortest path highlighted.
     
@@ -20,7 +20,7 @@ def print_shortest_path_graph(graph : nx.MultiDiGraph, shortestPath : list, edge
     :type savingFilePath: str
     '''
     # Convert the graph to the GeoDataFrames and find the list of edges the shortest path takes
-    edges_gdf, nodes_gdf = ox.graph_to_gdfs(graph)
+    nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
     edgePath = oxl.edge_path_to_csv_rule(shortestPath, edgesCSVPath)
 
     # Copy the GDFs and set the standard colour of nodes and edges to white, and being a little transparent
@@ -177,7 +177,7 @@ def add_crime_rating(edges_gdf : gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     )
     return edges_gdf
 
-def plot_crime_graph(graph : nx.MultiDiGraph, filePath : str = "graphs/png/crimeGraph.img"):
+def plot_crime_graph(graph : nx.MultiDiGraph, filePath : str = "graphs/png/crimeGraph.png"):
     '''
     Uses an algorithm to calculate crime spread across a graph and saves the crime heatmap as a picture
     
@@ -222,7 +222,6 @@ def plot_blank_graph(coords : tuple, radius : int, travel_type : str, saveToFile
     )
     graph = ox.add_edge_speeds(graph)
     graph = ox.add_edge_travel_times(graph)
-    graph = ox.add_node_elevations_raster(graph, "bristol_raster.tif")
 
     fig, ax = get_figure_and_axes(graph)
     
@@ -233,7 +232,7 @@ def plot_blank_graph(coords : tuple, radius : int, travel_type : str, saveToFile
 def get_figure_and_axes(graph : nx.MultiDiGraph) -> tuple[Figure, Axes]:
     return ox.plot_graph(graph, show=False, close=False)
 
-def plot_filled_graph(features : list, coords : tuple, radius : int, travel_type : str, saveToFile : bool = False, incLegend : bool = False, filePath : str = f"mapping/graphs/filled_graph.png") -> nx.MultiDiGraph:
+def plot_filled_graph(features : list, coords : tuple, radius : int, travel_type : str, saveToFile : bool = False, incLegend : bool = False, filePath : str = f"graphs/png/filled_graph.png") -> nx.MultiDiGraph:
     graph = plot_blank_graph(coords, radius, travel_type)
     fig, ax = get_figure_and_axes(graph)
     
@@ -252,5 +251,6 @@ def create_graphml(graph : nx.MultiDiGraph):
     ox.save_graphml(graph, "bristol_elevation.graphml")
 
 if __name__ == "__main__":
-    graph = plot_blank_graph((51.460498, -2.585757), 450, "walk")
-    create_graphml(graph)
+    graph = plot_blank_graph((51.460498, -2.585757), 450, "walk", True)
+    path = [104804, 282237615, 19875363, 5906108608, 19875366, 104837, 5906030287, 262442708, 104838, 287226483, 3332266263, 287226495, 3696173720, 9464338656, 644926923, 5823455892, 3329881929, 6937982874, 1280853173, 1382252976, 247834407, 242756955, 17406787, 104859, 365559371, 13288882110]
+    print_shortest_path_graph(graph, path, "graphs/csv/edges_table.csv")
