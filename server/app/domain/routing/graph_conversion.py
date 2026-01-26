@@ -44,7 +44,7 @@ def create_edges_table(edges_gdf : gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
 def convert_to_algorithm_graph(osmnx_graph):
     """
-    Convert OSMnx grpah into adjacency dict for routing algorithms
+    Convert OSMnx graph into adjacency dict for routing algorithms
     
     Output format:
     {
