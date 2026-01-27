@@ -5,11 +5,23 @@ Visualisation Utilities:
     - Plot blank or feature-filled graphs for debugging/visualisation
 """
 
+import os
 import osmnx as ox
 import networkx as nx
 import geopandas as gpd
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
+
+
+# -------------------------------------------------------------------
+# Output directory for all generated graphs
+# -------------------------------------------------------------------
+
+GRAPH_DIR = "server/app/api/infrastructure/graphs"
+
+def ensure_graph_dir():
+    """Ensure the graph output directory exists."""
+    os.makedirs(GRAPH_DIR, exist_ok=True)
 
 
 # -------------------------------------------------------------------
@@ -75,12 +87,16 @@ def add_feature_to_graph(graph, ax, coords, feature):
 # Visualisation functions
 # -------------------------------------------------------------------
 
-def print_shortest_path_graph(graph: nx.MultiDiGraph,
-                              node_path: list,
-                              savingFilePath: str = "graphs/png/shortest_path.png"):
+def print_shortest_path_graph(
+    graph: nx.MultiDiGraph,
+    node_path: list,
+    savingFilePath: str = f"{GRAPH_DIR}/shortest_path.png"
+):
     """
     Plot a graph with the shortest path highlighted.
     """
+
+    ensure_graph_dir()
 
     nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
 
@@ -120,11 +136,15 @@ def print_shortest_path_graph(graph: nx.MultiDiGraph,
     fig.savefig(savingFilePath, dpi=300)
 
 
-def plot_crime_graph(graph: nx.MultiDiGraph,
-                     filePath: str = "graphs/png/crime_graph.png"):
+def plot_crime_graph(
+    graph: nx.MultiDiGraph,
+    filePath: str = f"{GRAPH_DIR}/crime_graph.png"
+):
     """
     Plot a crime heatmap based on access_score.
     """
+
+    ensure_graph_dir()
 
     nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
     edges_gdf = add_crime_rating(edges_gdf)
@@ -140,11 +160,13 @@ def plot_crime_graph(graph: nx.MultiDiGraph,
     fig.savefig(filePath, dpi=300)
 
 
-def plot_blank_graph(coords: tuple,
-                     radius: int,
-                     travel_type: str,
-                     saveToFile: bool = False,
-                     filePath: str = "graphs/png/blank_graph.png"):
+def plot_blank_graph(
+    coords: tuple,
+    radius: int,
+    travel_type: str,
+    saveToFile: bool = False,
+    filePath: str = f"{GRAPH_DIR}/blank_graph.png"
+):
     """
     Plot a blank graph for debugging.
     """
@@ -158,18 +180,21 @@ def plot_blank_graph(coords: tuple,
     fig, ax = ox.plot_graph(graph, show=False, close=False)
 
     if saveToFile:
+        ensure_graph_dir()
         fig.savefig(filePath, dpi=300)
 
     return graph
 
 
-def plot_filled_graph(features: list,
-                      coords: tuple,
-                      radius: int,
-                      travel_type: str,
-                      saveToFile: bool = False,
-                      incLegend: bool = False,
-                      filePath: str = "graphs/png/filled_graph.png"):
+def plot_filled_graph(
+    features: list,
+    coords: tuple,
+    radius: int,
+    travel_type: str,
+    saveToFile: bool = False,
+    incLegend: bool = False,
+    filePath: str = f"{GRAPH_DIR}/filled_graph.png"
+):
     """
     Plot a graph with features (POIs) added.
     """
@@ -184,6 +209,7 @@ def plot_filled_graph(features: list,
         ax.legend()
 
     if saveToFile:
+        ensure_graph_dir()
         fig.savefig(filePath, dpi=300)
 
     return graph

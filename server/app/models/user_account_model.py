@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy import UUID, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.extensions import db
+from server.app.extensions import db
 
 
 class UserAccountModel(db.Model):
