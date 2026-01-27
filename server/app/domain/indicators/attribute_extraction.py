@@ -10,7 +10,7 @@ Indicators extracted:
     - greenery (0–1)
     - pollution (0–1)
     - surface_quality (0–1)
-    - amenity_proximity (0–1, computed separately)
+    - amenity_proximity (0–1)
 """
 import geopandas as gpd
 import networkx as nx
