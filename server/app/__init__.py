@@ -3,14 +3,14 @@
 from flask import Flask
 from flask_cors import CORS
 
-from app.api.error_handlers import register_error_handlers
-from app.api.users.routes import create_user_route_blueprint
-from app.config import Config
-from app.extensions import db, jwt, ma, migrate
-from app.repositories.user_repository import UserRepository
-from app.unit_of_work.sqlalchemy_uow import SqlAlchemyUnitOfWork
-from app.use_cases.users.list_users import ListUsers
-from app.use_cases.users.register_user import RegisterUser
+from server.app.api.error_handlers import register_error_handlers
+from server.app.api.users.routes import create_user_route_blueprint
+from server.app.config import Config
+from server.app.extensions import db, jwt, ma, migrate
+from server.app.repositories.user_repository import UserRepository
+from server.app.unit_of_work.sqlalchemy_uow import SqlAlchemyUnitOfWork
+from server.app.use_cases.users.list_users import ListUsers
+from server.app.use_cases.users.register_user import RegisterUser
 
 
 def create_app():

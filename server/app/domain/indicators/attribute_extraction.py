@@ -135,27 +135,35 @@ def attach_edge_indicators(graph: nx.MultiDiGraph):
     return graph
 
 
+# Amenity Proximity (fixed for OSMnx 1.x)
+# -----------------------------
 def compute_amenity_proximity(graph, center_coords, search_radius=450):
     """
     Compute amenity proximity for each edge using spatial distance to nightlife amenities.
+    Works with OSMnx 1.x (edges GeoDataFrame uses MultiIndex: (u, v, key)).
     """
 
+    # Extract edges GeoDataFrame (MultiIndex: u, v, key)
     edges_gdf = ox.graph_to_gdfs(graph, nodes=False, edges=True)
 
+    # Fetch nightlife amenities
     amenities = ox.features_from_point(
         center_coords,
         tags={"amenity": ["bar", "pub", "nightclub", "casino", "biergarten", "gambling"]},
         dist=search_radius,
     )
 
+    # If no amenities found, assign default
     if amenities.empty:
         for _, _, _, data in graph.edges(keys=True, data=True):
             data["amenity_proximity"] = 0.2
         return graph
 
+    # Project to metric CRS
     edges_m = edges_gdf.to_crs(epsg=27700)
     amenities_m = amenities.to_crs(epsg=27700)
 
+    # Spatial join
     joined = gpd.sjoin_nearest(
         edges_m,
         amenities_m,
@@ -163,6 +171,7 @@ def compute_amenity_proximity(graph, center_coords, search_radius=450):
         distance_col="dist_to_amenity",
     )
 
+    # Decay function
     def decay(d):
         if d is None:
             return 0.2
@@ -172,10 +181,9 @@ def compute_amenity_proximity(graph, center_coords, search_radius=450):
 
     joined["amenity_proximity"] = joined["dist_to_amenity"].apply(decay)
 
-    for (_, row) in joined.iterrows():
-        u = row["u"]
-        v = row["v"]
-        key = row["key"]
+    # Assign back to graph
+    for idx, row in joined.iterrows():
+        u, v, key = idx  # MultiIndex unpack
         graph[u][v][key]["amenity_proximity"] = row["amenity_proximity"]
 
     return graph
