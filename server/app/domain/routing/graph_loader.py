@@ -18,9 +18,9 @@ import os
 import pickle
 import networkx as nx
 
-from .graph_cache import load_cached_graph, save_cached_graph
-from indicators.attribute_extraction import attach_edge_indicators
-from ..indicators.normalisation import normalise_graph_attributes
+from server.app.domain.routing.graph_cache import load_cached_graph, save_cached_graph
+from server.app.domain.indicators.attribute_extraction import attach_edge_indicators
+from server.app.domain.indicators.normalisation import normalise_graph_attributes
 
 
 PROCESSED_GRAPH_PATH = "server/data/processed/processed_graph.pkl"
@@ -48,7 +48,7 @@ def ensure_indicators(graph: nx.MultiDiGraph) -> nx.MultiDiGraph:
     Ensure indicator attributes exist on edges.
     If the preprocessed graph already contains them, this is a no-op.
     """
-    sample_u, sample_v, sample_k, sample_data = next(graph.edges(keys=True, data=True))
+    sample_u, sample_v, sample_k, sample_data = next(iter(graph.edges(keys=True, data=True)))
 
     required = {"lighting", "greenery", "pollution", "surface_quality", "amenity_proximity"}
 
@@ -63,7 +63,7 @@ def ensure_normalisation(graph: nx.MultiDiGraph) -> nx.MultiDiGraph:
     Ensure indicator values are normalised.
     If already normalised, this is a no-op.
     """
-    sample_u, sample_v, sample_k, sample_data = next(graph.edges(keys=True, data=True))
+    sample_u, sample_v, sample_k, sample_data = next(iter(graph.edges(keys=True, data=True)))
 
     if sample_data.get("lighting", None) is not None and 0 <= sample_data["lighting"] <= 1:
         return graph  # assume normalised
@@ -98,3 +98,14 @@ def build_routing_graph(use_cache=True) -> nx.MultiDiGraph:
         print("Routing graph cached for future use")
 
     return graph
+
+if __name__ == "__main__":
+    print("Loading graph...")
+    graph = load_graph_from_disk()
+    print("Adding indicators...")
+    graph = ensure_indicators(graph)
+    print("Ensuring normalisation...")
+    graph = ensure_normalisation(graph)
+    print("Saving cached graph...")
+    save_cached_graph(graph)
+    print("Complete...")

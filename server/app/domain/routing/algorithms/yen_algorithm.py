@@ -2,7 +2,7 @@ import heapq
 import copy
 from math import inf
 import networkx as nx
-from .dijkstra_algorithm import dijkstra
+from server.app.domain.routing.algorithms.dijkstra_algorithm import dijkstra
 
 
 def compute_path_cost(graph: nx.MultiDiGraph, path, cost_function):

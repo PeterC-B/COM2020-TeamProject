@@ -15,13 +15,13 @@ These endpoints:
 from flask import Blueprint, request, jsonify
 
 # Utilities
-from app.domain.routing.nearest_node import get_nearest_node
-from app.domain.routing.validate_coordinates import validate_coordinates
-from app.domain.scoring.weight_utils import validate_weights, apply_default_weights
-from app.api.utils.response_utils import format_route_response
+from server.app.domain.routing.nearest_node import get_nearest_node
+from server.app.domain.routing.validate_coordinates import validate_coordinates
+from server.app.domain.scoring.weight_utils import validate_weights, apply_default_weights
+from server.app.api.utils.response_utils import format_route_response
 
 # Error utilities
-from app.api.utils.error_utils import (
+from server.app.api.utils.error_utils import (
     missing_json_body,
     invalid_coordinates,
     invalid_weights,
@@ -32,13 +32,13 @@ from app.api.utils.error_utils import (
 )
 
 # Graph + cost
-from app.domain.routing.graph_cache import load_cached_graph
-from app.domain.scoring.cost_functions import healthy_cost
+from server.app.domain.routing.graph_cache import load_cached_graph
+from server.app.domain.scoring.cost_functions import healthy_cost
 
 # Algorithms
-from app.domain.routing.algorithms.dijkstra_algorithm import dijkstra
-from app.domain.routing.algorithms.astar_algorithm import astar
-from app.domain.routing.algorithms.yen_algorithm import yens
+from server.app.domain.routing.algorithms.dijkstra_algorithm import dijkstra
+from server.app.domain.routing.algorithms.astar_algorithm import astar
+from server.app.domain.routing.algorithms.yen_algorithm import yens
 
 
 routing_bp = Blueprint("routing", __name__)

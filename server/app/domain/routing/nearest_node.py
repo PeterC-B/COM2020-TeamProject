@@ -11,7 +11,7 @@ import networkx as nx
 from math import inf
 
 
-def get_nearest_node(graph: nx.MultiDiGraph, coords):
+def get_nearest_node(graph: nx.MultiDiGraph, coords: tuple):
     """
     Return the nearest graph node to the given (lat, lon) coordinates.
 
@@ -46,3 +46,8 @@ def get_nearest_node(graph: nx.MultiDiGraph, coords):
         raise ValueError("No nodes in graph contain coordinate data")
 
     return best_node
+
+if __name__ == "__main__":
+    from server.app.domain.routing.graph_loader import load_graph_from_disk
+    graph = load_graph_from_disk()
+    print(get_nearest_node(graph, (51.460498, -2.585757)))

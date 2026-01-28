@@ -12,9 +12,9 @@ These endpoints:
 
 from flask import Blueprint, request, jsonify
 
-from app.domain.scoring.cost_functions import HS_ATTRIBUTES, explain_cost
-from app.domain.scoring.weight_utils import DEFAULT_WEIGHTS, validate_weights
-from app.api.utils.error_utils import (
+from server.app.domain.scoring.cost_functions import HS_ATTRIBUTES, explain_cost
+from server.app.domain.scoring.weight_utils import DEFAULT_WEIGHTS, validate_weights
+from server.app.api.utils.error_utils import (
     missing_json_body,
     missing_field,
     invalid_weights,
