@@ -82,6 +82,84 @@ def add_feature_to_graph(graph, ax, coords, feature):
         markersize=feature[4],
     )
 
+def add_lighting_tag(graph, coords, distance) -> nx.MultiDiGraph:
+    nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
+
+    lit_graph = ox.features_from_point(
+        center_point=coords,
+        tags={
+            "highway": "street_lamp",
+            "lit": ["yes", "automatic", "limited", "interval", "24/7"],
+        },
+        dist=distance,
+    )
+
+    edges_proj = edges_gdf.to_crs(epsg=27700)
+    lit_proj = lit_graph.to_crs(epsg=27700)
+
+    lit_proj = lit_proj[["lit", "geometry"]]
+
+    joined = gpd.sjoin_nearest(
+        edges_proj,
+        lit_proj,
+        how="left",
+        max_distance=5,
+        distance_col="lamp_dist",
+    )
+
+    joined = (
+        joined
+        .reset_index()
+        .sort_values("lamp_dist")
+        .drop_duplicates(subset=["u", "v", "key"])
+        .set_index(["u", "v", "key"])
+    )
+
+    joined["lit"] = joined["lit"].fillna("no")
+
+    edges_gdf["lit"] = joined["lit"]
+
+    return ox.graph_from_gdfs(nodes_gdf, edges_gdf)
+
+
+def add_surface_tag(graph, coords, distance):
+    nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
+
+    surface_graph = ox.features_from_point(
+        center_point=coords,
+        tags={"surface": [
+            "paved", "asphalt", "concrete", "paving_stones",
+            "compacted", "fine_gravel", "gravel", "dirt",
+            "earth", "mud", "sand", "grass"
+        ]},
+        dist=distance,
+    )
+
+    edges_proj = edges_gdf.to_crs(epsg=27700)
+    surface_proj = surface_graph.to_crs(epsg=27700)
+
+    joined = gpd.sjoin_nearest(
+        edges_proj,
+        surface_proj[["surface", "geometry"]],
+        how="left",
+        distance_col="surface_dist"
+    )
+
+    joined = (
+        joined
+        .reset_index()
+        .sort_values("surface_dist")
+        .drop_duplicates(subset=["u", "v", "key"])
+        .set_index(["u", "v", "key"])
+    )
+
+    joined["surface"] = joined["surface"].fillna("unknown")
+
+    edges_gdf["surface"] = joined["surface"]
+
+    return ox.graph_from_gdfs(nodes_gdf, edges_gdf)
+
+
 
 # -------------------------------------------------------------------
 # Visualisation functions

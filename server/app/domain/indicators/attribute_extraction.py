@@ -23,16 +23,16 @@ def extract_lighting(edge_data):
     lit = edge_data.get("lit")
 
     if lit is None:
-        return 0.0
+        return 0.8
 
     lit = str(lit).lower()
 
-    if lit == "yes":
-        return 1.0
+    if lit == "true":
+        return 0.2
     if lit in {"limited", "interval", "automatic"}:
         return 0.5
 
-    return 0.0
+    return 0.8
 
 
 # Greenery
@@ -104,9 +104,13 @@ def extract_surface_quality(edge_data):
 
     surface = str(surface).lower()
 
-    good = {"paved", "asphalt", "concrete", "paving_stones"}
-    medium = {"compacted", "fine_gravel", "gravel"}
-    poor = {"dirt", "earth", "mud", "sand", "grass"}
+    #good = {"paved", "asphalt", "concrete", "paving_stones"}
+    #medium = {"compacted", "fine_gravel", "gravel"}
+    #poor = {"dirt", "earth", "mud", "sand", "grass"}
+
+    good = {"asphalt", "concrete"}
+    medium = {"paved"}
+    poor = {"paving_stones"}
 
     if surface in good:
         return 1.0
@@ -120,19 +124,20 @@ def extract_surface_quality(edge_data):
 
 # Main extraction function
 # -----------------------------
-def attach_edge_indicators(graph: nx.MultiDiGraph):
+def attach_edge_indicators(edges_gdf: gpd.GeoDataFrame):
     """
     Attach all Healthy Streets indicators to each edge.
     """
 
-    for _, _, _, data in graph.edges(keys=True, data=True):
-        data["distance"] = data.get("length", 1)
-        data["lighting"] = extract_lighting(data)
-        data["greenery"] = extract_greenery(data)
-        data["pollution"] = extract_pollution(data)
-        data["surface_quality"] = extract_surface_quality(data)
+    edges_gdf_copy = edges_gdf.copy()
 
-    return graph
+    edges_gdf_copy["distance"] = edges_gdf_copy["length"]
+    edges_gdf_copy["lighting"] = edges_gdf_copy.apply(extract_lighting, axis=1)
+    edges_gdf_copy["greenery"] = edges_gdf_copy.apply(extract_greenery, axis=1)
+    edges_gdf_copy["pollution"] = edges_gdf_copy.apply(extract_pollution, axis=1)
+    edges_gdf_copy["surface_quality"] = edges_gdf_copy.apply(extract_surface_quality, axis=1)
+
+    return edges_gdf_copy
 
 
 # Amenity Proximity (fixed for OSMnx 1.x)
@@ -187,3 +192,25 @@ def compute_amenity_proximity(graph, center_coords, search_radius=450):
         graph[u][v][key]["amenity_proximity"] = row["amenity_proximity"]
 
     return graph
+
+if __name__ == "__main__":
+    from server.scripts.visualisation.visualisation_utils import plot_blank_graph, add_lighting_tag, add_surface_tag
+    graph = plot_blank_graph((51.460498, -2.585757), 450, "walk")
+
+    graph = add_lighting_tag(graph, (51.460498, -2.585757), 450)
+    graph = add_surface_tag(graph, (51.460498, -2.585757), 450)
+    fig, ax = ox.plot_graph(graph, show=False, close=False, node_size=2)
+    fig.savefig("server/app/domain/indicators/graph.png", dpi=300)
+    nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
+    edges_gdf.to_csv("server/app/domain/indicators/surface.csv")
+    edges_gdf = attach_edge_indicators(edges_gdf)
+    edges_export = edges_gdf.copy().reset_index()
+    edges_export = edges_export[[
+        "u", "v", "key",
+        "distance",
+        "lighting",
+        "greenery",
+        "pollution",
+        "surface_quality",
+    ]]
+    edges_export.to_csv("server/app/domain/indicators/edges.csv")
