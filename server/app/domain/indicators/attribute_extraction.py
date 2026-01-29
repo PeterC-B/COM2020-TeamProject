@@ -29,8 +29,6 @@ def extract_lighting(edge_data):
 
     if lit == "true":
         return 0.2
-    if lit in {"limited", "interval", "automatic"}:
-        return 0.5
 
     return 0.8
 
