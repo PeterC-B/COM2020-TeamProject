@@ -7,7 +7,7 @@ from sqlalchemy import Enum as SQLEnum
 from enums.ACCESS_TYPE import UserAccessType
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.extensions import db
+from server.app.extensions import db
 
 
 class UserAccountModel(db.Model):

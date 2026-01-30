@@ -3,7 +3,7 @@
 import datetime
 from dataclasses import dataclass
 
-from app.models.user_account_model import UserAccountModel
+from server.app.models.user_account_model import UserAccountModel
 
 
 @dataclass(frozen=True)
