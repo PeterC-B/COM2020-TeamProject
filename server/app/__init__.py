@@ -36,7 +36,7 @@ def create_app():
     ma.init_app(app)
 
     # Register the models
-    from app.models import user_account_model
+    from server.app.models import user_account_model
 
     # Initialise the services
     session = db.session
