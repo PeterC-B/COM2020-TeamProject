@@ -28,7 +28,7 @@ def ensure_graph_dir():
 # Local visualisation-only helpers (kept out of backend logic)
 # -------------------------------------------------------------------
 
-def add_crime_rating(edges_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+def add_crime_rating(edges_gdf: gpd.GeoDataFrame, add_colours: bool = False) -> gpd.GeoDataFrame:
     """
     Convert access_score into a colour-coded crime heatmap.
     This is a visualisation-only helper.
@@ -44,15 +44,15 @@ def add_crime_rating(edges_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         elif d < 0.0304: return 0.4
         elif d < 0.0353: return 0.3
         elif d < 0.0402: return 0.2
-        elif d < 0.0451: return 0.1
-        else: return 0
+        else: return 0.1
 
     edges_gdf["score_band"] = edges_gdf["access_score"].fillna(0).apply(score_band)
 
-    cmap = cm.get_cmap("RdYlGn")
-    edges_gdf["edge_colour"] = edges_gdf["score_band"].apply(
-        lambda x: mcolors.to_hex(cmap(x))
-    )
+    if(add_colours):
+        cmap = cm.get_cmap("RdYlGn")
+        edges_gdf["edge_colour"] = edges_gdf["score_band"].apply(
+            lambda x: mcolors.to_hex(cmap(x))
+        )
 
     return edges_gdf
 
