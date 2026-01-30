@@ -111,11 +111,11 @@ def extract_surface_quality(edge_data):
     poor = {"paving_stones"}
 
     if surface in good:
-        return 1.0
+        return 0.9
     if surface in medium:
-        return 0.6
+        return 0.55
     if surface in poor:
-        return 0.2
+        return 0.1
 
     return 0.5
 
