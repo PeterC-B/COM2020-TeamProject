@@ -2,7 +2,7 @@
 from sqlalchemy import Float, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.extensions import db
+from server.app.extensions import db
 
 class NodesModel(db.Model):
     __tablename__= 'nodes'

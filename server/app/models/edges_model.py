@@ -2,7 +2,7 @@
 from sqlalchemy import Float, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.extensions import db
+from server.app.extensions import db
 
 class EdgesModel(db.Model):
     __tablename__ = "edges"

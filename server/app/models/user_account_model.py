@@ -4,7 +4,7 @@ from datetime import datetime
 
 from sqlalchemy import UUID, DateTime, String
 from sqlalchemy import Enum as SQLEnum
-from enums.ACCESS_TYPE import UserAccessType
+from server.app.models.enums.ACCESS_TYPE import UserAccessType
 from sqlalchemy.orm import Mapped, mapped_column
 
 from server.app.extensions import db
