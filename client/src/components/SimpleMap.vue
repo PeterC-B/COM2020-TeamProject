@@ -10,6 +10,7 @@ import {
 import maplibregl, { type LngLatBoundsLike, type Map } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { fetchEdges, fetchNodes } from '@/services/graph'
 
 const mapEl = ref<HTMLDivElement | null>(null)
 let map: Map | null = null
@@ -36,13 +37,6 @@ const layerToSelection: Record<(typeof selectableLayers)[number], 'node' | 'edge
     'edges-line': 'edge',
 }
 
-// Keep it loaded locally for now until the API is up and running.
-async function loadGeoJSON(path: string): Promise<GeoJson> {
-    const res = await fetch(path)
-    if (!res.ok) throw new Error(`Failed to load ${path}: ${res.status}`)
-    return (await res.json()) as GeoJson
-}
-
 function parseFeatureId(value: unknown): number | null {
     if (typeof value === 'number') return Number.isFinite(value) ? value : null
     if (typeof value === 'string') {
@@ -50,6 +44,17 @@ function parseFeatureId(value: unknown): number | null {
         return Number.isFinite(parsed) ? parsed : null
     }
     return null
+}
+
+function assertFeatureCollection(value: unknown, label: string): GeoJson {
+    if (!value || typeof value !== 'object') {
+        throw new Error(`Invalid ${label} GeoJSON response`)
+    }
+    const collection = value as GeoJSON.FeatureCollection
+    if (!Array.isArray(collection.features)) {
+        throw new Error(`Invalid ${label} GeoJSON features`)
+    }
+    return collection
 }
 
 // When the component is first mounted we will setup the map and pull in the data.
@@ -63,82 +68,86 @@ onMounted(() => {
 
     map.addControl(new maplibregl.NavigationControl(), 'top-right')
 
-    map.on('load', async () => {
+    map.on('load', () => {
         if (!map) return
-        try {
-            loading.value = true
-            error.value = null
+        loading.value = true
+        error.value = null
 
-            nodes.value = await loadGeoJSON('/data/maplibre/nodes.geojson')
-            edges.value = await loadGeoJSON('/data/maplibre/edges.geojson')
-
-            map.addSource('edges', {
-                type: 'geojson',
-                data: edges.value as GeoJSON.FeatureCollection,
-            })
-            map.addSource('nodes', {
-                type: 'geojson',
-                data: nodes.value as GeoJSON.FeatureCollection,
-            })
-
-            // Add all our layers
-            map.addLayer(EDGE_BASE_LAYER)
-            map.addLayer(EDGE_HIT_LAYER)
-            map.addLayer(EDGE_HIGHLIGHT_LAYER)
-            map.addLayer(NODE_BASE_LAYER)
-            map.addLayer(NODE_HIT_LAYER)
-            map.addLayer(NODE_HIGHLIGHT_LAYER)
-
-            // Click to select an edge or node; hit layers make selection forgiving.
-            map.on('click', (event) => {
+        Promise.all([fetchNodes(), fetchEdges()])
+            .then(([nodeData, edgeData]) => {
                 if (!map) return
-                const features = map.queryRenderedFeatures(event.point, {
-                    layers: selectableLayers as unknown as string[],
+                nodes.value = assertFeatureCollection(nodeData, 'nodes')
+                edges.value = assertFeatureCollection(edgeData, 'edges')
+
+                map.addSource('edges', {
+                    type: 'geojson',
+                    data: edges.value as GeoJSON.FeatureCollection,
                 })
-                if (!features.length) {
-                    selectedNodeId.value = null
-                    selectedEdgeId.value = null
-                    return
+                map.addSource('nodes', {
+                    type: 'geojson',
+                    data: nodes.value as GeoJSON.FeatureCollection,
+                })
+
+                // Add all our layers
+                map.addLayer(EDGE_BASE_LAYER)
+                map.addLayer(EDGE_HIT_LAYER)
+                map.addLayer(EDGE_HIGHLIGHT_LAYER)
+                map.addLayer(NODE_BASE_LAYER)
+                map.addLayer(NODE_HIT_LAYER)
+                map.addLayer(NODE_HIGHLIGHT_LAYER)
+
+                // Click to select an edge or node; hit layers make selection forgiving.
+                map.on('click', (event) => {
+                    if (!map) return
+                    const features = map.queryRenderedFeatures(event.point, {
+                        layers: selectableLayers as unknown as string[],
+                    })
+                    if (!features.length) {
+                        selectedNodeId.value = null
+                        selectedEdgeId.value = null
+                        return
+                    }
+                    const feature = features[0]
+                    const layerId = feature.layer.id as (typeof selectableLayers)[number]
+                    if (layerToSelection[layerId] === 'node') {
+                        selectedNodeId.value = parseFeatureId(feature.properties?.node_id)
+                        selectedEdgeId.value = null
+                        return
+                    }
+                    if (layerToSelection[layerId] === 'edge') {
+                        selectedEdgeId.value = parseFeatureId(feature.properties?.edge_id)
+                        selectedNodeId.value = null
+                    }
+                })
+
+                map.on('mousemove', (event) => {
+                    if (!map) return
+                    const features = map.queryRenderedFeatures(event.point, {
+                        layers: selectableLayers as unknown as string[],
+                    })
+                    map.getCanvas().style.cursor = features.length ? 'pointer' : ''
+                })
+
+                const bounds = new maplibregl.LngLatBounds()
+                const nodeFeatures = nodes.value.features
+                for (const feature of nodeFeatures) {
+                    if (feature.geometry.type !== 'Point') continue
+                    const [lng, lat] = feature.geometry.coordinates as [number, number]
+                    bounds.extend([lng, lat])
                 }
-                const feature = features[0]
-                const layerId = feature.layer.id as (typeof selectableLayers)[number]
-                if (layerToSelection[layerId] === 'node') {
-                    selectedNodeId.value = parseFeatureId(feature.properties?.node_id)
-                    selectedEdgeId.value = null
-                    return
-                }
-                if (layerToSelection[layerId] === 'edge') {
-                    selectedEdgeId.value = parseFeatureId(feature.properties?.edge_id)
-                    selectedNodeId.value = null
+                if (!bounds.isEmpty()) {
+                    map.fitBounds(bounds as LngLatBoundsLike, { padding: 24, maxZoom: 16 })
+                    // Keep the camera locked to the dataset so you don't pan out to the world.
+                    map.setMaxBounds(bounds as LngLatBoundsLike)
+                    map.setRenderWorldCopies(false)
                 }
             })
-
-            map.on('mousemove', (event) => {
-                if (!map) return
-                const features = map.queryRenderedFeatures(event.point, {
-                    layers: selectableLayers as unknown as string[],
-                })
-                map.getCanvas().style.cursor = features.length ? 'pointer' : ''
+            .catch((err) => {
+                error.value = err instanceof Error ? err.message : 'Failed to load GeoJSON'
             })
-
-            const bounds = new maplibregl.LngLatBounds()
-            const nodeFeatures = nodes.value.features
-            for (const feature of nodeFeatures) {
-                if (feature.geometry.type !== 'Point') continue
-                const [lng, lat] = feature.geometry.coordinates as [number, number]
-                bounds.extend([lng, lat])
-            }
-            if (!bounds.isEmpty()) {
-                map.fitBounds(bounds as LngLatBoundsLike, { padding: 24, maxZoom: 16 })
-                // Keep the camera locked to the dataset so you don't pan out to the world.
-                map.setMaxBounds(bounds as LngLatBoundsLike)
-                map.setRenderWorldCopies(false)
-            }
-        } catch (err) {
-            error.value = err instanceof Error ? err.message : 'Failed to load GeoJSON'
-        } finally {
-            loading.value = false
-        }
+            .finally(() => {
+                loading.value = false
+            })
     })
 })
 
