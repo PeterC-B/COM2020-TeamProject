@@ -5,6 +5,8 @@ Weight utilities:
     - Clamp values to valid ranges
 """
 
+import geopandas as gpd
+
 # Full set of supported indicators
 DEFAULT_WEIGHTS = {
     "distance": 1.0,
@@ -79,3 +81,37 @@ def apply_default_weights(weights=None):
         final[key] = val
 
     return final
+
+def calculate_safety_score(edge_data : gpd.GeoDataFrame, safety_priority : float):
+    lighting = edge_data.get("lighting")
+    return (1-safety_priority) * lighting
+
+def calculate_speed_score(edge_data : gpd.GeoDataFrame, speed_priority : float):
+    speed = edge_data.get("surface_quality") * 4.8
+    if(speed != 0):
+        return speed * (1-speed_priority)
+    return 999
+
+def calculate_greenery_score(edge_data : gpd.GeoDataFrame, greenery_priority):
+    greenery = edge_data.get("greenery")
+    pollution = edge_data.get("pollution")
+    return (1-greenery) * pollution * (1-greenery_priority)
+
+def calculate_weight(edge_data):
+    greenery_score = edge_data.get("greenery_score")
+    safety_score = edge_data.get("safety_score")
+    speed_score = edge_data.get("speed_score")
+    length = edge_data.get("length")
+
+    return length * (greenery_score + safety_score + speed_score)
+
+def calculate_weights(edges_gdf : gpd.GeoDataFrame, safety_priority : float, speed_priority : float, greenery_priority : float) -> gpd.GeoDataFrame:
+    edges_gdf_copy = edges_gdf.copy()
+
+    edges_gdf_copy["safety_score"] = edges_gdf_copy.apply(calculate_safety_score, axis=1, args=(safety_priority,))
+    edges_gdf_copy["speed_score"] = edges_gdf_copy.apply(calculate_speed_score, axis=1, args=(speed_priority,))
+    edges_gdf_copy["greenery_score"] = edges_gdf_copy.apply(calculate_greenery_score, axis=1, args=(greenery_priority,))
+
+    edges_gdf_copy["weight"] = edges_gdf_copy.apply(calculate_weight, axis=1)
+
+    edges_gdf_copy.to_csv("server/app/domain/scoring/test.csv")

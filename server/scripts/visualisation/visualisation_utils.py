@@ -103,7 +103,7 @@ def add_lighting_tag(graph, coords, distance) -> nx.MultiDiGraph:
         edges_proj,
         lit_proj,
         how="left",
-        max_distance=5,
+        max_distance=3,
         distance_col="lamp_dist",
     )
 

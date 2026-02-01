@@ -23,11 +23,11 @@ def extract_lighting(edge_data):
     lit = edge_data.get("lit")
 
     if lit is None:
-        return 0.8
+        return 0.9
 
     lit = str(lit).lower()
 
-    if lit == "true":
+    if lit == "yes":
         return 0.2
 
     return 0.8
@@ -111,13 +111,13 @@ def extract_surface_quality(edge_data):
     poor = {"paving_stones"}
 
     if surface in good:
-        return 0.9
-    if surface in medium:
-        return 0.55
-    if surface in poor:
         return 0.1
+    if surface in medium:
+        return 0.2
+    if surface in poor:
+        return 0.3
 
-    return 0.5
+    return 0.4
 
 
 # Main extraction function
@@ -202,6 +202,8 @@ if __name__ == "__main__":
     nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
     edges_gdf.to_csv("server/app/domain/indicators/surface.csv")
     edges_gdf = attach_edge_indicators(edges_gdf)
+    from server.app.domain.scoring.weight_utils import calculate_weights
+    calculate_weights(edges_gdf, 0.7, 0.3, 0.4)
     edges_export = edges_gdf.copy().reset_index()
     edges_export = edges_export[[
         "u", "v", "key",
