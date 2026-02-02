@@ -120,14 +120,8 @@
 ├── 📁 temp_folder
 │   └── 🐍 __init__.py
 ├── ⚙️ .gitignore
-├── 📝 README.md
-├── 📄 bristol_elevation.graphml
-├── 🐍 file_reading.py
-├── 🐍 graph_conversion.py
-├── 🐍 graph_modification.py
-├── 🐍 routing.py
-├── 🐍 sql_testing.py
-└── 🐍 testing.py
+└── 📝 README.md
+
 ```
 
 ---
