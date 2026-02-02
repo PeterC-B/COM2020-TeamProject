@@ -3,7 +3,7 @@
 
 from sqlalchemy import select
 
-from app.models.user_account_model import UserAccountModel
+from server.app.models.user_account_model import UserAccountModel
 
 
 class UserRepository:
