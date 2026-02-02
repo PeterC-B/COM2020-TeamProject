@@ -21,18 +21,26 @@ def compute_path_cost(graph: nx.MultiDiGraph, path, cost_function):
 
 def yens(graph: nx.MultiDiGraph, source, target, k_paths, cost_function, trace=False):
     """
-    Yen's K-shortest loopless paths algorithm for MultiDiGraph.
+    Compute the K shortest loopless paths between two nodes in a NetworkX MultiDiGraph
+    using Yen's algorithm
 
-    Parameters:
-        graph: NetworkX MultiDiGraph
-        source: start node
-        target: goal node
-        k_paths: number of paths to return
-        cost_function: function(edge_data) -> cost
-        trace: enable debug logging
+    This implementation generates k simple (cycle-free) paths in increasing order
+    of total cost. It relies on Dijkstra's algorithm to compute spur paths and
+    supports multigraphs with parallel directed edges. Edge weights are derived
+    from the cost function
+
+    :type graph: nx.MultiDiGraph: the directed multigraph to search
+    :param source: the starting node for the search
+    :param target: the goal node to reach
+    :param k_paths: the number of shrotest loopless paths to return
+    :param cost_function: a function that accepts a single edge attribute dictionary
+    and returns the traversal cost for that edge
+    :param trace: when true prints debug outputs
 
     Returns:
-        List of paths (each path is a list of nodes)
+        list of lists
+            A list of up to "k_paths" shortest loopless paths. Each path is a list of
+            nodes from "source" to "target".
     """
 
     def log(msg):

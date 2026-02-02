@@ -5,17 +5,26 @@ import networkx as nx
 
 def dijkstra(graph: nx.MultiDiGraph, source, target, cost_function, trace=False):
     """
-    Dijkstra's algorithm on a NetworkX MultiDiGraph.
+    Computes the shortest path between two nodes in a NetworkX MultiDiGraph
+    using Dijkstra's algorithm
 
-    Parameters:
-        graph: MultiDiGraph with edge attributes
-        source: start node
-        target: goal node
-        cost_function: function(edge_data) -> cost
-        trace: enable debug logging
+    This implementation supports multigraphs with multiple directed edges
+    between nodes and allows for use of edge weights to be derived from arbitrary
+    attributes via the cost function
+    
+    :type graph: nx.MultiDiGraph: the directed multigraph to search
+    :param source: the starting node for the search
+    :param target: the goal node to reach
+    :param cost_function: a function that accepts a single edge attribute dictionary
+    and returns the traversal cost for that edge
+    :param trace: when true prints debug outputs
 
     Returns:
-        (distance, path)
+    tuple
+        A pair (distance, path) where:
+            - "distance" is the total cost of the shortest path
+            - "path" is a list of nodes representing the shortest route between
+              source and target.
     """
 
     pq = [(0, source)]
