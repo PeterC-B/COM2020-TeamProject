@@ -1,4 +1,4 @@
-import heapq
+'''import heapq
 from math import inf
 import networkx as nx
 
@@ -73,4 +73,4 @@ def astar(graph: nx.MultiDiGraph, source, target, cost_function, heuristic_funct
 
                 heapq.heappush(pq, (new_f_score, neighbour))
 
-    return inf, []
+    return inf, []'''
