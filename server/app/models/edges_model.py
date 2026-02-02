@@ -1,6 +1,7 @@
 # ORM model representation of a user in the database
 from sqlalchemy import Float, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from server.app.models.nodes_model import NodesModel
 
 from server.app.extensions import db
 
