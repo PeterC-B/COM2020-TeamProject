@@ -1,8 +1,7 @@
 import uuid
 
-from sqlalchemy import UUID, String, ForeignKey, Integer
+from sqlalchemy import UUID, ForeignKey, Integer
 from sqlalchemy import Enum as SQLEnum
-from server.app.models.enums.MISSION_TIER import MissionTier
 from server.app.models.missions_model import MissionsModel
 from server.app.models.user_account_model import UserAccountModel
 from server.app.models.enums.MISSION_STATUS import MissionStatus

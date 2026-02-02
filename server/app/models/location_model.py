@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Float, Integer, UUID, String, ForeignKey
+from sqlalchemy import UUID, String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from server.app.models.nodes_model import NodesModel
 from server.app.extensions import db
