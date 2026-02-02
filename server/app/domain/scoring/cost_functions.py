@@ -14,7 +14,7 @@ from server.app.domain.indicators.normalisation import normalise_edge_attributes
 HS_ATTRIBUTES = {
     "distance": {
         "description": "Length of the edge in meters",
-        "default": None,
+        "default": 0.0,
         "normalise": False
     },
     "lighting": {
