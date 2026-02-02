@@ -6,6 +6,9 @@ from server.app.models.nodes_model import NodesModel
 from server.app.extensions import db
 
 class EdgesModel(db.Model):
+    '''
+    Docstring for EdgesModel
+    '''
     __tablename__ = "edges"
 
     edge_id: Mapped[int] = mapped_column(Integer(), nullable=False, primary_key=True)
