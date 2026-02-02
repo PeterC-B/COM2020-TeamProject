@@ -203,7 +203,7 @@ if __name__ == "__main__":
     edges_gdf.to_csv("server/app/domain/indicators/surface.csv")
     edges_gdf = attach_edge_indicators(edges_gdf)
     from server.app.domain.scoring.weight_utils import calculate_weights
-    calculate_weights(edges_gdf, 0.7, 0.3, 0.4)
+    calculate_weights(edges_gdf, 0.3, 0.5, 0.9)
     edges_export = edges_gdf.copy().reset_index()
     edges_export = edges_export[[
         "u", "v", "key",
