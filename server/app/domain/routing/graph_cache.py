@@ -1,46 +1,73 @@
 """
-Graph cache:
-    - Save processed graphs to disk
-    - Load cached graphs to avoid reprocessing
-    - Handle versioning if attributes change
+Graph Cache
+-----------
+
+Caches the fully processed routing graph (NetworkX MultiDiGraph)
+to avoid expensive reloads during runtime.
+
+This cache is used by graph_loader.py, not by the preprocessor.
 """
+
 import os
 import pickle
+import networkx as nx
 
-cache_path = "data/processed_graph.pkl"
 
-# Return true if a cached graph file exists
-def cache_exists():
-    return os.path.exists(cache_path)
+CACHE_PATH = "server/data/processed/routing_graph_cache.pkl"
+CACHE_VERSION = "v1"   # bump this if indicators or scoring change
 
-def load_cached_graph() -> bool:
+
+def cache_exists() -> bool:
+    """Return True if a cached graph file exists."""
+    return os.path.exists(CACHE_PATH)
+
+
+def load_cached_graph():
     """
-    Load processed graph from disk if available
+    Load cached routing graph from disk.
+
     Returns:
-        - the cached graph (adjacency dict)
-        - None if no cache exists or loading fails
+        - NetworkX MultiDiGraph if cache is valid
+        - None if cache missing or invalid
     """
     if not cache_exists():
         return None
-    
+
     try:
-        with open(cache_path, "rb") as f:
-            graph = pickle.load(f)
+        with open(CACHE_PATH, "rb") as f:
+            payload = pickle.load(f)
+
+        # Validate structure
+        if payload.get("version") != CACHE_VERSION:
+            return None
+
+        graph = payload.get("graph")
+        if not isinstance(graph, nx.MultiDiGraph):
+            return None
+
         return graph
+
     except Exception as e:
         print(f"Failed to load cached graph: {e}")
         return None
 
-# Save processed graph from disk
-def save_cached_graph(graph):
-    # Ensure directiory exists
-    os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+
+def save_cached_graph(graph: nx.MultiDiGraph):
+    """
+    Save routing graph to disk.
+    """
+    os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
 
     try:
-        with open(cache_path, "wb") as f:
-            pickle.dump(graph, f)
-        print("Processed graph saved to cache")
+        payload = {
+            "version": CACHE_VERSION,
+            "graph": graph
+        }
+
+        with open(CACHE_PATH, "wb") as f:
+            pickle.dump(payload, f)
+
+        print("Routing graph saved to cache")
+
     except Exception as e:
         print(f"Failed to save cached graph: {e}")
-
-

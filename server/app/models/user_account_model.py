@@ -3,17 +3,20 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import UUID, DateTime, String
+from sqlalchemy import Enum as SQLEnum
+from server.app.models.enums.ACCESS_TYPE import UserAccessType
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.extensions import db
+from server.app.extensions import db
 
 
 class UserAccountModel(db.Model):
     __tablename__ = 'user_account'
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    first_name: Mapped[str] = mapped_column(String(50), nullable=False)
-    last_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    username: Mapped[str] = mapped_column(String(50), nullable=False)
+    email: Mapped[str] = mapped_column(String(50), nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    created_at: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
+    role: Mapped[UserAccessType] = mapped_column(SQLEnum(UserAccessType), nullable=False, default=UserAccessType.TRAVELLERS)
+    created_at: Mapped[datetime] = mapped_column(DateTime(), nullable=False, default=datetime.now)
