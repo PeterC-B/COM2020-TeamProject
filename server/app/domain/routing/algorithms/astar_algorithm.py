@@ -5,18 +5,28 @@ import networkx as nx
 
 def astar(graph: nx.MultiDiGraph, source, target, cost_function, heuristic_function, trace=False):
     """
-    A* search on a NetworkX MultiDiGraph.
+    Performs an A* search on a NetworkX MultiDiGraph
 
-    Parameters:
-        graph: MultiDiGraph with edge attributes
-        source: start node
-        target: goal node
-        cost_function: function(edge_data) -> cost
-        heuristic_function: function(node) -> estimated cost to goal
-        trace: enable debug logging
+    This implementation computes the lowest_cost path from a start node to a
+    target node using pre-defined cost and heuristic functions. It supports
+    graphs with mutiple directed edges between nodes and allows for edge weights
+    to be derived from arbitrary attributes.
+    
+    :type graph: nx.MultiDiGraph : the directed multigraph to search
+    :param source: the starting node for the search
+    :param target: the goal node to reach
+    :param cost_function: a function that accepts a single edge attribute dictionary
+    and returns the traversal cost for that edge
+    :param heuristic_function: a function that accepts a node and returns a heuristic estimate
+    of the remaining cost to the target
+    :param trace: when true prints debug outputs
 
     Returns:
-        (distance, path)
+    tuple
+        A pair (distance, path) where:
+            - "distance" is the total cost of the optimal path
+            - "path" is a list of nodes representing the optimal route between
+              source and target.
     """
 
     pq = [(0, source)]
