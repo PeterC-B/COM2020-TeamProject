@@ -1,9 +1,11 @@
 import { post } from '@/services/api'
 
+const BASE_PATH = '/route'
+
 export const ROUTE_ENDPOINTS = {
-    dijkstra: '/route/dijkstra',
-    astar: '/route/astar',
-    yens: '/route/yens',
+    dijkstra: `${BASE_PATH}/dijkstra`,
+    astar: `${BASE_PATH}/astar`,
+    yens: `${BASE_PATH}/yens`,
 } as const
 
 export type RouteRequest = {
