@@ -1,8 +1,8 @@
 from flask import request
 from werkzeug.exceptions import HTTPException
 
-from app.api.responses import error
-from app.domain.errors import (
+from server.app.api.responses import error
+from server.app.domain.errors import (
     AppError,
     AuthError,
     ConflictError,
