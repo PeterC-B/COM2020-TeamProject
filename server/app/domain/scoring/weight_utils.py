@@ -92,12 +92,12 @@ def calculate_speed_score(edge_data : gpd.GeoDataFrame, speed_priority : float):
         return speed * (1-speed_priority)
     return 999
 
-def calculate_greenery_score(edge_data : gpd.GeoDataFrame, greenery_priority):
+def calculate_greenery_score(edge_data : gpd.GeoDataFrame, greenery_priority : float):
     greenery = edge_data.get("greenery")
     pollution = edge_data.get("pollution")
     return (1-greenery) * pollution * (1-greenery_priority)
 
-def calculate_weight(edge_data):
+def calculate_weight(edge_data : gpd.GeoDataFrame):
     greenery_score = edge_data.get("greenery_score")
     safety_score = edge_data.get("safety_score")
     speed_score = edge_data.get("speed_score")
