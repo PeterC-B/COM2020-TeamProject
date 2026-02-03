@@ -19,20 +19,28 @@ def compute_path_cost(graph: nx.MultiDiGraph, path, cost_function):
     return total
 
 
-def yens(graph: nx.MultiDiGraph, source, target, k_paths, cost_function, trace=False):
+def yens_old(graph: nx.MultiDiGraph, source, target, k_paths, cost_function, trace=False):
     """
-    Yen's K-shortest loopless paths algorithm for MultiDiGraph.
+    Compute the K shortest loopless paths between two nodes in a NetworkX MultiDiGraph
+    using Yen's algorithm
 
-    Parameters:
-        graph: NetworkX MultiDiGraph
-        source: start node
-        target: goal node
-        k_paths: number of paths to return
-        cost_function: function(edge_data) -> cost
-        trace: enable debug logging
+    This implementation generates k simple (cycle-free) paths in increasing order
+    of total cost. It relies on Dijkstra's algorithm to compute spur paths and
+    supports multigraphs with parallel directed edges. Edge weights are derived
+    from the cost function
+
+    :type graph: nx.MultiDiGraph: the directed multigraph to search
+    :param source: the starting node for the search
+    :param target: the goal node to reach
+    :param k_paths: the number of shrotest loopless paths to return
+    :param cost_function: a function that accepts a single edge attribute dictionary
+    and returns the traversal cost for that edge
+    :param trace: when true prints debug outputs
 
     Returns:
-        List of paths (each path is a list of nodes)
+        list of lists
+            A list of up to "k_paths" shortest loopless paths. Each path is a list of
+            nodes from "source" to "target".
     """
 
     def log(msg):
@@ -94,5 +102,98 @@ def yens(graph: nx.MultiDiGraph, source, target, k_paths, cost_function, trace=F
         _, next_path = heapq.heappop(candidate_paths)
         shortest_paths.append(next_path)
         log(f"[P{k+1}] Next shortest path: {next_path}")
+
+    return shortest_paths
+
+
+def compute_path_length(graph, path):   # helper
+    total = 0
+    for from_node, to_node in zip(path, path[1:]):
+        total += graph[from_node][to_node]
+    return total
+
+# Yen's K-shortest loopless paths
+def yens(graph, source, target, k_paths = 3, trace=False):
+    original_graph = copy.deepcopy(graph)
+
+    def log(msg):
+        if trace:
+            print(msg)
+
+    log(f"[START] Yen's Algorithm from {source} to {target}, K = {k_paths}")
+
+    # First shortest path
+    initDist, initPath = dijkstra(graph, source, target, trace=trace)
+    if not initPath:
+        log("[FAIL] No initial shortest path found")
+        return []
+
+    shortest_paths = [initPath]
+    candidate_paths = []             
+
+    log(f"[P1] First shortest path: {initPath}")
+
+    # Generate K-1 additional paths
+    for path_index in range(1, k_paths):
+        log(f"\n[ITERATION] path_index = {path_index}")
+        prev_path = shortest_paths[path_index - 1]
+
+        # Spur each node in the previous path
+        for spur_index in range(len(prev_path) - 1):
+            spur_node = prev_path[spur_index]
+            root_path = prev_path[:spur_index + 1]
+
+            log(f"\n[SPUR] spur_index = {spur_index}, spur_node = {spur_node}, root_path = {root_path}")
+
+            removed_edges = []
+            removed_nodes = set()
+
+            # Remove edges that recreate previous paths
+            for existing_path in shortest_paths:
+                if len(existing_path) > spur_index and existing_path[:spur_index + 1] == root_path:
+                    from_node = existing_path[spur_index]
+                    to_node = existing_path[spur_index + 1]
+                    if to_node in graph.get(from_node, {}):
+                        log(f"  [REMOVE EDGE] {from_node} -> {to_node}")
+                        removed_edges.append((from_node, to_node, graph[from_node][to_node]))
+                        del graph[from_node][to_node]
+
+            # Remove root-path nodes except spur node
+            for root_node in root_path[:-1]:
+                if root_node in graph:
+                    log(f"  [REMOVE NODE] {root_node}")
+                    removed_nodes.add(root_node)
+                    for neighbor, weight in list(graph[root_node].items()):
+                        removed_edges.append((root_node, neighbor, weight))
+                    del graph[root_node]
+
+            # Run Dijkstra from spur node
+            spur_dist, spur_path = dijkstra(graph, spur_node, target, trace=trace)
+
+            if spur_path:
+                total_path = root_path[:-1] + spur_path
+                total_dist = compute_path_length(original_graph, total_path)
+                log(f"  [CANDIDATE] path = {total_path}, distance = {total_dist}")
+                heapq.heappush(candidate_paths, (total_dist, total_path))
+            else:
+                log("  [NO SPUR PATH]")
+
+            # Restore graph
+            for from_node, to_node, weight in removed_edges:
+                if from_node not in graph:
+                    graph[from_node] = {}
+                graph[from_node][to_node] = weight
+
+            for node in removed_nodes:
+                if node not in graph:
+                    graph[node] = {}
+
+        if not candidate_paths:
+            log("[END] No more candidate paths")
+            break
+
+        next_dist, next_path = heapq.heappop(candidate_paths)
+        log(f"[P{path_index+1}] Next shortest path: {next_path}")
+        shortest_paths.append(next_path)
 
     return shortest_paths

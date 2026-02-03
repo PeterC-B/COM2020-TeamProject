@@ -1,14 +1,19 @@
 # ORM model representation of a user in the database
 from sqlalchemy import Float, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from server.app.models.nodes_model import NodesModel
 
 from server.app.extensions import db
 
 class EdgesModel(db.Model):
+    '''
+    Docstring for EdgesModel
+    '''
     __tablename__ = "edges"
 
     edge_id: Mapped[int] = mapped_column(Integer(), nullable=False, primary_key=True)
     from_node_id: Mapped[int] = mapped_column(ForeignKey("nodes.node_id"), nullable=False)
+
     to_node_id: Mapped[int] = mapped_column(ForeignKey("nodes.node_id"), nullable=False)
     from_node: Mapped["NodesModel"] = relationship("NodesModel", foreign_keys=[from_node_id])
     to_node: Mapped["NodesModel"] = relationship("NodesModel", foreign_keys=[to_node_id])
