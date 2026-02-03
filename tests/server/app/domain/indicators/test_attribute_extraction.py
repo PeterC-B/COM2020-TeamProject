@@ -55,7 +55,7 @@ def test_compute_amenity_proximity_with_amenities(monkeypatch, small_graph):
     edges_gdf = gpd.GeoDataFrame(data, index=idx, crs="EPSG:4326")
 
     # Mock ox.graph_to_gdfs to return nodes, edges
-    monkeypatch.setattr(ae.ox, "graph_to_gdfs", lambda G, nodes=True, edges=True: (None, edges_gdf))
+    monkeypatch.setattr(ae.ox, "graph_to_gdfs", lambda G, nodes=False, edges=True: edges_gdf)
 
     # Mock features_from_point to return a GeoDataFrame with one amenity point
     amenities = gpd.GeoDataFrame({"geometry":[Point(0.5,0.5)]}, crs="EPSG:4326")
