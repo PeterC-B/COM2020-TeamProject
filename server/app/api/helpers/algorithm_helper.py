@@ -33,11 +33,15 @@ def nodes_csv_to_gdf(csv_path: str = "client/public/nodes_table.csv", crs="EPSG:
         Point(xy) for xy in zip(df["x"], df["y"])
     ]
 
+    node_id_col = "node_id"
+
     gdf = gpd.GeoDataFrame(
         df,
         geometry=geometry,
         crs=crs
     )
+
+    gdf = gdf.set_index(node_id_col)
 
     return gdf
 
@@ -52,16 +56,17 @@ def edges_csv_to_gdf(
 
     geom_df["geometry"] = geom_df["geometry"].apply(wkt.loads)
 
-    gdf = gpd.GeoDataFrame(
-        edges_df.merge(
-            geom_df,
-            left_on=["from_node", "to_node", "key"],
-            right_on=["u", "v", "key"],
-            how="inner"
-        ),
-        geometry="geometry",
-        crs=crs
+    gdf = edges_df.merge(
+        geom_df,
+        left_on=["from_node", "to_node", "key"],
+        right_on=["u", "v", "key"],
+        how="inner"
     )
+
+    gdf = gdf.drop(columns=["from_node", "to_node", "edge_id"])
+
+    gdf = gpd.GeoDataFrame(gdf, geometry="geometry", crs=crs)
+    gdf = gdf.set_index(["u","v","key"])
 
     return gdf
 
