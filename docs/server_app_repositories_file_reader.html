@@ -1,0 +1,110 @@
+<html><head>
+<title>server.app.repositories.file_reader</title>
+<style>
+
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .navbar { background: #333; padding: 10px; }
+        .navbar a { color: white; margin-right: 15px; text-decoration: none; }
+        .navbar a:hover { text-decoration: underline; }
+        h1 { color: #333; }
+        pre { background: #f4f4f4; padding: 10px; white-space: pre-wrap; }
+    
+</style>
+</head><body>
+<div class="navbar">
+<a href="index.html">Home</a>
+<a href="server_app.html">server.app</a>
+<a href="server_app_api.html">server.app.api</a>
+<a href="server_app_api_blueprints.html">server.app.api.blueprints</a>
+<a href="server_app_api_error_handlers.html">server.app.api.error_handlers</a>
+<a href="server_app_api_responses.html">server.app.api.responses</a>
+<a href="server_app_api_users.html">server.app.api.users</a>
+<a href="server_app_api_users_routes.html">server.app.api.users.routes</a>
+<a href="server_app_config.html">server.app.config</a>
+<a href="server_app_domain.html">server.app.domain</a>
+<a href="server_app_domain_errors.html">server.app.domain.errors</a>
+<a href="server_app_domain_user.html">server.app.domain.user</a>
+<a href="server_app_extensions.html">server.app.extensions</a>
+<a href="server_app_models.html">server.app.models</a>
+<a href="server_app_models_Base.html">server.app.models.Base</a>
+<a href="server_app_models_edges_model.html">server.app.models.edges_model</a>
+<a href="server_app_models_location_model.html">server.app.models.location_model</a>
+<a href="server_app_models_mission_progress_model.html">server.app.models.mission_progress_model</a>
+<a href="server_app_models_missions_model.html">server.app.models.missions_model</a>
+<a href="server_app_models_nodes_model.html">server.app.models.nodes_model</a>
+<a href="server_app_models_user_account_model.html">server.app.models.user_account_model</a>
+<a href="server_app_repositories.html">server.app.repositories</a>
+<a href="server_app_repositories_file_reader.html">server.app.repositories.file_reader</a>
+<a href="server_app_repositories_user_repository.html">server.app.repositories.user_repository</a>
+<a href="server_app_unit_of_work.html">server.app.unit_of_work</a>
+<a href="server_app_unit_of_work_sqlalchemy_uow.html">server.app.unit_of_work.sqlalchemy_uow</a>
+<a href="server_app_use_cases.html">server.app.use_cases</a>
+<a href="server_app_use_cases_users.html">server.app.use_cases.users</a>
+<a href="server_app_use_cases_users_get_user.html">server.app.use_cases.users.get_user</a>
+<a href="server_app_use_cases_users_list_users.html">server.app.use_cases.users.list_users</a>
+<a href="server_app_use_cases_users_register_user.html">server.app.use_cases.users.register_user</a>
+<a href="server_app_use_cases_users_update_user.html">server.app.use_cases.users.update_user</a>
+<a href="server_run.html">server.run</a>
+</div>
+<h1>Module: server.app.repositories.file_reader</h1>
+<h2>Module Docstring</h2>
+<pre>File Reading Utilities:
+    - Load edge lists from CSV
+    - Load node coordinate lists from CSV
+    - Convert node paths to edge paths using CSV tables
+    - Compute distance from CSV-based graphs
+
+These functions are useful for:
+    - Testing algorithms without OSMnx
+    - Loading custom graph datasets</pre>
+<h2>Functions</h2>
+<h3>calculate_distance_from_node_path</h3>
+<pre>No docstring</pre>
+<h3>edge_csv_to_dict</h3>
+<pre>Convert an edges CSV file into an adjacency dictionary
+
+Expected CSV columns:
+    - from_node
+    - to_node
+    - length
+
+Returns:
+    {
+        from_node: {to_node: length,...
+        },
+        ...
+    }</pre>
+<h3>edge_path_to_csv_rule</h3>
+<pre>Converts the path of nodes into the path of edges in the shortest route. Returns it in a way that can be queried with the CSV file
+
+:param nodePath: A path of nodes that a route follows
+:type nodePath: list
+:param edgeTablePath: The filepath for the csv file that contains all edge information
+:type edgeTablePath: str
+:return: A list containing a path of edges that the route follows in the format that the csv file can be queried with
+:rtype: list</pre>
+<h3>find_edge_path</h3>
+<pre>Converts the path of nodes that a route follows into a path of the edges it follows
+
+:param nodePath: A path of nodes that a route follows
+:type nodePath: list
+:param edgeTablePath: The filepath for the csv file that contains all edge information
+:type edgeTablePath: str
+:return: A list containing a path of edges that the route follows in a readable format
+:rtype: list</pre>
+<h3>node_csv_to_dict</h3>
+<pre>Converts a nodes CSV file into a dictionary mapping node_id -&gt; (x, y)
+
+Expected CSV columns:
+    - node_id
+    - x
+    - y
+
+Returns:
+{
+    node_id: (x, y),
+    ...
+}</pre>
+<h2>Classes</h2>
+<p>No classes found.</p>
+</body></html>
