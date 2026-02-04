@@ -62,6 +62,14 @@ def run_route_algorithm():
     return jsonify(route_geojson)
     
 
+@route_bp.route("/map", methods=["GET"])
+def load_edges_and_nodes():
+    all_features = {
+        "nodes" : nodes_geojson,
+        "edges" : edges_geojson
+    }
+    return jsonify({"features" : all_features})
+
 def edges_to_json(edge_list : list):
     import json
     with open(JSON_PATH, 'w') as f:
