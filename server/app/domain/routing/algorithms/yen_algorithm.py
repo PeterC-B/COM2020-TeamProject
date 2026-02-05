@@ -109,7 +109,8 @@ def yens_old(graph: nx.MultiDiGraph, source, target, k_paths, cost_function, tra
 def compute_path_length(graph, path):   # helper
     total = 0
     for from_node, to_node in zip(path, path[1:]):
-        total += graph[from_node][to_node]
+        if from_node in graph and to_node in graph[from_node]:
+            total += graph[from_node][to_node]
     return total
 
 # Yen's K-shortest loopless paths
