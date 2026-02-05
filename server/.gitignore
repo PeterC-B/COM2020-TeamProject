@@ -1,11 +1,4 @@
-# Python
-server/.venv/
-__pycache__/
-*.pyc
 
-
-# Vue (Node)
-client/node_modules/
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
