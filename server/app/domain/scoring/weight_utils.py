@@ -114,4 +114,4 @@ def calculate_weights(edges_gdf : gpd.GeoDataFrame, safety_priority : float, spe
 
     edges_gdf_copy["weight"] = edges_gdf_copy.apply(calculate_weight, axis=1)
 
-    edges_gdf_copy.to_csv("server/app/domain/scoring/test.csv")
+    return edges_gdf_copy
