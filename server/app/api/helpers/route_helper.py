@@ -48,6 +48,7 @@ def run_route_algorithm():
         return jsonify({"error": "Start and end nodes required"}), 400
 
     edge_list = get_dict_of_edges(GRAPH)
+
     if start_node not in GRAPH or end_node not in GRAPH:
         return jsonify({"error" : "Invalid start or end node"}), 400
     
@@ -70,6 +71,7 @@ def load_edges_and_nodes():
     }
     return jsonify({"features" : all_features})
 
+# Testing
 def edges_to_json(edge_list : list):
     import json
     with open(JSON_PATH, 'w') as f:
