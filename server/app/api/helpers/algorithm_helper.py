@@ -8,6 +8,12 @@ from shapely.geometry import Point
 from shapely.ops import unary_union
 import geopandas as gpd
 
+from server.app.extensions import db
+from server.app.models.nodes_model import NodesModel
+from server.app.models.location_model import LocationModel
+from server.app.models.edges_model import EdgesModel
+from sqlalchemy import func
+
 def get_dict_of_edges(graph : nx.MultiDiGraph):
     _, edges_gdf = ox.graph_to_gdfs(graph)
     edges_gdf = edges_gdf.reset_index()
@@ -97,6 +103,54 @@ def path_to_geojson(route_edges: gpd.GeoDataFrame) -> dict:
             }
         ]
     }
+
+def get_number_of_feature(feature : str) -> int:
+    features = (
+        db.session
+        .query(NodesModel)
+        .filter(NodesModel.feature == feature)
+        .count()
+    )
+    return features
+
+def get_total_distance(edge_list : list[int]) -> float:
+    distance = (
+        db.session
+        .query(func.sum(EdgesModel.length))
+        .filter(EdgesModel.edge_id.in_(edge_list))
+        .scalar()
+    )
+    if distance is None:
+        return 0.0
+    return distance
+
+def get_start_and_end_node(edge_list : list[int]) -> tuple[int, int]:
+    start_location = (
+        db.session
+        .query(LocationModel.name, LocationModel.type)
+        .filter(LocationModel.node_id == edge_list[0])
+        .scalar()
+    )
+
+    end_location = (
+        db.session
+        .query(LocationModel.name, LocationModel.type)
+        .filter(LocationModel.node_id == edge_list[len(edge_list)-1])
+        .scalar()
+    )
+
+    return start_location, end_location
+
+def get_travel_time(edge_list : list[int]) -> float:
+    time = (
+        db.session
+        .query(func.sum(EdgesModel.travel_time))
+        .filter(EdgesModel.edge_id.in_(edge_list))
+        .scalar()
+    )
+    if time is None:
+        return 0.0
+    return time
 
 if __name__ == "__main__":
     print(edges_csv_to_gdf())

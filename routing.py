@@ -198,7 +198,7 @@ def plot_crime_graph(graph : nx.MultiDiGraph, filePath : str = "graphs/png/crime
     )
     fig.savefig(filePath, dpi=300)
 
-def plot_blank_graph(coords : tuple, radius : int, travel_type : str, saveToFile : bool = False, filePath : str = f"graphs/png/blank_graph.png") -> nx.MultiDiGraph:
+def plot_blank_graph(coords : tuple, radius : int, travel_type : str, saveToFile : bool = False, filePath : str = f"blank_graph.png") -> nx.MultiDiGraph:
     '''
     Create and saves the blank graph centered around coordinates from OSM with a designated radius
     
