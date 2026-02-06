@@ -1,3 +1,8 @@
 p {
     font-size: large;
 }
+
+img {
+    width: 400px;
+    height: auto;
+}
