@@ -9,6 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from server.app.extensions import db
 
+# TODO: Whenever changed, edit the report documentation
 
 class UserAccountModel(db.Model):
     __tablename__ = 'user_account'
