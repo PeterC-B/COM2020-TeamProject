@@ -7,6 +7,8 @@ from server.app.models.user_account_model import UserAccountModel
 from server.app.models.enums.MISSION_STATUS import MissionStatus
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+# TODO: Whenever changed, edit the report documentation
+
 from server.app.extensions import db
 
 class MissionProgressModel(db.Model):

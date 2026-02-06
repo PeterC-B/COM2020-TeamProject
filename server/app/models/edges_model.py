@@ -5,6 +5,8 @@ from server.app.models.nodes_model import NodesModel
 
 from server.app.extensions import db
 
+# TODO: Whenever changed, edit the report documentation
+
 class EdgesModel(db.Model):
     '''
     Docstring for EdgesModel
