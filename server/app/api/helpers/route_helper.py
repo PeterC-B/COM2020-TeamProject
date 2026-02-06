@@ -39,6 +39,8 @@ EDGES_GDF = edges_csv_to_gdf()
 
 GRAPH = ox.graph_from_gdfs(NODES_GDF, EDGES_GDF)
 
+# TODO: Create algo for passing route and score breakdown
+
 @route_bp.route("/routing", methods=["GET"])
 def run_route_algorithm():
     start_node = request.args.get("start", type=int)
