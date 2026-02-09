@@ -2,10 +2,10 @@ from pathlib import Path
 
 from flask import Blueprint, jsonify
 
-from client.public.convert import (build_edges_geojson, build_nodes_geojson,
-                                   load_edge_geometries)
+from server.data.convert import (build_edges_geojson, build_nodes_geojson,
+                                 load_edge_geometries)
 
-DATA_PATH = Path("client/public")
+DATA_PATH = Path("server/data/processed")
 NODES_CSV = DATA_PATH / "nodes_table.csv"
 EDGES_CSV = DATA_PATH / "edges_table.csv"
 GEOM_CSV = DATA_PATH / "edges_geometry.csv"
@@ -49,6 +49,9 @@ def create_graph_route_blueprint():
         
         
     
+
+        
+        
 
         
         

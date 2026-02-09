@@ -27,7 +27,7 @@ NODES_GDF = help_algos.nodes_csv_to_gdf()
 EDGES_GDF = help_algos.edges_csv_to_gdf()
 
 GRAPH = ox.graph_from_gdfs(NODES_GDF, EDGES_GDF)
-
+  
 @route_bp.route("/routing", methods=["GET"])
 def run_route_algorithm():
     start_node = request.args.get("start", type=int)
