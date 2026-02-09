@@ -10,7 +10,7 @@ import {
 import maplibregl, { type LngLatBoundsLike, type Map } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { fetchEdges, fetchNodes } from '@/services/graph'
+import { fetchGraphData } from '@/services/graph'
 
 const mapEl = ref<HTMLDivElement | null>(null)
 let map: Map | null = null
@@ -73,11 +73,11 @@ onMounted(() => {
         loading.value = true
         error.value = null
 
-        Promise.all([fetchNodes(), fetchEdges()])
-            .then(([nodeData, edgeData]) => {
+        Promise.all([fetchGraphData()])
+            .then(([graphData]) => {
                 if (!map) return
-                nodes.value = assertFeatureCollection(nodeData, 'nodes')
-                edges.value = assertFeatureCollection(edgeData, 'edges')
+                nodes.value = assertFeatureCollection(graphData.features?.nodes, 'nodes')
+                edges.value = assertFeatureCollection(graphData.features?.edges, 'edges')
 
                 map.addSource('edges', {
                     type: 'geojson',

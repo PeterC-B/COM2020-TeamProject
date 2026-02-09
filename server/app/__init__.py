@@ -29,8 +29,8 @@ def create_app():
 
     app.config['JWT_SECRET_KEY'] = config.SECRET_KEY
 
-    # # Enable CORS
-    # CORS(app, resources={r'/*': {'origins': config.CORS_ADDRESSES}})
+    # Enable CORS for local frontend-backend development across ports.
+    CORS(app)
 
 
     # Initialise extensions
