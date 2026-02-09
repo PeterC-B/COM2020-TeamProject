@@ -23,7 +23,7 @@ def create_graph_route_blueprint():
     bp = Blueprint("graph", __name__, url_prefix="/graph")
 
     # Main endpoint to get graph data (nodes + edges)
-    @bp.route("/", methods=["GET"])
+    @bp.route("", methods=["GET"])
     def get_graph_data():
 
         edge_geometries = load_edge_geometries(GEOM_CSV)
