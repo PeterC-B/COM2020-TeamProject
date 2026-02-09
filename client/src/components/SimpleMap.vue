@@ -57,117 +57,93 @@ function assertFeatureCollection(value: unknown, label: string): GeoJson {
     return collection
 }
 
-// When the component is first mounted we will setup the map and pull in the data.
+// When the component is first mounted we will setup the map! and pull in the data.
 onMounted(() => {
-    map = new maplibregl.Map({
+    map! = new maplibregl.Map({
         container: mapEl.value!,
         style: 'https://demotiles.maplibre.org/style.json',
-        center: [-0.1276, 51.5072],
-        zoom: 12,
+        center: [-2.585757, 51.460498],
+        zoom: 15,
     })
 
-    map.addControl(new maplibregl.NavigationControl(), 'top-right')
+    map!.addControl(new maplibregl.NavigationControl(), 'top-right')
 
-    map.on('load', () => {
-        if (!map) return
-        loading.value = true
-        error.value = null
+    map!.on('load', () => {
+        map!.addSource('edges', {
+            type: 'geojson',
+            data: '/edges.geojson',
+        })
+        map!.addSource('nodes', {
+            type: 'geojson',
+            data: '/nodes.geojson',
+        })
 
-        Promise.all([fetchNodes(), fetchEdges()])
-            .then(([nodeData, edgeData]) => {
-                if (!map) return
-                nodes.value = assertFeatureCollection(nodeData, 'nodes')
-                edges.value = assertFeatureCollection(edgeData, 'edges')
+        // Add all our layers
+        map!.addLayer(EDGE_BASE_LAYER)
+        map!.addLayer(EDGE_HIT_LAYER)
+        map!.addLayer(EDGE_HIGHLIGHT_LAYER)
+        map!.addLayer(NODE_BASE_LAYER)
+        map!.addLayer(NODE_HIT_LAYER)
+        map!.addLayer(NODE_HIGHLIGHT_LAYER)
 
-                map.addSource('edges', {
-                    type: 'geojson',
-                    data: edges.value as GeoJSON.FeatureCollection,
-                })
-                map.addSource('nodes', {
-                    type: 'geojson',
-                    data: nodes.value as GeoJSON.FeatureCollection,
-                })
-
-                // Add all our layers
-                map.addLayer(EDGE_BASE_LAYER)
-                map.addLayer(EDGE_HIT_LAYER)
-                map.addLayer(EDGE_HIGHLIGHT_LAYER)
-                map.addLayer(NODE_BASE_LAYER)
-                map.addLayer(NODE_HIT_LAYER)
-                map.addLayer(NODE_HIGHLIGHT_LAYER)
-
-                // Click to select an edge or node; hit layers make selection forgiving.
-                map.on('click', (event) => {
-                    if (!map) return
-                    const features = map.queryRenderedFeatures(event.point, {
-                        layers: selectableLayers as unknown as string[],
-                    })
-                    if (!features.length) {
-                        selectedNodeId.value = null
-                        selectedEdgeId.value = null
-                        return
-                    }
-                    const feature = features[0]
-                    const layerId = feature.layer.id as (typeof selectableLayers)[number]
-                    if (layerToSelection[layerId] === 'node') {
-                        selectedNodeId.value = parseFeatureId(feature.properties?.node_id)
-                        selectedEdgeId.value = null
-                        return
-                    }
-                    if (layerToSelection[layerId] === 'edge') {
-                        selectedEdgeId.value = parseFeatureId(feature.properties?.edge_id)
-                        selectedNodeId.value = null
-                    }
-                })
-
-                map.on('mousemove', (event) => {
-                    if (!map) return
-                    const features = map.queryRenderedFeatures(event.point, {
-                        layers: selectableLayers as unknown as string[],
-                    })
-                    map.getCanvas().style.cursor = features.length ? 'pointer' : ''
-                })
-
-                const bounds = new maplibregl.LngLatBounds()
-                const nodeFeatures = nodes.value.features
-                for (const feature of nodeFeatures) {
-                    if (feature.geometry.type !== 'Point') continue
-                    const [lng, lat] = feature.geometry.coordinates as [number, number]
-                    bounds.extend([lng, lat])
-                }
-                if (!bounds.isEmpty()) {
-                    map.fitBounds(bounds as LngLatBoundsLike, { padding: 24, maxZoom: 16 })
-                    // Keep the camera locked to the dataset so you don't pan out to the world.
-                    map.setMaxBounds(bounds as LngLatBoundsLike)
-                    map.setRenderWorldCopies(false)
-                }
+        // Click to select an edge or node; hit layers make selection forgiving.
+        map!.on('click', (event) => {
+            if (!map!) return
+            const features = map!.queryRenderedFeatures(event.point, {
+                layers: selectableLayers as unknown as string[],
             })
-            .catch((err) => {
-                error.value = err instanceof Error ? err.message : 'Failed to load GeoJSON'
+            if (!features.length) {
+                selectedNodeId.value = null
+                selectedEdgeId.value = null
+                return
+            }
+            const feature = features[0]
+            const layerId = feature.layer.id as (typeof selectableLayers)[number]
+            if (layerToSelection[layerId] === 'node') {
+                selectedNodeId.value = parseFeatureId(feature.properties?.node_id)
+                selectedEdgeId.value = null
+                return
+            }
+            if (layerToSelection[layerId] === 'edge') {
+                selectedEdgeId.value = parseFeatureId(feature.properties?.edge_id)
+                selectedNodeId.value = null
+            }
+        })
+
+        map!.on('mousemove', (event) => {
+            if (!map!) return
+            const features = map!.queryRenderedFeatures(event.point, {
+                layers: selectableLayers as unknown as string[],
             })
-            .finally(() => {
-                loading.value = false
-            })
+            map!.getCanvas().style.cursor = features.length ? 'pointer' : ''
+        })
+
+        if (!bounds.isEmpty()) {
+            map!.fitBounds(bounds as LngLatBoundsLike, { padding: 24, maxZoom: 16 })
+            // Keep the camera locked to the dataset so you don't pan out to the world.
+            map!.setMaxBounds(bounds as LngLatBoundsLike)
+            map!.setRenderWorldCopies(false)
+        }
     })
 })
 
 watch(selectedEdgeId, (edgeId) => {
-    if (!map) return
-    if (!map.getLayer('edges-line-highlight')) return
+    if (!map!) return
+    if (!map!.getLayer('edges-line-highlight')) return
     const value = edgeId ?? -1
-    map.setFilter('edges-line-highlight', ['==', ['get', 'edge_id'], value])
+    map!.setFilter('edges-line-highlight', ['==', ['get', 'edge_id'], value])
 })
 
 watch(selectedNodeId, (nodeId) => {
-    if (!map) return
-    if (!map.getLayer('nodes-circle-highlight')) return
+    if (!map!) return
+    if (!map!.getLayer('nodes-circle-highlight')) return
     const value = nodeId ?? -1
-    map.setFilter('nodes-circle-highlight', ['==', ['get', 'node_id'], value])
+    map!.setFilter('nodes-circle-highlight', ['==', ['get', 'node_id'], value])
 })
 
 onBeforeUnmount(() => {
-    map?.remove()
-    map = null
+    map!?.remove()
+    map! = null
 })
 </script>
 
