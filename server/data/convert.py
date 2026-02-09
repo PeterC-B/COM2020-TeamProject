@@ -30,7 +30,6 @@ def parse_linestring_wkt(wkt: str) -> List[Coord]:
 def load_edge_geometries(path: Path) -> Dict[EdgeKey, List[Coord]]:
     geometries: Dict[EdgeKey, List[Coord]] = {}
     with path.open(newline="", encoding="utf-8") as f:
-        print("Opened")
         reader = csv.DictReader(f)
         for row in reader:
             u = int(row["u"])
