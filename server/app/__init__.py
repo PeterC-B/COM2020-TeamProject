@@ -5,6 +5,7 @@ from flask_cors import CORS
 
 from server.app.api.error_handlers import register_error_handlers
 from server.app.api.graph.graph_endpoints import create_graph_route_blueprint
+from server.app.api.health.health_endpoints import create_health_routes
 from server.app.api.routing.routing_endpoints import \
     create_routing_route_blueprint
 from server.app.api.users.routes import create_user_route_blueprint
@@ -56,6 +57,7 @@ def create_app():
     # Initialise the Routes
     app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc))
     app.register_blueprint(create_graph_route_blueprint())
+    app.register_blueprint(create_health_routes())
     app.register_blueprint(create_routing_route_blueprint())
 
     # Import error handlers
