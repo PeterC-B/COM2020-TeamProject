@@ -139,7 +139,7 @@ def yens_from_multidigraph(graph: nx.MultiDiGraph, source, target, weights, k_pa
     return yens(weighted_graph, source, target, k_paths=k_paths, trace=trace)
 
 
-def process_yens_routing_request(data):
+def process_yens_routing_request(data, graph=None):
     """
     Single function to handle the flow of the routing request
     Returns (payload_dict, status_code)
@@ -167,7 +167,7 @@ def process_yens_routing_request(data):
     else:
         weights = apply_default_weights(raw_weights)
 
-    graph = load_cached_graph()
+    graph = graph if graph is not None else load_cached_graph()
     if graph is None:
         return {"error": "No cached graph found. Build the graph first."}, 500
 
