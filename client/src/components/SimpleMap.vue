@@ -19,6 +19,10 @@ import maplibregl, { type Map } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
+const props = defineProps<{
+    routes?: Array<Array<[number, number]>>
+}>()
+
 const emit = defineEmits<{
     (
         event: 'selection-change',
@@ -62,6 +66,65 @@ const layerToSelection: Record<(typeof selectableLayers)[number], 'node' | 'edge
     'edges-line': 'edge',
 }
 
+const routeSourceId = 'routes'
+const routeColors = ['#2563eb', '#ef4444', '#16a34a']
+const routeLayerIds = routeColors.map((_, index) => `route-line-${index}`)
+
+function toMapCoordinates(point: [number, number]): [number, number] {
+    // Backend route geometry is (lat, lon), but MapLibre expects (lon, lat).
+    const [lat, lon] = point
+    return [lon, lat]
+}
+
+function buildRouteFeatureCollection(routes: Array<Array<[number, number]>>): GeoJSON.FeatureCollection {
+    return {
+        type: 'FeatureCollection',
+        features: routes.slice(0, routeColors.length).flatMap((route, routeIndex) => {
+            if (route.length < 2) return []
+            return [
+                {
+                    type: 'Feature',
+                    properties: { routeIndex },
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: route.map(toMapCoordinates),
+                    },
+                },
+            ]
+        }),
+    }
+}
+
+function renderRoutes(routes: Array<Array<[number, number]>> = []) {
+    if (!map || !map.isStyleLoaded()) return
+
+    for (const layerId of routeLayerIds) {
+        if (map.getLayer(layerId)) map.removeLayer(layerId)
+    }
+    if (map.getSource(routeSourceId)) {
+        map.removeSource(routeSourceId)
+    }
+
+    map.addSource(routeSourceId, {
+        type: 'geojson',
+        data: buildRouteFeatureCollection(routes),
+    })
+
+    routeLayerIds.forEach((layerId, routeIndex) => {
+        map?.addLayer({
+            id: layerId,
+            type: 'line',
+            source: routeSourceId,
+            filter: ['==', ['get', 'routeIndex'], routeIndex],
+            paint: {
+                'line-color': routeColors[routeIndex],
+                'line-width': 4,
+                'line-opacity': 0.95,
+            },
+        })
+    })
+}
+
 // Initialize map and load graph data.
 onMounted(() => {
     map = new maplibregl.Map({
@@ -103,6 +166,7 @@ onMounted(() => {
                 map.addLayer(NODE_BASE_LAYER)
                 map.addLayer(NODE_HIT_LAYER)
                 map.addLayer(NODE_HIGHLIGHT_LAYER)
+                renderRoutes(props.routes)
 
                 // Hit layers make node and edge selection easier.
                 map.on('click', (event) => {
@@ -184,6 +248,13 @@ onBeforeUnmount(() => {
     map?.remove()
     map = null
 })
+
+watch(
+    () => props.routes,
+    (routes) => {
+        renderRoutes(routes ?? [])
+    },
+)
 </script>
 
 <template>
