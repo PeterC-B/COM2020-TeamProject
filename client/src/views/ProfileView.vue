@@ -10,11 +10,12 @@ const statusLabel = computed(() => (mainStore.isAuthenticated ? 'Logged in' : 'L
 const roleLabel = computed(() => mainStore.userRole ?? 'guest')
 
 function handleLogin() {
-    void router.push('/')
+    void router.push('/login')
 }
 
 function handleLogout() {
     mainStore.clearAccessToken()
+    void router.push('/login')
 }
 </script>
 

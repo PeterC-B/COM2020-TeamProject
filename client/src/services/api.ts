@@ -20,7 +20,7 @@ http.interceptors.response.use(
         if (error.response && error.response.status === 401) {
             const mainStore = useMainStore()
             mainStore.clearAccessToken()
-            void router.push('/')
+            void router.push('/login')
         }
         return Promise.reject(error)
     },
