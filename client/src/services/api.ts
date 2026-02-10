@@ -1,4 +1,4 @@
-import axios, { type AxiosResponse } from 'axios'
+import axios from 'axios'
 import { useMainStore } from '@/stores/main'
 import router from '@/router'
 
@@ -29,20 +29,20 @@ http.interceptors.response.use(
 export function get<T = unknown>(
     endpoint: string,
     params: Record<string, unknown> = {},
-): Promise<AxiosResponse<T>> {
+) {
     return http.get<T>(endpoint, {
         headers: getHeaders(),
         params: params,
     })
 }
 
-export function post<T = unknown>(endpoint: string, data: unknown): Promise<AxiosResponse<T>> {
+export function post<T = unknown>(endpoint: string, data: unknown) {
     return http.post<T>(endpoint, data, {
         headers: getHeaders(),
     })
 }
 
-export function put<T = unknown>(endpoint: string, data: unknown): Promise<AxiosResponse<T>> {
+export function put<T = unknown>(endpoint: string, data: unknown) {
     return http.put<T>(endpoint, data, {
         headers: getHeaders(),
     })
