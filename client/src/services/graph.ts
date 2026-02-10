@@ -10,6 +10,6 @@ export type GraphDataResponse = {
     }
 }
 
-export function fetchGraphData(params: Record<string, unknown> = {}): Promise<GraphDataResponse> {
+export function fetchGraphData(params: Record<string, unknown> = {}) {
     return get<GraphDataResponse>(GRAPH_ENDPOINT, params).then(({ data }) => data)
 }

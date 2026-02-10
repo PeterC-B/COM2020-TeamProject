@@ -1,14 +1,13 @@
 import { post } from '@/services/api'
 
-const BASE_PATH = '/route'
+const BASE_PATH = '/routing'
 
 export const ROUTE_ENDPOINTS = {
-    dijkstra: `${BASE_PATH}/dijkstra`,
-    astar: `${BASE_PATH}/astar`,
-    yens: `${BASE_PATH}/yens`,
+    yens: BASE_PATH,
 } as const
 
 export type RouteRequest = {
+    // Backend expects (lat, lon)
     start: [number, number]
     end: [number, number]
     weights?: Record<string, number>
@@ -21,29 +20,19 @@ export type RouteResponse = {
     path?: number[]
 }
 
-export function fetchDijkstraRoute({
-    start,
-    end,
-    weights,
-}: RouteRequest): Promise<RouteResponse> {
-    return post(ROUTE_ENDPOINTS.dijkstra, { start, end, weights }).then(({ data }) => data)
-}
-
-export function fetchAstarRoute({
-    start,
-    end,
-    weights,
-}: RouteRequest): Promise<RouteResponse> {
-    return post(ROUTE_ENDPOINTS.astar, { start, end, weights }).then(({ data }) => data)
-}
-
 export type YensRouteRequest = RouteRequest & { k?: number }
 
-export function fetchYensRoutes({
-    start,
-    end,
-    k,
-    weights,
-}: YensRouteRequest): Promise<{ routes: RouteResponse[] }> {
-    return post(ROUTE_ENDPOINTS.yens, { start, end, k, weights }).then(({ data }) => data)
+export type YensRoutesResponse = {
+    algorithm: 'yens'
+    requested_routes: number
+    returned_routes: number
+    routes: RouteResponse[]
+    comparison?: Record<string, unknown>
+}
+
+export function fetchYensRoutes({ start, end, k, weights }: YensRouteRequest) {
+    console.log('Fetching Yens routes with parameters:', { start, end, k, weights })
+    return post<YensRoutesResponse>(ROUTE_ENDPOINTS.yens, { start, end, k, weights }).then(
+        ({ data }) => data,
+    )
 }
