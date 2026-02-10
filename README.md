@@ -42,4 +42,4 @@ Stop the container + delete all data (full reset)
 'docker compose down -v'
 
 Connect with psql inside the container:
-'docker exec -it com2020-dev-db psql -U postgres -d com2020-dev'
+'docker exec -it com2020-dev-db psql -U postgres -d com20200_dev'
