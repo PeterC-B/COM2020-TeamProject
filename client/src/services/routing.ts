@@ -16,6 +16,14 @@ export type RouteRequest = {
 export type RouteResponse = {
     distance?: number
     geometry: Array<[number, number]>
+    indicators?: {
+        lighting?: number
+        greenery?: number
+        pollution?: number
+        surface_quality?: number
+        amenity_proximity?: number
+        weighted_score?: number
+    }
     metadata?: Record<string, unknown>
     path?: number[]
 }
@@ -27,7 +35,12 @@ export type YensRoutesResponse = {
     requested_routes: number
     returned_routes: number
     routes: RouteResponse[]
-    comparison?: Record<string, unknown>
+    comparison?: {
+        count?: number
+        shortest_distance?: number | null
+        longest_distance?: number | null
+        average_distance?: number | null
+    }
 }
 
 export function fetchYensRoutes({ start, end, k, weights }: YensRouteRequest) {
