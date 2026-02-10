@@ -14,6 +14,7 @@ from server.app.extensions import db, jwt, ma, migrate
 from server.app.repositories.user_repository import UserRepository
 from server.app.unit_of_work.sqlalchemy_uow import SqlAlchemyUnitOfWork
 from server.app.use_cases.users.list_users import ListUsers
+from server.app.use_cases.users.login_user import LoginUser
 from server.app.use_cases.users.register_user import RegisterUser
 
 
@@ -53,9 +54,10 @@ def create_app():
     # Initialise the Use Cases
     register_user_uc = RegisterUser(uow, user_repo)
     list_users_uc = ListUsers(user_repo)
+    login_user_uc = LoginUser(user_repo)
 
     # Initialise the Routes
-    app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc))
+    app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc))
     app.register_blueprint(create_graph_route_blueprint())
     app.register_blueprint(create_health_routes())
     app.register_blueprint(create_routing_route_blueprint())
