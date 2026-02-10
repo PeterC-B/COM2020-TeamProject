@@ -2,6 +2,7 @@ import pytest
 import geopandas as gpd
 import pandas as pd
 from shapely.geometry import Point, LineString
+from tests.utils.confusion import assert_confusion
 
 import server.app.domain.indicators.attribute_extraction as ae
 
@@ -9,6 +10,7 @@ import server.app.domain.indicators.attribute_extraction as ae
 def test_extract_lighting_missing():
     # file returns 0.9 when lit is missing
     assert ae.extract_lighting({}) == pytest.approx(0.9)
+
 
 def test_extract_lighting_yes():
     # file returns 0.2 when lit == "yes"
@@ -18,6 +20,14 @@ def test_extract_lighting_other():
     # any other value returns 0.8
     assert ae.extract_lighting({"lit": "no"}) == pytest.approx(0.8)
 
+def test_extract_lighting_confusion_matrix():
+    inputs = [{}, {"lit": "yes"}, {"lit": "no"}]
+
+    expected = ["0.9", "0.2", "0.8"]
+    predicted = [str(ae.extract_lighting(x)) for x in inputs]
+
+    assert_confusion(expected, predicted, labels=["0.2", "0.8", "0.9"], name="Lighting Extraction")
+
 # Surface quality mapping tests
 def test_extract_surface_quality_defaults_and_categories():
     assert ae.extract_surface_quality({}) == pytest.approx(0.5)
@@ -25,6 +35,23 @@ def test_extract_surface_quality_defaults_and_categories():
     assert ae.extract_surface_quality({"surface": "paved"}) == pytest.approx(0.2)
     assert ae.extract_surface_quality({"surface": "paving_stones"}) == pytest.approx(0.3)
     assert ae.extract_surface_quality({"surface": "unknown_surface"}) == pytest.approx(0.4)
+
+def test_extract_surface_quality_confusion_matrix():
+    inputs = [
+        {},
+        {"surface": "asphalt"},
+        {"surface": "paved"},
+        {"surface": "paving_stones"},
+        {"surface": "unknown_surface"},
+        {"surface": "asphalt"},
+        {},
+    ]
+
+    expected = ["0.5", "0.1", "0.2", "0.3", "0.4", "0.1", "0.5"]
+    predicted = [str(ae.extract_surface_quality(x)) for x in inputs]
+
+    assert_confusion(expected, predicted, labels=["0.1", "0.2", "0.3", "0.4", "0.5"], name="Surface Quality")
+
 
 # attach_edge_indicators: ensure new columns exist and values derived from input
 def test_attach_edge_indicators_creates_columns(small_edges_gdf):

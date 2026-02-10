@@ -3,6 +3,8 @@ import networkx as nx
 from math import inf
 
 from server.app.domain.routing.algorithms.astar_algorithm import astar
+from tests.utils.algorithm_diag import log_algorithm_diagnostic
+
 
 # Helpers
 def unit_cost(edge_data):
@@ -15,8 +17,8 @@ def zero_heuristic(node):
     return 0
 
 def simple_heuristic(node):
-    # A fake heuristic that prefers higher-numbered nodes
     return -node
+
 
 # Tests
 def test_astar_simple_chain():
@@ -31,8 +33,13 @@ def test_astar_simple_chain():
 
     dist, path = astar(G, 1, 4, length_cost, zero_heuristic, trace=False)
 
+    expected = {"distance": 3, "path": [1, 2, 3, 4]}
+    actual = {"distance": dist, "path": path}
+    log_algorithm_diagnostic("A*: simple chain", expected, actual)
+
     assert dist == 3
     assert path == [1, 2, 3, 4]
+
 
 def test_astar_branching_paths_with_heuristic():
     """
@@ -49,8 +56,13 @@ def test_astar_branching_paths_with_heuristic():
 
     dist, path = astar(G, 1, 4, length_cost, zero_heuristic, trace=False)
 
+    expected = {"distance": 2, "path": [1, 3, 4]}
+    actual = {"distance": dist, "path": path}
+    log_algorithm_diagnostic("A*: branching paths", expected, actual)
+
     assert dist == 2
     assert path == [1, 3, 4]
+
 
 def test_astar_no_path():
     G = nx.MultiDiGraph()
@@ -58,8 +70,13 @@ def test_astar_no_path():
 
     dist, path = astar(G, 1, 3, length_cost, zero_heuristic, trace=False)
 
+    expected = {"distance": inf, "path": []}
+    actual = {"distance": dist, "path": path}
+    log_algorithm_diagnostic("A*: no path", expected, actual)
+
     assert dist == inf
     assert path == []
+
 
 def test_astar_source_equals_target():
     G = nx.MultiDiGraph()
@@ -67,8 +84,13 @@ def test_astar_source_equals_target():
 
     dist, path = astar(G, 5, 5, length_cost, zero_heuristic, trace=False)
 
+    expected = {"distance": 0, "path": [5]}
+    actual = {"distance": dist, "path": path}
+    log_algorithm_diagnostic("A*: source == target", expected, actual)
+
     assert dist == 0
     assert path == [5]
+
 
 def test_astar_multiedges():
     """
@@ -86,8 +108,13 @@ def test_astar_multiedges():
 
     dist, path = astar(G, 1, 3, length_cost, zero_heuristic, trace=False)
 
+    expected = {"distance": 2, "path": [1, 2, 3]}
+    actual = {"distance": dist, "path": path}
+    log_algorithm_diagnostic("A*: multiedges", expected, actual)
+
     assert dist == 2
     assert path == [1, 2, 3]
+
 
 def test_astar_cycle_handling():
     """
@@ -104,8 +131,13 @@ def test_astar_cycle_handling():
 
     dist, path = astar(G, 1, 4, length_cost, zero_heuristic, trace=False)
 
+    expected = {"distance": 2, "path": [1, 2, 4]}
+    actual = {"distance": dist, "path": path}
+    log_algorithm_diagnostic("A*: cycle handling", expected, actual)
+
     assert dist == 2
     assert path == [1, 2, 4]
+
 
 def test_astar_with_admissible_heuristic():
     """
@@ -121,6 +153,10 @@ def test_astar_with_admissible_heuristic():
 
     dist, path = astar(G, 1, 3, length_cost, h, trace=False)
 
+    expected = {"distance": 4, "path": [1, 2, 3]}
+    actual = {"distance": dist, "path": path}
+    log_algorithm_diagnostic("A*: admissible heuristic", expected, actual)
+
     assert dist == 4
     assert path == [1, 2, 3]
 
@@ -135,12 +171,15 @@ def test_astar_with_inadmissible_heuristic():
     G.add_edge(2, 3, length=2)
     G.add_edge(1, 3, length=10)
 
-    # Overestimates cost
     def h(n):
-        return 100
+        return 100  # overestimates
 
     dist, path = astar(G, 1, 3, length_cost, h, trace=False)
 
-    # A* might choose the direct edge due to heuristic bias
+    expected = {"valid_paths": [[1, 2, 3], [1, 3]]}
+    actual = {"valid_paths": [path]}
+    log_algorithm_diagnostic("A*: inadmissible heuristic", expected, actual)
+
     assert path in ([1, 2, 3], [1, 3])
-    assert dist in (4, 10)'''
+    assert dist in (4, 10)
+'''
