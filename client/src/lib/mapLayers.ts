@@ -1,13 +1,14 @@
-import type {
-    BackgroundLayer,
-    CircleLayer,
-    FillLayer,
-    HeatmapLayer,
-    HillshadeLayer,
-    LineLayer,
-    RasterLayer,
-    SymbolLayer,
-} from 'maplibre-gl'
+import type { LayerSpecification } from 'maplibre-gl'
+
+type LayerOf<T extends LayerSpecification['type']> = Extract<LayerSpecification, { type: T }>
+type BackgroundLayer = LayerOf<'background'>
+type CircleLayer = LayerOf<'circle'>
+type FillLayer = LayerOf<'fill'>
+type HeatmapLayer = LayerOf<'heatmap'>
+type HillshadeLayer = LayerOf<'hillshade'>
+type LineLayer = LayerOf<'line'>
+type RasterLayer = LayerOf<'raster'>
+type SymbolLayer = LayerOf<'symbol'>
 
 export type MapLayer =
     | LineLayer
