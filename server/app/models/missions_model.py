@@ -6,6 +6,8 @@ from sqlalchemy import Enum as SQLEnum
 from server.app.models.enums.MISSION_TIER import MissionTier
 from sqlalchemy.orm import Mapped, mapped_column
 
+# TODO: Whenever changed, edit the report documentation
+
 from server.app.extensions import db
 
 class MissionsModel(db.Model):

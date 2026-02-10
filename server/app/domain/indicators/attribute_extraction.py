@@ -191,7 +191,7 @@ def compute_amenity_proximity(graph, center_coords, search_radius=450):
 
     return graph
 
-if __name__ == "__main__":
+"""if __name__ == "__main__":
     from server.scripts.visualisation.visualisation_utils import plot_blank_graph, add_lighting_tag, add_surface_tag
     graph = plot_blank_graph((51.460498, -2.585757), 450, "walk")
 
@@ -213,4 +213,4 @@ if __name__ == "__main__":
         "pollution",
         "surface_quality",
     ]]
-    edges_export.to_csv("server/app/domain/indicators/edges.csv")
+    edges_export.to_csv("server/app/domain/indicators/edges.csv")"""
