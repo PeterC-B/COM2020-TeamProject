@@ -21,6 +21,7 @@ const selection = ref<SelectionPayload>({
 const loadingRoute = ref(false)
 const routeError = ref<string | null>(null)
 const routeData = ref<YensRoutesResponse | null>(null)
+const routeGeometries = computed(() => routeData.value?.routes.map((route) => route.geometry) ?? [])
 
 const canRequestRoute = computed(() =>
     Boolean(selection.value.start && selection.value.end && !loadingRoute.value),
@@ -90,6 +91,6 @@ async function requestRoute() {
             </p>
         </div>
 
-        <SimpleMap @selection-change="onSelectionChange" />
+        <SimpleMap :routes="routeGeometries" @selection-change="onSelectionChange" />
     </section>
 </template>
