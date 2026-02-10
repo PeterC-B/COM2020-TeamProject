@@ -1,5 +1,12 @@
 <script setup lang="ts">
 import {
+    assertFeatureCollection,
+    parseFeatureId,
+    parseFeaturePointCoordinates,
+    type GeoJson,
+} from '@/components/simple-map/geoJsonUtils'
+import { useMapSelection } from '@/components/simple-map/useMapSelection'
+import {
     EDGE_BASE_LAYER,
     EDGE_HIGHLIGHT_LAYER,
     EDGE_HIT_LAYER,
@@ -7,22 +14,39 @@ import {
     NODE_HIGHLIGHT_LAYER,
     NODE_HIT_LAYER,
 } from '@/lib/mapLayers'
-import maplibregl, { type LngLatBoundsLike, type Map } from 'maplibre-gl'
+import { fetchGraphData } from '@/services/graph'
+import maplibregl, { type Map } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { fetchGraphData } from '@/services/graph'
+
+const emit = defineEmits<{
+    (
+        event: 'selection-change',
+        payload: {
+            start: [number, number] | null
+            end: [number, number] | null
+            startNodeId: number | null
+            endNodeId: number | null
+        },
+    ): void
+}>()
 
 const mapEl = ref<HTMLDivElement | null>(null)
 let map: Map | null = null
-
-type GeoJson = GeoJSON.FeatureCollection
 
 const nodes = ref<GeoJson | null>(null)
 const edges = ref<GeoJson | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
-const selectedEdgeId = ref<number | null>(null)
-const selectedNodeId = ref<number | null>(null)
+const {
+    applyEdgeSelection,
+    applyNodeSelection,
+    clearFeatureSelection,
+    dispose,
+    selectedEdgeId,
+    selectedNodeId,
+    setMap,
+} = useMapSelection((payload) => emit('selection-change', payload))
 
 const selectableLayers = [
     'nodes-circle-hit',
@@ -30,6 +54,7 @@ const selectableLayers = [
     'nodes-circle',
     'edges-line',
 ] as const
+const selectableLayerIds = [...selectableLayers]
 const layerToSelection: Record<(typeof selectableLayers)[number], 'node' | 'edge'> = {
     'nodes-circle-hit': 'node',
     'edges-line-hit': 'edge',
@@ -37,27 +62,7 @@ const layerToSelection: Record<(typeof selectableLayers)[number], 'node' | 'edge
     'edges-line': 'edge',
 }
 
-function parseFeatureId(value: unknown): number | null {
-    if (typeof value === 'number') return Number.isFinite(value) ? value : null
-    if (typeof value === 'string') {
-        const parsed = Number(value)
-        return Number.isFinite(parsed) ? parsed : null
-    }
-    return null
-}
-
-function assertFeatureCollection(value: unknown, label: string): GeoJson {
-    if (!value || typeof value !== 'object') {
-        throw new Error(`Invalid ${label} GeoJSON response`)
-    }
-    const collection = value as GeoJSON.FeatureCollection
-    if (!Array.isArray(collection.features)) {
-        throw new Error(`Invalid ${label} GeoJSON features`)
-    }
-    return collection
-}
-
-// When the component is first mounted we will setup the map and pull in the data.
+// Initialize map and load graph data.
 onMounted(() => {
     map = new maplibregl.Map({
         container: mapEl.value!,
@@ -65,6 +70,7 @@ onMounted(() => {
         center: [-0.1276, 51.5072],
         zoom: 12,
     })
+    setMap(map)
 
     map.addControl(new maplibregl.NavigationControl(), 'top-right')
 
@@ -73,22 +79,24 @@ onMounted(() => {
         loading.value = true
         error.value = null
 
-        Promise.all([fetchGraphData()])
-            .then(([graphData]) => {
+        fetchGraphData()
+            .then((graphData) => {
                 if (!map) return
-                nodes.value = assertFeatureCollection(graphData.features?.nodes, 'nodes')
-                edges.value = assertFeatureCollection(graphData.features?.edges, 'edges')
+                const nodeCollection = assertFeatureCollection(graphData.features?.nodes, 'nodes')
+                const edgeCollection = assertFeatureCollection(graphData.features?.edges, 'edges')
+                nodes.value = nodeCollection
+                edges.value = edgeCollection
 
                 map.addSource('edges', {
                     type: 'geojson',
-                    data: edges.value as GeoJSON.FeatureCollection,
+                    data: edgeCollection,
                 })
                 map.addSource('nodes', {
                     type: 'geojson',
-                    data: nodes.value as GeoJSON.FeatureCollection,
+                    data: nodeCollection,
                 })
 
-                // Add all our layers
+                // Add render layers
                 map.addLayer(EDGE_BASE_LAYER)
                 map.addLayer(EDGE_HIT_LAYER)
                 map.addLayer(EDGE_HIGHLIGHT_LAYER)
@@ -96,34 +104,36 @@ onMounted(() => {
                 map.addLayer(NODE_HIT_LAYER)
                 map.addLayer(NODE_HIGHLIGHT_LAYER)
 
-                // Click to select an edge or node; hit layers make selection forgiving.
+                // Hit layers make node and edge selection easier.
                 map.on('click', (event) => {
                     if (!map) return
                     const features = map.queryRenderedFeatures(event.point, {
-                        layers: selectableLayers as unknown as string[],
+                        layers: selectableLayerIds,
                     })
                     if (!features.length) {
-                        selectedNodeId.value = null
-                        selectedEdgeId.value = null
+                        clearFeatureSelection()
                         return
                     }
+
                     const feature = features[0]
+                    if (!feature) return
+
                     const layerId = feature.layer.id as (typeof selectableLayers)[number]
                     if (layerToSelection[layerId] === 'node') {
-                        selectedNodeId.value = parseFeatureId(feature.properties?.node_id)
-                        selectedEdgeId.value = null
+                        const nodeId = parseFeatureId(feature.properties?.node_id)
+                        const point = parseFeaturePointCoordinates(feature)
+                        applyNodeSelection(nodeId, point)
                         return
                     }
                     if (layerToSelection[layerId] === 'edge') {
-                        selectedEdgeId.value = parseFeatureId(feature.properties?.edge_id)
-                        selectedNodeId.value = null
+                        applyEdgeSelection(parseFeatureId(feature.properties?.edge_id))
                     }
                 })
 
                 map.on('mousemove', (event) => {
                     if (!map) return
                     const features = map.queryRenderedFeatures(event.point, {
-                        layers: selectableLayers as unknown as string[],
+                        layers: selectableLayerIds,
                     })
                     map.getCanvas().style.cursor = features.length ? 'pointer' : ''
                 })
@@ -132,13 +142,17 @@ onMounted(() => {
                 const nodeFeatures = nodes.value.features
                 for (const feature of nodeFeatures) {
                     if (feature.geometry.type !== 'Point') continue
-                    const [lng, lat] = feature.geometry.coordinates as [number, number]
+                    const coordinates = feature.geometry.coordinates
+                    if (coordinates.length < 2) continue
+                    const lng = Number(coordinates[0])
+                    const lat = Number(coordinates[1])
+                    if (!Number.isFinite(lng) || !Number.isFinite(lat)) continue
                     bounds.extend([lng, lat])
                 }
                 if (!bounds.isEmpty()) {
-                    map.fitBounds(bounds as LngLatBoundsLike, { padding: 24, maxZoom: 16 })
-                    // Keep the camera locked to the dataset so you don't pan out to the world.
-                    map.setMaxBounds(bounds as LngLatBoundsLike)
+                    map.fitBounds(bounds, { padding: 24, maxZoom: 16 })
+                    // Keep camera constrained to the dataset extent.
+                    map.setMaxBounds(bounds)
                     map.setRenderWorldCopies(false)
                 }
             })
@@ -166,12 +180,12 @@ watch(selectedNodeId, (nodeId) => {
 })
 
 onBeforeUnmount(() => {
+    dispose()
     map?.remove()
     map = null
 })
 </script>
 
 <template>
-    <!-- fills viewport; adjust if you have a top nav -->
     <div ref="mapEl" class="h-[calc(100vh-64px)] w-full" />
 </template>
