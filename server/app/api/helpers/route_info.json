@@ -1,0 +1,18 @@
+{
+    "route_data": {
+        "start_and_end": {
+            "start_location": "Point A",
+            "end_location": "Point B"
+        },
+        "stats": {
+            "edge_count": 26,
+            "distance": 0.0,
+            "time": 0.0
+        },
+        "traffic_feature_count": {
+            "crossings": 0,
+            "traffic_signals": 0,
+            "turning_circles": 0
+        }
+    }
+}

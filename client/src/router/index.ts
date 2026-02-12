@@ -1,0 +1,45 @@
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+
+import { pinia } from '@/stores'
+import { useMainStore } from '@/stores/main'
+
+const routes: RouteRecordRaw[] = [
+    { path: '/login', component: () => import('@/views/LoginView.vue') },
+    { path: '/', component: () => import('@/views/HomeView.vue'), meta: { requiresAuth: true } },
+    { path: '/map', component: () => import('@/views/MapView.vue'), meta: { requiresAuth: true } },
+    {
+        path: '/profile',
+        component: () => import('@/views/ProfileView.vue'),
+        meta: { requiresAuth: true },
+    },
+
+    {
+        path: '/:pathMatch(.*)*',
+        component: () => import('@/views/NotFoundView.vue'),
+        meta: { requiresAuth: true },
+    },
+]
+
+const router = createRouter({
+    history: createWebHistory(import.meta.env.BASE_URL),
+    routes,
+    scrollBehavior() {
+        return { top: 0 }
+    },
+})
+
+router.beforeEach((to) => {
+    const mainStore = useMainStore(pinia)
+
+    if (to.path === '/login' && mainStore.isAuthenticated) {
+        return '/'
+    }
+
+    if (to.meta.requiresAuth && !mainStore.isAuthenticated) {
+        return { path: '/login', query: { redirect: to.fullPath } }
+    }
+
+    return true
+})
+
+export default router
