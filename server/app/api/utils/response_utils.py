@@ -6,7 +6,7 @@ Response utilities:
 """
 
 import networkx as nx
-from server.app.api.utils.error_utils import error_response
+from app.api.utils.error_utils import error_response
 
 def format_error(message, status=400):
     """Back-compatible wrapper for error responses"""
