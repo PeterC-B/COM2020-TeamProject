@@ -17,7 +17,7 @@ def parse_linestring_wkt(wkt: str) -> List[Coord]:
     right = text.rfind(")")
     if left == -1 or right == -1 or right <= left:
         raise ValueError(f"Invalid WKT: {wkt}")
-
+  
     coords: List[Coord] = []
     for pair in text[left + 1 : right].split(","):
         parts = pair.strip().split()
@@ -98,10 +98,10 @@ def main(argv: Iterable[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Convert CSV graph data to MapLibre-ready GeoJSON."
     )
-    parser.add_argument("--nodes", default="data/nodes_table.csv", help="Path to nodes_table.csv")
-    parser.add_argument("--edges", default="data/edges_table.csv", help="Path to edges_table.csv")
-    parser.add_argument("--geom", default="data/edges_geometry.csv", help="Path to edges_geometry.csv")
-    parser.add_argument("--out", default="data/maplibre", help="Output folder for GeoJSON files")
+    parser.add_argument("--nodes", default="data/processed/nodes_table.csv", help="Path to nodes_table.csv")
+    parser.add_argument("--edges", default="data/processed/edges_table.csv", help="Path to edges_table.csv")
+    parser.add_argument("--geom", default="data/processed/edges_geometry.csv", help="Path to edges_geometry.csv")
+    parser.add_argument("--out", default="data/processed/maplibre", help="Output folder for GeoJSON files")
     args = parser.parse_args(argv)
 
     nodes_path = Path(args.nodes)

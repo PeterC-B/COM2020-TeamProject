@@ -1,36 +1,14 @@
-from server.app.domain.routing.algorithms.yen_algorithm import yens
-import server.app.api.helpers.algorithm_helper as help_algos
-
-import networkx as nx
-import osmnx as ox
+from json import dump
 from pathlib import Path
 
+import osmnx as ox
+from flask import Blueprint, jsonify, request
+
+import server.app.api.helpers.algorithm_helper as help_algos
+from client.public.convert import (build_edges_geojson, build_nodes_geojson,
+                                   load_edge_geometries)
+from server.app.domain.routing.algorithms.yen_algorithm import yens
 from server.app.extensions import db
-
-from flask import Blueprint, request, jsonify
-
-from server.app import create_app
-app = create_app()
-
-from server.app.models.nodes_model import NodesModel
-from server.app.models.location_model import LocationModel
-from server.app.models.edges_model import EdgesModel
-
-from client.public.convert import (
-    load_edge_geometries,
-    build_nodes_geojson,
-    build_edges_geojson,
-)
-
-from server.app.domain.scoring.cost_functions import HS_ATTRIBUTES, explain_cost
-from server.app.domain.scoring.weight_utils import DEFAULT_WEIGHTS, validate_weights
-from server.app.api.utils.error_utils import (
-    missing_json_body,
-    missing_field,
-    invalid_weights,
-)
-
-from json import dump
 
 route_bp = Blueprint("route", __name__)
 
@@ -49,7 +27,7 @@ NODES_GDF = help_algos.nodes_csv_to_gdf()
 EDGES_GDF = help_algos.edges_csv_to_gdf()
 
 GRAPH = ox.graph_from_gdfs(NODES_GDF, EDGES_GDF)
-
+  
 @route_bp.route("/routing", methods=["GET"])
 def run_route_algorithm():
     start_node = request.args.get("start", type=int)
@@ -73,15 +51,6 @@ def run_route_algorithm():
 
     return jsonify(route_geojson)
     
-
-@route_bp.route("/map", methods=["GET"])
-def load_edges_and_nodes():
-    all_features = {
-        "nodes" : nodes_geojson,
-        "edges" : edges_geojson
-    }
-    return jsonify({"features" : all_features})
-
 @route_bp.route("/route_breakdown", methods=["GET"])
 def get_route_breakdown():
     edge_list = request.args.get("edge_list", type=list)
