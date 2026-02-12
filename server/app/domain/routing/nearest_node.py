@@ -48,6 +48,6 @@ def get_nearest_node(graph: nx.MultiDiGraph, coords: tuple):
     return best_node
 
 if __name__ == "__main__":
-    from server.app.domain.routing.graph_loader import load_graph_from_disk
+    from app.domain.routing.graph_loader import load_graph_from_disk
     graph = load_graph_from_disk()
     print(get_nearest_node(graph, (51.460498, -2.585757)))

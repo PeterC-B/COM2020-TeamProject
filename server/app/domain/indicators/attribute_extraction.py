@@ -200,9 +200,9 @@ if __name__ == "__main__":
     fig, ax = ox.plot_graph(graph, show=False, close=False, node_size=2)
     #fig.savefig("server/app/domain/indicators/graph.png", dpi=300)
     nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
-    edges_gdf.to_csv("server/app/domain/indicators/surface.csv")
+    edges_gdf.to_csv("app/domain/indicators/surface.csv")
     edges_gdf = attach_edge_indicators(edges_gdf)
-    from server.app.domain.scoring.weight_utils import calculate_weights
+    from app.domain.scoring.weight_utils import calculate_weights
     calculate_weights(edges_gdf, 0.3, 0.5, 0.9)
     edges_export = edges_gdf.copy().reset_index()
     edges_export = edges_export[[

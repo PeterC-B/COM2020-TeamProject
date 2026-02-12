@@ -7,7 +7,7 @@ Defines:
     - Debugging breakdown helper
 """
 
-from server.app.domain.indicators.normalisation import normalise_edge_attributes
+from app.domain.indicators.normalisation import normalise_edge_attributes
 
 
 # Healthy Streets attribute schema
