@@ -3,13 +3,13 @@ import heapq
 
 import networkx as nx
 
-from server.app.api.utils.response_utils import (compare_routes,
+from app.api.utils.response_utils import (compare_routes,
                                                  format_route_response)
-from server.app.domain.routing.algorithms.dijkstra_algorithm import dijkstra
-from server.app.domain.routing.graph_cache import load_cached_graph
-from server.app.domain.routing.nearest_node import get_nearest_node
-from server.app.domain.scoring.cost_functions import healthy_cost
-from server.app.domain.scoring.weight_utils import (apply_default_weights,
+from app.domain.routing.algorithms.dijkstra_algorithm import dijkstra
+from app.domain.routing.graph_cache import load_cached_graph
+from app.domain.routing.nearest_node import get_nearest_node
+from app.domain.scoring.cost_functions import healthy_cost
+from app.domain.scoring.weight_utils import (apply_default_weights,
                                                     validate_weights)
 
 
