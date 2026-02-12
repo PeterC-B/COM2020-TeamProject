@@ -1,0 +1,256 @@
+<script setup lang="ts">
+import {
+    assertFeatureCollection,
+    parseFeatureId,
+    parseFeaturePointCoordinates,
+    type GeoJson,
+} from '@/components/simple-map/geoJsonUtils'
+import { useMapSelection } from '@/components/simple-map/useMapSelection'
+import {
+    EDGE_BASE_LAYER,
+    EDGE_HIGHLIGHT_LAYER,
+    EDGE_HIT_LAYER,
+    NODE_BASE_LAYER,
+    NODE_HIGHLIGHT_LAYER,
+    NODE_HIT_LAYER,
+} from '@/lib/mapLayers'
+import { fetchGraphData } from '@/services/graph'
+import maplibregl, { type Map } from 'maplibre-gl'
+import 'maplibre-gl/dist/maplibre-gl.css'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+
+const props = defineProps<{
+    routes?: Array<Array<[number, number]>>
+}>()
+
+const emit = defineEmits<{
+    (
+        event: 'selection-change',
+        payload: {
+            start: [number, number] | null
+            end: [number, number] | null
+            startNodeId: number | null
+            endNodeId: number | null
+        },
+    ): void
+}>()
+
+const mapEl = ref<HTMLDivElement | null>(null)
+let map: Map | null = null
+
+const nodes = ref<GeoJson | null>(null)
+const edges = ref<GeoJson | null>(null)
+const loading = ref(true)
+const error = ref<string | null>(null)
+const {
+    applyEdgeSelection,
+    applyNodeSelection,
+    clearFeatureSelection,
+    dispose,
+    selectedEdgeId,
+    selectedNodeId,
+    setMap,
+} = useMapSelection((payload) => emit('selection-change', payload))
+
+const selectableLayers = [
+    'nodes-circle-hit',
+    'edges-line-hit',
+    'nodes-circle',
+    'edges-line',
+] as const
+const selectableLayerIds = [...selectableLayers]
+const layerToSelection: Record<(typeof selectableLayers)[number], 'node' | 'edge'> = {
+    'nodes-circle-hit': 'node',
+    'edges-line-hit': 'edge',
+    'nodes-circle': 'node',
+    'edges-line': 'edge',
+}
+
+const routeSourceId = 'routes'
+const routeColors = ['#2563eb', '#ef4444', '#16a34a']
+const routeLayerIds = routeColors.map((_, index) => `route-line-${index}`)
+
+function toMapCoordinates(point: [number, number]): [number, number] {
+    // Backend route geometry is (lat, lon), but MapLibre expects (lon, lat).
+    const [lat, lon] = point
+    return [lon, lat]
+}
+
+function buildRouteFeatureCollection(routes: Array<Array<[number, number]>>): GeoJSON.FeatureCollection {
+    return {
+        type: 'FeatureCollection',
+        features: routes.slice(0, routeColors.length).flatMap((route, routeIndex) => {
+            if (route.length < 2) return []
+            return [
+                {
+                    type: 'Feature',
+                    properties: { routeIndex },
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: route.map(toMapCoordinates),
+                    },
+                },
+            ]
+        }),
+    }
+}
+
+function renderRoutes(routes: Array<Array<[number, number]>> = []) {
+    if (!map || !map.isStyleLoaded()) return
+
+    for (const layerId of routeLayerIds) {
+        if (map.getLayer(layerId)) map.removeLayer(layerId)
+    }
+    if (map.getSource(routeSourceId)) {
+        map.removeSource(routeSourceId)
+    }
+
+    map.addSource(routeSourceId, {
+        type: 'geojson',
+        data: buildRouteFeatureCollection(routes),
+    })
+
+    routeLayerIds.forEach((layerId, routeIndex) => {
+        map?.addLayer({
+            id: layerId,
+            type: 'line',
+            source: routeSourceId,
+            filter: ['==', ['get', 'routeIndex'], routeIndex],
+            paint: {
+                'line-color': routeColors[routeIndex],
+                'line-width': 4,
+                'line-opacity': 0.95,
+            },
+        })
+    })
+}
+
+// Initialize map and load graph data.
+onMounted(() => {
+    map! = new maplibregl.Map({
+        container: mapEl.value!,
+        style: 'https://demotiles.maplibre.org/style.json',
+        center: [-2.585757, 51.460498],
+        zoom: 15,
+    })
+    setMap(map)
+
+    map.addControl(new maplibregl.NavigationControl(), 'top-right')
+
+    map.on('load', () => {
+        if (!map) return
+        loading.value = true
+        error.value = null
+
+        fetchGraphData()
+            .then((graphData) => {
+                if (!map) return
+                const nodeCollection = assertFeatureCollection(graphData.features?.nodes, 'nodes')
+                const edgeCollection = assertFeatureCollection(graphData.features?.edges, 'edges')
+                nodes.value = nodeCollection
+                edges.value = edgeCollection
+
+                map.addSource('edges', {
+                    type: 'geojson',
+                    data: edgeCollection,
+                })
+                map.addSource('nodes', {
+                    type: 'geojson',
+                    data: nodeCollection,
+                })
+
+                // Add render layers
+                map.addLayer(EDGE_BASE_LAYER)
+                map.addLayer(EDGE_HIT_LAYER)
+                map.addLayer(EDGE_HIGHLIGHT_LAYER)
+                map.addLayer(NODE_BASE_LAYER)
+                map.addLayer(NODE_HIT_LAYER)
+                map.addLayer(NODE_HIGHLIGHT_LAYER)
+                renderRoutes(props.routes)
+
+                // Hit layers make node and edge selection easier.
+                map.on('click', (event) => {
+                    if (!map) return
+                    const features = map.queryRenderedFeatures(event.point, {
+                        layers: selectableLayerIds,
+                    })
+                    if (!features.length) {
+                        clearFeatureSelection()
+                        return
+                    }
+
+                    const feature = features[0]
+                    if (!feature) return
+
+                    const layerId = feature.layer.id as (typeof selectableLayers)[number]
+                    if (layerToSelection[layerId] === 'node') {
+                        const nodeId = parseFeatureId(feature.properties?.node_id)
+                        const point = parseFeaturePointCoordinates(feature)
+                        applyNodeSelection(nodeId, point)
+                        return
+                    }
+                    if (layerToSelection[layerId] === 'edge') {
+                        applyEdgeSelection(parseFeatureId(feature.properties?.edge_id))
+                    }
+                })
+
+                map.on('mousemove', (event) => {
+                    if (!map) return
+                    const features = map.queryRenderedFeatures(event.point, {
+                        layers: selectableLayerIds,
+                    })
+                    map.getCanvas().style.cursor = features.length ? 'pointer' : ''
+                })
+
+                const bounds = new maplibregl.LngLatBounds()
+                const nodeFeatures = nodes.value.features
+                for (const feature of nodeFeatures) {
+                    if (feature.geometry.type !== 'Point') continue
+                    const coordinates = feature.geometry.coordinates
+                    if (coordinates.length < 2) continue
+                    const lng = Number(coordinates[0])
+                    const lat = Number(coordinates[1])
+                    if (!Number.isFinite(lng) || !Number.isFinite(lat)) continue
+                    bounds.extend([lng, lat])
+                }
+                if (!bounds.isEmpty()) {
+                    map.fitBounds(bounds, { padding: 24, maxZoom: 16 })
+                    // Keep camera constrained to the dataset extent.
+                    map.setMaxBounds(bounds)
+                    map.setRenderWorldCopies(false)
+                }
+        })
+    })
+})
+
+watch(selectedEdgeId, (edgeId) => {
+    if (!map!) return
+    if (!map!.getLayer('edges-line-highlight')) return
+    const value = edgeId ?? -1
+    map!.setFilter('edges-line-highlight', ['==', ['get', 'edge_id'], value])
+})
+
+watch(selectedNodeId, (nodeId) => {
+    if (!map!) return
+    if (!map!.getLayer('nodes-circle-highlight')) return
+    const value = nodeId ?? -1
+    map!.setFilter('nodes-circle-highlight', ['==', ['get', 'node_id'], value])
+})
+
+onBeforeUnmount(() => {
+    dispose()
+    map?.remove()
+    map = null
+})
+
+watch(
+    () => props.routes,
+    (routes) => {
+        renderRoutes(routes ?? [])
+    },
+)
+</script>
+
+<template>
+    <div ref="mapEl" class="h-[calc(100vh-64px)] w-full" />
+</template>

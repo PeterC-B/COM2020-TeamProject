@@ -1,8 +1,9 @@
 from flask import request
+from marshmallow import ValidationError as MarshmallowValidationError
 from werkzeug.exceptions import HTTPException
 
-from app.api.responses import error
-from app.domain.errors import (
+from server.app.api.responses import error
+from server.app.domain.errors import (
     AppError,
     AuthError,
     ConflictError,
@@ -81,6 +82,14 @@ def register_error_handlers(app) -> None:
             details=err.details,
             status=400,
         )
+
+    @app.errorhandler(MarshmallowValidationError)
+    def handle_schema_validation_error(err: MarshmallowValidationError):
+        mapped = ValidationError(
+            message="Request validation failed",
+            details={"fields": err.messages},
+        )
+        return handle_validation_error(mapped)
 
     # HTTP Errors eg. 404 not found, 405 method not allowed etc.
 

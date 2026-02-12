@@ -20,3 +20,8 @@ class UserRepository:
         results = self.session.execute(stmt).scalars().all()
 
         return results, len(results)
+
+    def get_by_username(self, username: str):
+        stmt = select(UserAccountModel).where(UserAccountModel.username == username)
+        response = self.session.execute(stmt).scalars().first()
+        return response

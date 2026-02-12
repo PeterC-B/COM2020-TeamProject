@@ -19,7 +19,7 @@
  #   debug = os.environ.get("DEBUG", "False") == "True"
 #    app.run(host=host, port=port, debug=debug)
 
-from app import create_app
+from server.app import create_app
 
 app = create_app()
 
