@@ -1,9 +1,10 @@
 from flask import Blueprint
 from server.app.api.responses import ok
 from server.app.domain.missions.missions_read import MissionReadSchema
+from flask import request
 
 
-def create_missions_blueprint(list_missions_uc, get_mission_uc):
+def create_missions_blueprint(list_missions_uc, get_mission_uc, create_mission_uc):
     bp = Blueprint("missions", __name__, url_prefix="/missions")
 
     @bp.route("", methods=["GET"])
@@ -17,5 +18,10 @@ def create_missions_blueprint(list_missions_uc, get_mission_uc):
         mission = get_mission_uc.execute(mission_id)
         data = MissionReadSchema().dump(mission)
         return ok(data=data)
+    
+    @bp.route('', methods=['POST'])
+    def create_mission():
+        mission = create_mission_uc.execute(request.json)
+        return ok(data=MissionReadSchema().dump(mission), status=201)
 
     return bp
