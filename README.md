@@ -112,12 +112,27 @@ In light of this, James chose to only use Yen's algorithm for sprint 1, as it al
 
 ### Routing:
 #### Assignees: Max, James
+Max started off with looking at OpenSteetMap Networks (OSMnx) which allowed us to create a map view and download all of the edges and nodes for our chosen spot into CSV files for future use. It also allows us to find all of the nearby features that are needed for our scoring, including:
+
+ - Lighting
+ - Places you can drink in
+ - Greenery
+ - The distance of each edge
+ - The amenities that act as our key nodes to go to and from
+
+OSMnx also allows us to generate the geometry for each edge and node, which is useful for generating our map data inside our website.
+
+Eventually we just use OSMnx to generate the necessary files for our project, and don't use it for anything else.
 
 ### Database: 
 #### Assignees: Max, Peter, Charlotte
+Peter started this off by creating a Docker container using Postgres SQL to store our information in, which can be hosted using AWS so would be ideal for our project. Charlotte then created an Entity Relationship Diagram for our data tables and planned out the relationships. Peter initially created the nodes and edges tables using Flask SQL. Max then finished off the edges and nodes table, and created the missions model. Charlotte then completed the mission_progress and location models with appropriate relationships as per her ERD.
+
+Max then tested the SQL with Docker implementation and made sure the models worked well.
 
 ### Scoring / Weighting:
 #### Assignees: James, Max
+
 
 ### Deployment
 #### Assignees: Eleanor, Peter
