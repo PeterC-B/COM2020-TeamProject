@@ -127,11 +127,11 @@ function renderRoutes(routes: Array<Array<[number, number]>> = []) {
 
 // Initialize map and load graph data.
 onMounted(() => {
-    map = new maplibregl.Map({
+    map! = new maplibregl.Map({
         container: mapEl.value!,
         style: 'https://demotiles.maplibre.org/style.json',
-        center: [-0.1276, 51.5072],
-        zoom: 12,
+        center: [-2.585757, 51.460498],
+        zoom: 15,
     })
     setMap(map)
 
@@ -220,27 +220,53 @@ onMounted(() => {
                     map.setRenderWorldCopies(false)
                 }
             })
-            .catch((err) => {
-                error.value = err instanceof Error ? err.message : 'Failed to load GeoJSON'
+            if (!features.length) {
+                selectedNodeId.value = null
+                selectedEdgeId.value = null
+                return
+            }
+            const feature = features[0]
+            const layerId = feature.layer.id as (typeof selectableLayers)[number]
+            if (layerToSelection[layerId] === 'node') {
+                selectedNodeId.value = parseFeatureId(feature.properties?.node_id)
+                selectedEdgeId.value = null
+                return
+            }
+            if (layerToSelection[layerId] === 'edge') {
+                selectedEdgeId.value = parseFeatureId(feature.properties?.edge_id)
+                selectedNodeId.value = null
+            }
+        })
+
+        map!.on('mousemove', (event) => {
+            if (!map!) return
+            const features = map!.queryRenderedFeatures(event.point, {
+                layers: selectableLayers as unknown as string[],
             })
-            .finally(() => {
-                loading.value = false
-            })
+            map!.getCanvas().style.cursor = features.length ? 'pointer' : ''
+        })
+
+        if (!bounds.isEmpty()) {
+            map!.fitBounds(bounds as LngLatBoundsLike, { padding: 24, maxZoom: 16 })
+            // Keep the camera locked to the dataset so you don't pan out to the world.
+            map!.setMaxBounds(bounds as LngLatBoundsLike)
+            map!.setRenderWorldCopies(false)
+        }
     })
 })
 
 watch(selectedEdgeId, (edgeId) => {
-    if (!map) return
-    if (!map.getLayer('edges-line-highlight')) return
+    if (!map!) return
+    if (!map!.getLayer('edges-line-highlight')) return
     const value = edgeId ?? -1
-    map.setFilter('edges-line-highlight', ['==', ['get', 'edge_id'], value])
+    map!.setFilter('edges-line-highlight', ['==', ['get', 'edge_id'], value])
 })
 
 watch(selectedNodeId, (nodeId) => {
-    if (!map) return
-    if (!map.getLayer('nodes-circle-highlight')) return
+    if (!map!) return
+    if (!map!.getLayer('nodes-circle-highlight')) return
     const value = nodeId ?? -1
-    map.setFilter('nodes-circle-highlight', ['==', ['get', 'node_id'], value])
+    map!.setFilter('nodes-circle-highlight', ['==', ['get', 'node_id'], value])
 })
 
 onBeforeUnmount(() => {
