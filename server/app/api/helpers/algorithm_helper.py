@@ -8,10 +8,10 @@ from shapely.geometry import Point
 from shapely.ops import unary_union
 import geopandas as gpd
 
-from server.app.extensions import db
-from server.app.models.nodes_model import NodesModel
-from server.app.models.location_model import LocationModel
-from server.app.models.edges_model import EdgesModel
+from app.extensions import db
+from app.models.nodes_model import NodesModel
+from app.models.location_model import LocationModel
+from app.models.edges_model import EdgesModel
 from sqlalchemy import func
 
 def get_dict_of_edges(graph : nx.MultiDiGraph):

@@ -4,11 +4,11 @@ from pathlib import Path
 import osmnx as ox
 from flask import Blueprint, jsonify, request
 
-import server.app.api.helpers.algorithm_helper as help_algos
+import app.api.helpers.algorithm_helper as help_algos
 from client.public.convert import (build_edges_geojson, build_nodes_geojson,
                                    load_edge_geometries)
-from server.app.domain.routing.algorithms.yen_algorithm import yens
-from server.app.extensions import db
+from app.domain.routing.algorithms.yen_algorithm import yens
+from app.extensions import db
 
 route_bp = Blueprint("route", __name__)
 
@@ -21,7 +21,7 @@ edge_geometries = load_edge_geometries(GEOM_CSV)
 nodes_geojson = build_nodes_geojson(NODES_CSV)
 edges_geojson = build_edges_geojson(EDGES_CSV, edge_geometries)
 
-JSON_PATH = "server/app/api/helpers/edge_list.json"
+JSON_PATH = "app/api/helpers/edge_list.json"
 
 NODES_GDF = help_algos.nodes_csv_to_gdf()
 EDGES_GDF = help_algos.edges_csv_to_gdf()
@@ -78,7 +78,7 @@ def get_route_breakdown():
     }
 
     # Get count of crossings, traffic lights, turning circles
-    from server.app.models.enums.HIGHWAY_FEATURES import HighwayFeatures
+    from app.models.enums.HIGHWAY_FEATURES import HighwayFeatures
     feature_dict = {}
     for feature in HighwayFeatures:
         feature_name = f"{feature.value}s" if feature.value[len(feature.value) - 1] != "s" else feature.value
@@ -130,7 +130,7 @@ def get_route_breakdown_main(edge_list):
         "traffic_feature_count" : feature_dict
     }
 
-    with open("server/app/api/helpers/route_info.json", 'w') as f:
+    with open("app/api/helpers/route_info.json", 'w') as f:
         dump({"route_data":route_info}, f, indent=4)
 
 # Testing

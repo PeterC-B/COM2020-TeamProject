@@ -4,7 +4,7 @@ Weight utilities:
     - Apply defaults
     - Clamp values to valid ranges
 """
-import server.app.api.helpers.algorithm_helper as help_algos
+import app.api.helpers.algorithm_helper as help_algos
 import geopandas as gpd
 import osmnx as ox
 import numpy as np
