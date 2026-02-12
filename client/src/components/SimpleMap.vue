@@ -219,39 +219,7 @@ onMounted(() => {
                     map.setMaxBounds(bounds)
                     map.setRenderWorldCopies(false)
                 }
-            })
-            if (!features.length) {
-                selectedNodeId.value = null
-                selectedEdgeId.value = null
-                return
-            }
-            const feature = features[0]
-            const layerId = feature.layer.id as (typeof selectableLayers)[number]
-            if (layerToSelection[layerId] === 'node') {
-                selectedNodeId.value = parseFeatureId(feature.properties?.node_id)
-                selectedEdgeId.value = null
-                return
-            }
-            if (layerToSelection[layerId] === 'edge') {
-                selectedEdgeId.value = parseFeatureId(feature.properties?.edge_id)
-                selectedNodeId.value = null
-            }
         })
-
-        map!.on('mousemove', (event) => {
-            if (!map!) return
-            const features = map!.queryRenderedFeatures(event.point, {
-                layers: selectableLayers as unknown as string[],
-            })
-            map!.getCanvas().style.cursor = features.length ? 'pointer' : ''
-        })
-
-        if (!bounds.isEmpty()) {
-            map!.fitBounds(bounds as LngLatBoundsLike, { padding: 24, maxZoom: 16 })
-            // Keep the camera locked to the dataset so you don't pan out to the world.
-            map!.setMaxBounds(bounds as LngLatBoundsLike)
-            map!.setRenderWorldCopies(false)
-        }
     })
 })
 

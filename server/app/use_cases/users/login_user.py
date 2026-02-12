@@ -25,8 +25,8 @@ class LoginUser:
         if not username or not password:
             raise ValidationError(message="Username and password are required")
 
+
         user = self.user_repo.get_by_username(username)
-        print("User fetched from repository:", user)
         if user is None or user.password_hash != f"hashed-{password}":
             raise AuthError(message="Invalid username or password")
 
