@@ -87,6 +87,8 @@ Responsibilites:
    - Created an AWS instance for deploying our website
    - Compiled our project into AWS to be deployed by it
 
+<br>
+
 ## File Structure:
 
 ## Breakdown of each main project part
@@ -96,6 +98,10 @@ Responsibilites:
 3. [Database](#database)
 4. [Scoring / Weighting](#scoring--weighting)
 5. [Deployment](#deployment)
+
+<br>
+
+---
 
 ### Shortest Path Algorithms:
 #### Assignees: James
@@ -109,6 +115,8 @@ We decided to use some standard routing algorithms to calculate the shortest pat
   - The A-Star (A*) algorithm also uses a heuristic function to combine the best aspects of Dijkstra's algorithm, while including the best parts of a greedy best-first search.
 
 In light of this, James chose to only use Yen's algorithm for sprint 1, as it allows for the creation of 3 shortest routes without having to run the function multiple times.
+
+<br>
 
 ### Routing:
 #### Assignees: Max, James
@@ -124,18 +132,46 @@ OSMnx also allows us to generate the geometry for each edge and node, which is u
 
 Eventually we just use OSMnx to generate the necessary files for our project, and don't use it for anything else.
 
+<br>
+
 ### Database: 
 #### Assignees: Max, Peter, Charlotte
 Peter started this off by creating a Docker container using Postgres SQL to store our information in, which can be hosted using AWS so would be ideal for our project. Charlotte then created an Entity Relationship Diagram for our data tables and planned out the relationships. Peter initially created the nodes and edges tables using Flask SQL. Max then finished off the edges and nodes table, and created the missions model. Charlotte then completed the mission_progress and location models with appropriate relationships as per her ERD.
 
 Max then tested the SQL with Docker implementation and made sure the models worked well.
 
+<br>
+
 ### Scoring / Weighting:
 #### Assignees: James, Max
+We started by coming up with the indicators that we would use for the for the routing weights:
+1. Proximity to green spaces
+2. Proximity to places you can drink
+3. Whether the edges are lit or not
+4. Distance of the node
+5. Surface quality of each node
 
+<br>
+
+We then grouped these into the 3 route preferences that the user can adjust using sliders on the route selection page:
+1. Safety
+   - Lighting
+   - Proximity to places you can drink
+2. Greenery
+   - Proximity to green spaces
+3. Speed
+   - Time
+   - Surface quality
+  
+<br>
+For each map load, the weights are calculated based on the indicators and the weight that the user gives to each of the sliders. This is then multiplied by the distance of the edges which calculates the new weights.
+
+<br>
 
 ### Deployment
 #### Assignees: Eleanor, Peter
+
+<br>
 
 ## Local Setup for Dev Database on Windows:
 

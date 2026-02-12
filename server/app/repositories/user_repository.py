@@ -23,4 +23,5 @@ class UserRepository:
 
     def get_by_username(self, username: str):
         stmt = select(UserAccountModel).where(UserAccountModel.username == username)
-        return self.session.execute(stmt).scalars().first()
+        response = self.session.execute(stmt).scalars().first()
+        return response
