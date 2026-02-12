@@ -23,9 +23,10 @@ from server.app.use_cases.routing.route_yens import RouteYens
 from server.app.use_cases.users.list_users import ListUsers
 from server.app.use_cases.users.login_user import LoginUser
 from server.app.use_cases.users.register_user import RegisterUser
-from server.app.repositories.mission_repository import MissionRepository
+from server.app.repositories.mission_repository import MissionsRepository
 from server.app.use_cases.missions.list_missions import ListMissions
 from server.app.use_cases.missions.get_mission import GetMission
+from server.app.use_cases.missions.create_mission import CreateMission
 from server.app.api.missions.routes import create_missions_blueprint
 
 
@@ -64,7 +65,7 @@ def create_app():
     user_repo = UserRepository(session)
     graph_data_repo = GraphDataRepository()
     routing_graph_repo = RoutingGraphRepository()
-    missions_repo = MissionRepository(session)
+    missions_repo = MissionsRepository(session)
 
     # Initialise the Use Cases
     register_user_uc = RegisterUser(uow, user_repo)
@@ -77,13 +78,14 @@ def create_app():
     route_yens_uc = RouteYens(routing_graph_repo)
     list_missions_uc = ListMissions(missions_repo)
     get_mission_uc = GetMission(missions_repo)
+    create_mission_uc = CreateMission(missions_repo)
 
     # Initialise the Routes
     app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc))
     app.register_blueprint(create_graph_route_blueprint(get_graph_data_uc))
     app.register_blueprint(create_health_routes(get_health_attributes_uc, get_default_weights_uc, explain_edge_cost_uc))
     app.register_blueprint(create_routing_route_blueprint(route_yens_uc))
-    app.register_blueprint(create_missions_blueprint(list_missions_uc, get_mission_uc))
+    app.register_blueprint(create_missions_blueprint(list_missions_uc, get_mission_uc, create_mission_uc))
 
     # Import error handlers
     register_error_handlers(app)
