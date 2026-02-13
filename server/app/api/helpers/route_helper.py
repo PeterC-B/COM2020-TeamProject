@@ -1,14 +1,13 @@
 from json import dump
 from pathlib import Path
 
-import osmnx as ox
-from flask import Blueprint, jsonify, request
-
 import app.api.helpers.algorithm_helper as help_algos
-from client.public.convert import (build_edges_geojson, build_nodes_geojson,
-                                   load_edge_geometries)
+import osmnx as ox
 from app.domain.routing.algorithms.yen_algorithm import yens
 from app.extensions import db
+from client.public.convert import (build_edges_geojson, build_nodes_geojson,
+                                   load_edge_geometries)
+from flask import Blueprint, jsonify, request
 
 route_bp = Blueprint("route", __name__)
 
@@ -118,7 +117,7 @@ def get_route_breakdown_main(edge_list):
     }
 
     # Get count of crossings, traffic lights, turning circles
-    from server.app.models.enums.HIGHWAY_FEATURES import HighwayFeatures
+    from app.models.enums.HIGHWAY_FEATURES import HighwayFeatures
     feature_dict = {}
     for feature in HighwayFeatures:
         feature_name = f"{feature.value}s" if feature.value[len(feature.value) - 1] != "s" else feature.value
@@ -143,4 +142,5 @@ if __name__ == "__main__":
     edge_list = [104804, 282237615, 19875363, 5906108608, 19875366, 104837, 5906030287, 262442708, 104838, 287226483, 3332266263, 287226495, 3696173720, 9464338656, 644926923, 5823455892, 3329881929, 6937982874, 1280853173, 1382252976, 247834407, 242756955, 17406787, 104859, 365559371, 13288882110]
     with app.app_context():
         db.create_all()
+        get_route_breakdown_main(edge_list)
         get_route_breakdown_main(edge_list)

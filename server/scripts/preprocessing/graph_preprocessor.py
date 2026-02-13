@@ -18,16 +18,12 @@ Outputs:
 
 import os
 import pickle
-import osmnx as ox
+
 import networkx as nx
-import pandas as pd
-
-from server.app.domain.indicators.attribute_extraction import (
-    attach_edge_indicators,
-    compute_amenity_proximity,
-)
-from server.app.domain.indicators.normalisation import normalise_graph_attributes
-
+import osmnx as ox
+from app.domain.indicators.attribute_extraction import (
+    attach_edge_indicators, compute_amenity_proximity)
+from app.domain.indicators.normalisation import normalise_graph_attributes
 
 # ---------------------------------------------------------
 # Output paths

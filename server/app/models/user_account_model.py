@@ -2,12 +2,12 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import UUID, DateTime, String
+from app.extensions import db
+from app.models.enums.ACCESS_TYPE import UserAccessType
+from sqlalchemy import UUID, DateTime
 from sqlalchemy import Enum as SQLEnum
-from server.app.models.enums.ACCESS_TYPE import UserAccessType
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
-
-from server.app.extensions import db
 
 # TODO: Whenever changed, edit the report documentation
 
