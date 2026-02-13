@@ -3,12 +3,13 @@ from pathlib import Path
 
 import app.api.helpers.algorithm_helper as help_algos
 import osmnx as ox
+from app.api.responses import ok
 from app.domain.errors import ValidationError
 from app.domain.routing.algorithms.yen_algorithm import yens
 from app.extensions import db
 from client.public.convert import (build_edges_geojson, build_nodes_geojson,
                                    load_edge_geometries)
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 
 route_bp = Blueprint("route", __name__)
 
@@ -55,7 +56,7 @@ def run_route_algorithm():
         route_edges = help_algos.edges_in_path(path, EDGES_GDF)
         route_geojson[name] = help_algos.path_to_geojson(route_edges)
 
-    return jsonify(route_geojson)
+    return ok(data=route_geojson)
     
 @route_bp.route("/route_breakdown", methods=["GET"])
 def get_route_breakdown():
@@ -96,7 +97,7 @@ def get_route_breakdown():
         "traffic_feature_count" : feature_dict
     }
 
-    return jsonify({"route_data": route_info})
+    return ok(data={"route_data": route_info})
 
 
 def get_route_breakdown_main(edge_list):
