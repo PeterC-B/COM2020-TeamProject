@@ -47,3 +47,7 @@ export function put<T = unknown>(endpoint: string, data: unknown) {
         headers: getHeaders(),
     })
 }
+
+export function postPublic<T = unknown>(endpoint: string, data: unknown) {
+    return http.post<T>(endpoint, data)
+}
