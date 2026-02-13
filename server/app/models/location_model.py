@@ -16,9 +16,4 @@ class LocationModel(db.Model):
     name: Mapped[str] = mapped_column(String(50), nullable=False)
     node_id: Mapped[int] = mapped_column(ForeignKey("nodes.node_id"), nullable=False)
     node: Mapped["NodesModel"] = relationship("NodesModel", foreign_keys=[node_id])
-
-    type: Mapped[LocationType] = mapped_column(SQLEnum(LocationType), nullable=False, default=LocationType.GENERAL_AMENITY)
-
-    type: Mapped[LocationType] = mapped_column(SQLEnum(LocationType), nullable=False, default=LocationType.GENERAL_AMENITY)
-
     type: Mapped[LocationType] = mapped_column(SQLEnum(LocationType), nullable=False, default=LocationType.GENERAL_AMENITY)

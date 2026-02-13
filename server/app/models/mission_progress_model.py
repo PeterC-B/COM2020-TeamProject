@@ -23,4 +23,4 @@ class MissionProgressModel(db.Model):
     mission: Mapped["MissionsModel"] = relationship("MissionsModel", foreign_keys=[mission_id])
 
     status: Mapped[MissionStatus] = mapped_column(SQLEnum(MissionStatus), nullable=False, default=MissionStatus.NOT_STARTED)
-    score: Mapped[int] = mapped_column(Integer(), nullable=False)    score: Mapped[int] = mapped_column(Integer(), nullable=False)
+    score: Mapped[int] = mapped_column(Integer(), nullable=False)
