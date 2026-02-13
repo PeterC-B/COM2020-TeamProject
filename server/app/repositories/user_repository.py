@@ -22,6 +22,10 @@ class UserRepository:
         return results, len(results)
 
     def get_by_username(self, username: str):
-        stmt = select(UserAccountModel).where(UserAccountModel.username == username)
-        response = self.session.execute(stmt).scalars().first()
-        return response
+        try:
+            stmt = select(UserAccountModel).where(UserAccountModel.username == username)
+            response = self.session.execute(stmt).scalars().first()
+            return response
+        except Exception as e:
+            print(e)
+            raise
