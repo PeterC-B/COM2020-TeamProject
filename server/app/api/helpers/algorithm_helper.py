@@ -32,7 +32,7 @@ def get_dict_of_edges(graph : nx.MultiDiGraph):
 
     return all_edges
 
-def nodes_csv_to_gdf(csv_path: str = "server/data/processed/nodes_table.csv", crs="EPSG:4326") -> gpd.GeoDataFrame:
+def nodes_csv_to_gdf(csv_path: str = "app/data/processed/nodes_table.csv", crs="EPSG:4326") -> gpd.GeoDataFrame:
     df = pd.read_csv(csv_path)
 
     geometry = [
@@ -52,8 +52,8 @@ def nodes_csv_to_gdf(csv_path: str = "server/data/processed/nodes_table.csv", cr
     return gdf
 
 def edges_csv_to_gdf(
-    edges_csv: str = "server/data/processed/edges_table.csv",
-    geom_csv: str = "server/data/processed/edges_geometry.csv",
+    edges_csv: str = "app/data/processed/edges_table.csv",
+    geom_csv: str = "app/data/processed/edges_geometry.csv",
     crs="EPSG:4326"
 ) -> gpd.GeoDataFrame:
 

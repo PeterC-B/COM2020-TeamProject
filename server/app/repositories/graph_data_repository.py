@@ -1,11 +1,11 @@
 from pathlib import Path
 
-from server.data.convert import build_edges_geojson, build_nodes_geojson, load_edge_geometries
+from app.data.convert import build_edges_geojson, build_nodes_geojson, load_edge_geometries
 
 
 class GraphDataRepository:
     def __init__(self, data_path: Path | None = None):
-        self.data_path = data_path or Path("server/data/processed")
+        self.data_path = data_path or Path("app/data/processed")
 
     def get_graph_features(self):
         nodes_csv = self.data_path / "nodes_table.csv"

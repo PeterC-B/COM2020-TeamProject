@@ -29,7 +29,7 @@ from app.domain.indicators.normalisation import normalise_graph_attributes
 # Output paths
 # ---------------------------------------------------------
 
-OUTPUT_DIR = "server/data/processed"
+OUTPUT_DIR = "app/data/processed"
 GRAPH_PKL = os.path.join(OUTPUT_DIR, "processed_graph.pkl")
 GRAPH_GRAPHML = os.path.join(OUTPUT_DIR, "processed_graph.graphml")
 NODES_CSV = os.path.join(OUTPUT_DIR, "nodes_table.csv")
