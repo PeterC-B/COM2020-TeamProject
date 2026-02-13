@@ -1,10 +1,10 @@
 # ORM model representation of a user in the database
-from sqlalchemy import Float, BigInteger
+from app.extensions import db
+from app.models.enums.HIGHWAY_FEATURES import HighwayFeatures
+from sqlalchemy import BigInteger
 from sqlalchemy import Enum as SQLEnum
+from sqlalchemy import Float
 from sqlalchemy.orm import Mapped, mapped_column
-from server.app.models.enums.HIGHWAY_FEATURES import HighwayFeatures
-
-from server.app.extensions import db
 
 # TODO: Whenever changed, edit the report documentation
 

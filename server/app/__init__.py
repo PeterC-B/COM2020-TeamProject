@@ -1,34 +1,31 @@
 # Create_app() function to initialize the Flask application
 
+from app.api.error_handlers import register_error_handlers
+from app.api.graph.graph_endpoints import create_graph_route_blueprint
+from app.api.health.health_endpoints import create_health_routes
+from app.api.missions.routes import create_missions_blueprint
+from app.api.routing.routing_endpoints import create_routing_route_blueprint
+from app.api.users.routes import create_user_route_blueprint
+from app.config import Config
+from app.extensions import db, jwt, ma, migrate
+from app.repositories.graph_data_repository import GraphDataRepository
+from app.repositories.mission_repository import MissionsRepository
+from app.repositories.routing_graph_repository import RoutingGraphRepository
+from app.repositories.user_repository import UserRepository
+from app.unit_of_work.sqlalchemy_uow import SqlAlchemyUnitOfWork
+from app.use_cases.graph.get_graph_data import GetGraphData
+from app.use_cases.health.explain_edge_cost import ExplainEdgeCost
+from app.use_cases.health.get_attributes import GetHealthAttributes
+from app.use_cases.health.get_default_weights import GetDefaultWeights
+from app.use_cases.missions.create_mission import CreateMission
+from app.use_cases.missions.get_mission import GetMission
+from app.use_cases.missions.list_missions import ListMissions
+from app.use_cases.routing.route_yens import RouteYens
+from app.use_cases.users.list_users import ListUsers
+from app.use_cases.users.login_user import LoginUser
+from app.use_cases.users.register_user import RegisterUser
 from flask import Flask
 from flask_cors import CORS
-
-from server.app.api.error_handlers import register_error_handlers
-from server.app.api.graph.graph_endpoints import create_graph_route_blueprint
-from server.app.api.health.health_endpoints import create_health_routes
-from server.app.api.routing.routing_endpoints import \
-    create_routing_route_blueprint
-from server.app.api.users.routes import create_user_route_blueprint
-from server.app.config import Config
-from server.app.extensions import db, jwt, ma, migrate
-from server.app.repositories.graph_data_repository import GraphDataRepository
-from server.app.repositories.routing_graph_repository import RoutingGraphRepository
-from server.app.repositories.user_repository import UserRepository
-from server.app.unit_of_work.sqlalchemy_uow import SqlAlchemyUnitOfWork
-from server.app.use_cases.graph.get_graph_data import GetGraphData
-from server.app.use_cases.health.explain_edge_cost import ExplainEdgeCost
-from server.app.use_cases.health.get_attributes import GetHealthAttributes
-from server.app.use_cases.health.get_default_weights import GetDefaultWeights
-from server.app.use_cases.routing.route_yens import RouteYens
-from server.app.use_cases.users.list_users import ListUsers
-from server.app.use_cases.users.login_user import LoginUser
-from server.app.use_cases.users.register_user import RegisterUser
-from server.app.repositories.mission_repository import MissionsRepository
-from server.app.use_cases.missions.list_missions import ListMissions
-from server.app.use_cases.missions.get_mission import GetMission
-from server.app.use_cases.missions.create_mission import CreateMission
-from server.app.api.missions.routes import create_missions_blueprint
-
 
 
 def create_app():
@@ -54,7 +51,7 @@ def create_app():
     ma.init_app(app)
 
     # Register the models
-    from server.app.models import user_account_model
+    from app.models import user_account_model
 
     # Initialise the services
     session = db.session
@@ -78,7 +75,7 @@ def create_app():
     route_yens_uc = RouteYens(routing_graph_repo)
     list_missions_uc = ListMissions(missions_repo)
     get_mission_uc = GetMission(missions_repo)
-    create_mission_uc = CreateMission(missions_repo)
+    create_mission_uc = CreateMission(uow, missions_repo)
 
     # Initialise the Routes
     app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc))

@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 
+from app.domain.errors import AuthError, ValidationError
 from flask_jwt_extended import create_access_token
-
-from server.app.domain.errors import AuthError, ValidationError
 
 
 @dataclass(frozen=True)

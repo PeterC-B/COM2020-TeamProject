@@ -1,4 +1,4 @@
-from server.app.domain.routing.graph_cache import load_cached_graph
+from app.domain.routing.graph_cache import load_cached_graph
 
 
 class RoutingGraphRepository:

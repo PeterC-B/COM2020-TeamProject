@@ -1,17 +1,10 @@
+from app.api.responses import error
+from app.domain.errors import (AppError, AuthError, ConflictError,
+                               ForbiddenError, InfrastructureError,
+                               NotFoundError, ValidationError)
 from flask import request
 from marshmallow import ValidationError as MarshmallowValidationError
 from werkzeug.exceptions import HTTPException
-
-from server.app.api.responses import error
-from server.app.domain.errors import (
-    AppError,
-    AuthError,
-    ConflictError,
-    ForbiddenError,
-    InfrastructureError,
-    NotFoundError,
-    ValidationError,
-)
 
 
 def register_error_handlers(app) -> None:

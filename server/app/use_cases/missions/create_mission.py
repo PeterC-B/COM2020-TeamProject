@@ -1,4 +1,5 @@
-from server.app.models.missions_model import MissionsModel
+from app.models.missions_model import MissionsModel
+
 
 class CreateMission:
     def __init__(self, uow, missions_repo):
