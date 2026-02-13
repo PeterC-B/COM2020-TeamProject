@@ -1,14 +1,15 @@
 # ORM model representation of a user in the database
 import uuid
 
-from sqlalchemy import UUID, String, Li
+from app.extensions import db
+from app.models.enums.MISSION_TIER import MissionTier
+from sqlalchemy import UUID
 from sqlalchemy import Enum as SQLEnum
-from server.app.models.enums.MISSION_TIER import MissionTier
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
 # TODO: Whenever changed, edit the report documentation
 
-from server.app.extensions import db
 
 class MissionsModel(db.Model):
     __tablename__ = "missions"

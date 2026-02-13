@@ -1,5 +1,5 @@
-from server.app.extensions import ma
-from server.app.models.missions_model import MissionsModel
+from app.extensions import ma
+from app.models.missions_model import MissionsModel
 
 
 class MissionReadSchema(ma.SQLAlchemySchema):
