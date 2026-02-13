@@ -3,6 +3,7 @@ from pathlib import Path
 
 import app.api.helpers.algorithm_helper as help_algos
 import osmnx as ox
+from app.domain.errors import ValidationError
 from app.domain.routing.algorithms.yen_algorithm import yens
 from app.extensions import db
 from client.public.convert import (build_edges_geojson, build_nodes_geojson,
@@ -33,12 +34,18 @@ def run_route_algorithm():
     end_node = request.args.get("end", type=int)
 
     if start_node is None or end_node is None:
-        return jsonify({"error": "Start and end nodes required"}), 400
+        raise ValidationError(
+            message="Start and end nodes required",
+            details={"required_fields": ["start", "end"]},
+        )
 
     edge_list = help_algos.get_dict_of_edges(GRAPH)
 
     if start_node not in GRAPH or end_node not in GRAPH:
-        return jsonify({"error" : "Invalid start or end node"}), 400
+        raise ValidationError(
+            message="Invalid start or end node",
+            details={"start": start_node, "end": end_node},
+        )
     
     shortest_paths = yens(edge_list, start_node, end_node)
     route_geojson = {}
