@@ -1,14 +1,15 @@
-from app.extensions import ma
+from app.models.enums.MISSION_TIER import MissionTier
 from app.models.missions_model import MissionsModel
+from marshmallow import Schema, fields
 
 
-class MissionReadSchema(ma.SQLAlchemySchema):
+class MissionReadSchema(Schema):
     class Meta:
         model = MissionsModel
 
-    mission_id = ma.auto_field()
-    mission_name = ma.auto_field()
-    question = ma.auto_field()
-    possible_answers = ma.auto_field()
-    answer = ma.auto_field()
-    tier = ma.auto_field()
+    mission_id = fields.UUID(required=True)
+    mission_name = fields.String(required=True)
+    question = fields.String(required=True)
+    possible_answers = fields.List(fields.String(), required=True)
+    answer = fields.String(required=True)
+    tier = fields.Enum(MissionTier, required=True)
