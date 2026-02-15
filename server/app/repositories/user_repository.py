@@ -4,6 +4,7 @@
 from sqlalchemy import select
 
 from app.models.user_account_model import UserAccountModel
+from app.repositories.db_error_mapper import map_db_errors
 
 
 class UserRepository:
@@ -13,7 +14,7 @@ class UserRepository:
     def add(self, user: UserAccountModel) -> None:
         self.session.add(user)
 
-
+    @map_db_errors("user:get")
     def get(self):
         stmt = select(UserAccountModel)
 
@@ -21,11 +22,7 @@ class UserRepository:
 
         return results, len(results)
 
+    @map_db_errors("user:get_by_username")
     def get_by_username(self, username: str):
-        try:
-            stmt = select(UserAccountModel).where(UserAccountModel.username == username)
-            response = self.session.execute(stmt).scalars().first()
-            return response
-        except Exception as e:
-            print(e)
-            raise
+        stmt = select(UserAccountModel).where(UserAccountModel.username == username)
+        return self.session.execute(stmt).scalars().first()
