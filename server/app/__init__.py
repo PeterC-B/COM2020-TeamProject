@@ -1,5 +1,8 @@
 # Create_app() function to initialize the Flask application
 
+from flask import Flask
+from flask_cors import CORS
+
 from app.api.error_handlers import register_error_handlers
 from app.api.graph.graph_endpoints import create_graph_route_blueprint
 from app.api.health.health_endpoints import create_health_routes
@@ -24,8 +27,6 @@ from app.use_cases.routing.route_yens import RouteYens
 from app.use_cases.users.list_users import ListUsers
 from app.use_cases.users.login_user import LoginUser
 from app.use_cases.users.register_user import RegisterUser
-from flask import Flask
-from flask_cors import CORS
 
 
 def create_app():
@@ -38,6 +39,9 @@ def create_app():
 
     app.config['SQLALCHEMY_DATABASE_URI'] = config.DB_URI
 
+
+    print("Database URI:", app.config['SQLALCHEMY_DATABASE_URI'])  # Debugging line
+    
     app.config['JWT_SECRET_KEY'] = config.SECRET_KEY
 
     # Enable CORS for local frontend-backend development across ports.
@@ -51,7 +55,14 @@ def create_app():
     ma.init_app(app)
 
     # Register the models
-    from app.models import user_account_model
+    from app.models import (
+        edges_model,
+        location_model,
+        mission_progress_model,
+        missions_model,
+        nodes_model,
+        user_account_model,
+    )
 
     # Initialise the services
     session = db.session
