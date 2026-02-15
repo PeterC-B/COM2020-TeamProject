@@ -5,6 +5,7 @@ import { useMainStore } from '@/stores/main'
 
 const routes: RouteRecordRaw[] = [
     { path: '/login', component: () => import('@/views/LoginView.vue') },
+    { path: '/register', component: () => import('@/views/RegisterView.vue') },
     { path: '/', component: () => import('@/views/HomeView.vue'), meta: { requiresAuth: true } },
     { path: '/map', component: () => import('@/views/MapView.vue'), meta: { requiresAuth: true } },
     {
@@ -31,11 +32,13 @@ const router = createRouter({
 router.beforeEach((to) => {
     const mainStore = useMainStore(pinia)
 
-    if (to.path === '/login' && mainStore.isAuthenticated) {
+    const publicPages = ['/login', '/register']
+
+    if (publicPages.includes(to.path) && mainStore.isAuthenticated) {
         return '/'
     }
 
-    if (to.meta.requiresAuth && !mainStore.isAuthenticated) {
+    if (!publicPages.includes(to.path) && to.meta.requiresAuth && !mainStore.isAuthenticated) {
         return { path: '/login', query: { redirect: to.fullPath } }
     }
 
