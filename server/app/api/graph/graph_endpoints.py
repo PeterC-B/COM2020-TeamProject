@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify
+from app.api.responses import ok
+from flask import Blueprint
 
 
 def create_graph_route_blueprint(get_graph_data_uc):
@@ -6,6 +7,6 @@ def create_graph_route_blueprint(get_graph_data_uc):
 
     @bp.route("", methods=["GET"])
     def get_graph_data():
-        return jsonify(get_graph_data_uc.execute())
+        return ok(data=get_graph_data_uc.execute())
 
     return bp

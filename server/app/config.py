@@ -2,6 +2,7 @@
 
 import os
 
+from app.domain.errors import ValidationError
 from dotenv import load_dotenv
 
 # Load environment variables from a .env file into the system's environment variables
@@ -27,7 +28,10 @@ class Config:
             self.APP_ENV = 'TEST'
             print("App started in Testing environment")
         else:
-            raise ValueError("Invalid environment")
+            raise ValidationError(
+                message="Invalid environment",
+                details={"field": "ENV", "allowed": ["development", "testing", "production"]},
+            )
 
         self.SECRET_KEY = config_dict.get('SECRET_KEY')
 
@@ -45,13 +49,18 @@ class Config:
             # print("SSL Disabled")
 
         CORS_ADDRESSES = config_dict.get(f'{self.APP_ENV}_CORS_ADDRESSES')
+        if not CORS_ADDRESSES:
+            raise ValidationError(
+                message="Missing required environment variable",
+                details={"field": f"{self.APP_ENV}_CORS_ADDRESSES"},
+            )
         self.CORS_ADDRESSES = CORS_ADDRESSES.split(',')
 
         # self.print_config()
 
         # Check all successfull
         if any(attr is None for attr in [self.APP_ENV, self.SECRET_KEY, self.DB_URI, self.CORS_ADDRESSES]):
-            raise ValueError("Error setting up app config")
+            raise ValidationError(message="Error setting up app config")
         
 
     def print_config(self):
