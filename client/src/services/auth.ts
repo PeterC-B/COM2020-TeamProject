@@ -1,16 +1,20 @@
-import { postPublic } from '@/services/api'
+import { postPublic, type ApiEnvelope } from '@/services/api'
 
 type LoginResponse = {
     access_token?: string
+    role?: string
+    username?: string
 }
 
 export async function login(username: string, password: string) {
-    const response = await postPublic<LoginResponse>(
-        '/user/login',
-        { username, password }
-    )
+    const response = await postPublic<ApiEnvelope<LoginResponse>>('/user/login', {
+        username,
+        password,
+    })
 
-    const token = response.data?.access_token
+    console.log('Login response:', response)
+
+    const token = response.data?.data?.access_token
 
     if (!token) {
         throw new Error('Login response did not include a token')

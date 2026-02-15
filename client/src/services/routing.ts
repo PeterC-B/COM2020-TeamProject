@@ -1,4 +1,4 @@
-import { post } from '@/services/api'
+import { post, type ApiEnvelope } from '@/services/api'
 
 const BASE_PATH = '/routing'
 
@@ -45,7 +45,12 @@ export type YensRoutesResponse = {
 
 export function fetchYensRoutes({ start, end, k, weights }: YensRouteRequest) {
     console.log('Fetching Yens routes with parameters:', { start, end, k, weights })
-    return post<YensRoutesResponse>(ROUTE_ENDPOINTS.yens, { start, end, k, weights }).then(
-        ({ data }) => data,
+    return post<ApiEnvelope<YensRoutesResponse>>(ROUTE_ENDPOINTS.yens, {
+        start,
+        end,
+        k,
+        weights,
+    }).then(
+        ({ data }) => data.data,
     )
 }

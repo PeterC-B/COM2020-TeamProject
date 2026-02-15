@@ -2,6 +2,11 @@ import axios from 'axios'
 import { useMainStore } from '@/stores/main'
 import router from '@/router'
 
+export type ApiEnvelope<T, M = Record<string, unknown>> = {
+    data: T
+    meta?: M
+}
+
 const http = axios.create({
     // baseURL: "SET THIS TO THE DEPLOYED BACKEND URL",
     baseURL: 'http://localhost:8000',
