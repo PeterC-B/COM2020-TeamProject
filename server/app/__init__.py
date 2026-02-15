@@ -1,5 +1,7 @@
 # Create_app() function to initialize the Flask application
 
+from pathlib import Path
+
 from flask import Flask
 from flask_cors import CORS
 
@@ -39,6 +41,9 @@ def create_app():
 
     app.config['SQLALCHEMY_DATABASE_URI'] = config.DB_URI
 
+    repo_root = Path(__file__).resolve().parents[2]
+    app.config["MIGRATIONS_DIR"] = str(repo_root / "migrations")
+
 
     print("Database URI:", app.config['SQLALCHEMY_DATABASE_URI'])  # Debugging line
     
@@ -50,7 +55,7 @@ def create_app():
 
     # Initialise extensions
     db.init_app(app)
-    migrate.init_app(app, db)
+    migrate.init_app(app, db, directory=app.config["MIGRATIONS_DIR"])
     jwt.init_app(app)
     ma.init_app(app)
 
