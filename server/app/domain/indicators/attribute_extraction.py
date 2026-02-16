@@ -192,13 +192,13 @@ def compute_amenity_proximity(graph, center_coords, search_radius=450):
     return graph
 
 if __name__ == "__main__":
-    from server.scripts.visualisation.visualisation_utils import plot_blank_graph, add_lighting_tag, add_surface_tag
+    from scripts.visualisation.visualisation_utils import plot_blank_graph, add_lighting_tag, add_surface_tag
     graph = plot_blank_graph((51.460498, -2.585757), 450, "walk")
 
     graph = add_lighting_tag(graph, (51.460498, -2.585757), 450)
     graph = add_surface_tag(graph, (51.460498, -2.585757), 450)
     fig, ax = ox.plot_graph(graph, show=False, close=False, node_size=2)
-    #fig.savefig("server/app/domain/indicators/graph.png", dpi=300)
+    #fig.savefig("app/domain/indicators/graph.png", dpi=300)
     nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
     edges_gdf.to_csv("app/domain/indicators/surface.csv")
     edges_gdf = attach_edge_indicators(edges_gdf)
@@ -213,4 +213,4 @@ if __name__ == "__main__":
         "pollution",
         "surface_quality",
     ]]
-    #edges_export.to_csv("server/app/domain/indicators/edges.csv")
+    #edges_export.to_csv("app/domain/indicators/edges.csv")

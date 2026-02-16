@@ -177,7 +177,7 @@ def calculate_weights(edges_gdf : gpd.GeoDataFrame, safety_priority : float, spe
         .apply(normalize_pub_distance)
     )
 
-    edges_gdf_copy.to_csv("server/app/domain/scoring/test_1.csv")
+    edges_gdf_copy.to_csv("app/domain/scoring/test_1.csv")
 
     edges_gdf_copy["safety_score"] = edges_gdf_copy.apply(calculate_safety_score, axis=1, args=(safety_priority,))
     edges_gdf_copy["speed_score"] = edges_gdf_copy.apply(calculate_speed_score, axis=1, args=(speed_priority,))
@@ -185,4 +185,4 @@ def calculate_weights(edges_gdf : gpd.GeoDataFrame, safety_priority : float, spe
 
     edges_gdf_copy["weight"] = edges_gdf_copy.apply(calculate_weight, axis=1)
 
-    edges_gdf_copy.to_csv("server/app/domain/scoring/test.csv")
+    edges_gdf_copy.to_csv("app/domain/scoring/test.csv")
