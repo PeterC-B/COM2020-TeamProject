@@ -153,27 +153,37 @@ onMounted(loadMissions)
                         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                             <div class="sm:col-span-1">
                                 <label class="block text-sm font-semibold text-slate-700 mb-1">Mission Name</label>
-                                <input v-model="editableMission.mission_name" type="text" placeholder="e.g. The Dragon's Lair" class="form-input" :disabled="!canEdit" />
+                                <input v-model="editableMission.mission_name" type="text" placeholder="e.g. The Dragon's Lair" class="w-full rounded-lg border border-slate-200 text-sm shadow-sm transition-all
+         focus:border-indigo-500 focus:ring-indigo-500
+         disabled:bg-slate-50 disabled:text-slate-500" :disabled="!canEdit" />
                             </div>
                             <div class="sm:col-span-1">
                                 <label class="block text-sm font-semibold text-slate-700 mb-1">Tier</label>
-                                <input v-model="editableMission.tier" type="text" placeholder="e.g. Bronze" class="form-input" :disabled="!canEdit" />
+                                <input v-model="editableMission.tier" type="text" placeholder="e.g. Bronze" class="w-full rounded-lg border border-slate-200 text-sm shadow-sm transition-all
+         focus:border-indigo-500 focus:ring-indigo-500
+         disabled:bg-slate-50 disabled:text-slate-500" :disabled="!canEdit" />
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1">Question</label>
-                            <textarea v-model="editableMission.question" rows="3" placeholder="What is the mission objective?" class="form-input" :disabled="!canEdit" />
+                            <textarea v-model="editableMission.question" rows="3" placeholder="What is the mission objective?" class="w-full rounded-lg border border-slate-200 text-sm shadow-sm transition-all
+         focus:border-indigo-500 focus:ring-indigo-500
+         disabled:bg-slate-50 disabled:text-slate-500" :disabled="!canEdit" />
                         </div>
 
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1">Possible Answers</label>
-                            <input v-model="editableMission.possible_answers" placeholder="Separate by commas" class="form-input" :disabled="!canEdit" />
+                            <input v-model="editableMission.possible_answers" placeholder="Separate by commas" class="w-full rounded-lg border border-slate-200 text-sm shadow-sm transition-all
+         focus:border-indigo-500 focus:ring-indigo-500
+         disabled:bg-slate-50 disabled:text-slate-500" :disabled="!canEdit" />
                         </div>
 
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1">Correct Answer</label>
-                            <input v-model="editableMission.answer" placeholder="The exact correct response" class="form-input" :disabled="!canEdit" />
+                            <input v-model="editableMission.answer" placeholder="The exact correct response" class="w-full rounded-lg border border-slate-200 text-sm shadow-sm transition-all
+         focus:border-indigo-500 focus:ring-indigo-500
+         disabled:bg-slate-50 disabled:text-slate-500" :disabled="!canEdit" />
                         </div>
 
                         <div v-if="canEdit" class="pt-4">
@@ -201,9 +211,3 @@ onMounted(loadMissions)
         </div>
     </section>
 </template>
-
-<style scoped>
-.form-input {
-    @apply w-full rounded-lg border-slate-200 text-sm shadow-sm transition-all focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-slate-50 disabled:text-slate-500;
-}
-</style>
