@@ -11,7 +11,7 @@
                     Welcome to Healthy Streets
                 </h1>
                 <p class="mt-6 text-lg leading-8 text-slate-300">
-                    Plan safer routes, play a game, and explore accessibility insights across your city. 
+                    Plan safer routes, play a game, and explore accessibility insights across your city.  </p>
                 <div class="mt-10 flex items-center gap-x-6">
                     <router-link
                         to="/map"
@@ -36,7 +36,8 @@
                 <h3 class="text-lg font-bold text-slate-900">Safety First</h3>
                 <p class="mt-2 text-sm leading-relaxed text-slate-500">
                     Choose your route based on lighting, surgace quality, and other safety indicators. 
-
+                </p>
+            </div>
             <div class="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition hover:shadow-md">
                 <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,8 +47,6 @@
                 <h3 class="text-lg font-bold text-slate-900">Gamified Missions</h3>
                 <p class="mt-2 text-sm leading-relaxed text-slate-500">
                     Compete with friends to complete missions and unlock better paths.
-                </p>
-            </div>
                 </p>
             </div>
 
@@ -61,6 +60,7 @@
                 <h3 class="text-lg font-bold text-slate-900">Deep Insights</h3>
                 <p class="mt-2 text-sm leading-relaxed text-slate-500">
                     Use the map to discover safer ways to travel and understand how street features impact accessibility.
+                </p>
             </div>
         </div>
 

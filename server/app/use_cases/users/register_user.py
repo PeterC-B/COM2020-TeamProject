@@ -52,5 +52,4 @@ class RegisterUser:
             self.user_repo.add(user)
 
             self.uow.commit()
-
         return RegisterUserResult(user_id=str(user.user_id))

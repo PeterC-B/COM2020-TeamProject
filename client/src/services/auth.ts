@@ -1,5 +1,7 @@
 import { postPublic, type ApiEnvelope } from '@/services/api'
 
+import { defineStore } from 'pinia'
+
 type LoginResponse = {
     access_token?: string
     role?: string
@@ -35,5 +37,6 @@ export async function register(payload: RegisterPayload) {
         '/user/register',
         payload,
     )
+    console.log('Registration successful for user:', payload.username)
 }
 
