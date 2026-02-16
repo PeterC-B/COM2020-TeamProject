@@ -131,7 +131,7 @@ onMounted(() => {
         container: mapEl.value!,
         style: 'https://demotiles.maplibre.org/style.json',
         center: [-2.585757, 51.460498],
-        zoom: 15,
+        zoom: 13,
     })
     setMap(map)
 
