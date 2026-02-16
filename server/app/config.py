@@ -2,8 +2,9 @@
 
 import os
 
-from app.domain.errors import ValidationError
 from dotenv import load_dotenv
+
+from app.domain.errors import ValidationError
 
 # Load environment variables from a .env file into the system's environment variables
 load_dotenv()
@@ -12,8 +13,10 @@ config_dict = os.environ
 
 class Config:
 
+    APP_ENV = None
     SECRET_KEY = None
     DB_URI = None
+    CORS_ADDRESSES = None
 
     def get_config(self):
 
