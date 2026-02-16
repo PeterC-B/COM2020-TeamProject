@@ -1,19 +1,16 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 import { register } from '@/services/auth'
-import { useMainStore } from '@/stores/main'
 
-const mainStore = useMainStore()
 const router = useRouter()
-const route = useRoute()
 
 const username = ref('')
 const password = ref('')
 const error = ref<string | null>(null)
+const success = ref(false)
 
-// Basic input check
 const canSubmit = computed(
     () => username.value.trim().length > 0 && password.value.trim().length > 0,
 )
@@ -25,20 +22,20 @@ async function handleSubmit() {
     }
 
     error.value = null
+    success.value = false
 
     try {
         await register(username.value.trim(), password.value)
+        success.value = true
 
-        // After successful registration, go to login
-        await router.push({
-            path: '/login',
-            query: { registered: 'true' },
-        })
+        // Small delay so the user sees success feedback
+        setTimeout(() => {
+            router.push('/login')
+        }, 800)
     } catch (err) {
         error.value = err instanceof Error ? err.message : 'Registration failed'
     }
 }
-
 </script>
 
 <template>
@@ -68,6 +65,9 @@ async function handleSubmit() {
             </label>
 
             <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+            <p v-if="success" class="text-sm text-green-600">
+                Account created! Redirecting to login…
+            </p>
 
             <button
                 type="submit"
