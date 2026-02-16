@@ -169,7 +169,7 @@ onMounted(loadMissions)
                             <label class="block text-sm font-semibold text-slate-700 mb-1">Question</label>
                             <textarea v-model="editableMission.question" rows="3" placeholder="What is the mission objective?" class="w-full rounded-lg border border-slate-200 text-sm shadow-sm transition-all
          focus:border-indigo-500 focus:ring-indigo-500
-         disabled:bg-slate-50 disabled:text-slate-500" :disabled="!canEdit" />
+         disabled:bg-slate-50 disabled:text-slate-500" :disabled="!canEdit" ></textarea>
                         </div>
 
                         <div>
