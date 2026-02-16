@@ -50,7 +50,7 @@ async function handleSubmit() {
             
             <div class="p-8">
                 <header class="mb-8 text-center">
-                    <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Welcome Back</h1>
+                    <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Welcome</h1>
                     <p class="mt-2 text-sm text-slate-500">Sign in to your account to continue.</p>
                 </header>
 
@@ -110,7 +110,7 @@ async function handleSubmit() {
 
                 <footer class="mt-8 text-center">
                     <p class="text-xs text-slate-400 italic">
-                        By logging in, you agree to our terms and conditions.
+                        Please note: this is not real-time safety advice, see our disclaimer (next page). 
                     </p>
                 </footer>
             </div>
