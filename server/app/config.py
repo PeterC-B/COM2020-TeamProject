@@ -45,7 +45,7 @@ class Config:
         DB_PORT = config_dict.get(f'{self.APP_ENV}_DB_PORT')
 
         if env == 'production':
-            self.DB_URI = f'postgresql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?sslmode=require'
+            self.DB_URI = f'postgresql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
             # print("SSL Enabled")
         else:
             self.DB_URI = f'postgresql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
