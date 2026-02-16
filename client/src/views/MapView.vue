@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-
+import '@/assets/main.css'
 import Disclaimer from '@/components/Disclaimer.vue'
 import SimpleMap from '@/components/SimpleMap.vue'
 import { fetchYensRoutes, type YensRoutesResponse } from '@/services/routing'
@@ -230,15 +230,3 @@ onMounted(() => {
         </div>
     </section>
 </template>
-
-<style scoped>
-/* Customizing the slider thumb for a nicer look */
-input[type='range']::-webkit-slider-thumb {
-    @apply h-4 w-4 rounded-full bg-indigo-600 border-2 border-white shadow-md;
-    -webkit-appearance: none;
-}
-
-input[type='range']::-moz-range-thumb {
-    @apply h-4 w-4 rounded-full bg-indigo-600 border-2 border-white shadow-md;
-}
-</style>
