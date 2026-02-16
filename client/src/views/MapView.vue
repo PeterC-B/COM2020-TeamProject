@@ -110,11 +110,11 @@ async function requestRoute() {
                     <span>{{ field.label }}</span>
                     <input
                         v-model.number="weights[field.key]"
-                        type="number"
+                        type="range"
                         min="1"
                         max="10"
                         step="1"
-                        class="w-16 rounded border border-slate-300 px-2 py-1 text-right"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                     />
                 </label>
             </div>
