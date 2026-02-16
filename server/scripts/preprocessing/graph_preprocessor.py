@@ -18,22 +18,18 @@ Outputs:
 
 import os
 import pickle
-import osmnx as ox
+
 import networkx as nx
-import pandas as pd
-
-from server.app.domain.indicators.attribute_extraction import (
-    attach_edge_indicators,
-    compute_amenity_proximity,
-)
-from server.app.domain.indicators.normalisation import normalise_graph_attributes
-
+import osmnx as ox
+from app.domain.indicators.attribute_extraction import (
+    attach_edge_indicators, compute_amenity_proximity)
+from app.domain.indicators.normalisation import normalise_graph_attributes
 
 # ---------------------------------------------------------
 # Output paths
 # ---------------------------------------------------------
 
-OUTPUT_DIR = "server/data/processed"
+OUTPUT_DIR = "app/data/processed"
 GRAPH_PKL = os.path.join(OUTPUT_DIR, "processed_graph.pkl")
 GRAPH_GRAPHML = os.path.join(OUTPUT_DIR, "processed_graph.graphml")
 NODES_CSV = os.path.join(OUTPUT_DIR, "nodes_table.csv")

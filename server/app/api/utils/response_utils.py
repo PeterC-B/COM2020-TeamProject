@@ -1,16 +1,10 @@
 """
 Response utilities:
     - Standard API response formatting
-    - Error formatting
     - Route comparison summaries
 """
 
 import networkx as nx
-from server.app.api.utils.error_utils import error_response
-
-def format_error(message, status=400):
-    """Back-compatible wrapper for error responses"""
-    return error_response(message, status)
 
 def compute_path_distance(graph: nx.MultiDiGraph, path):
     """Compute total distance along a path in a MultiDiGraph."""

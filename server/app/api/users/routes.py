@@ -2,19 +2,21 @@
 
 from flask import Blueprint, request
 
-from server.app.api.responses import created, ok
-from server.app.schemas.user.user_read import UserReadSchema
-from server.app.schemas.user.user_register import UserRegisterSchema
+from app.api.responses import created, ok
+from app.schemas.user.user_read import UserReadSchema
+from app.schemas.user.user_register import UserRegisterSchema
 
 
-def create_user_route_blueprint(register_user_uc, list_users_uc):
-    bp = Blueprint("user", __name__, url_prefix="/user")
+def create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc):
+    bp = Blueprint("user", __name__, url_prefix="/api/user")
 
     @bp.route("/register", methods=["POST"])
     def register_user():
         # Validate with schema
         payload = UserRegisterSchema().load(request.get_json())
+
         # Call use case to perform the logic
+        print("Executing registration")
         result = register_user_uc.execute(payload)
         return created(
             data={"user_id": result.user_id},
@@ -32,5 +34,18 @@ def create_user_route_blueprint(register_user_uc, list_users_uc):
             "total": result.total,
         }
         return ok(data=data, meta=meta)
+
+    @bp.route("/login", methods=["POST"])
+    def login_user():
+        payload = request.get_json(silent=True) or {}
+        print('Executing login')
+        result = login_user_uc.execute(payload)
+        return ok(
+            data={
+                "access_token": result.access_token,
+                "role": result.role,
+                "username": result.username,
+            }
+        )
     
     return bp

@@ -18,27 +18,31 @@ import os
 import pickle
 import networkx as nx
 
-from server.app.domain.routing.graph_cache import load_cached_graph, save_cached_graph
-from server.app.domain.indicators.attribute_extraction import attach_edge_indicators
-from server.app.domain.indicators.normalisation import normalise_graph_attributes
+from app.domain.errors import InfrastructureError
+from app.domain.routing.graph_cache import load_cached_graph, save_cached_graph
+from app.domain.indicators.attribute_extraction import attach_edge_indicators
+from app.domain.indicators.normalisation import normalise_graph_attributes
 
 
-PROCESSED_GRAPH_PATH = "server/data/processed/processed_graph.pkl"
+PROCESSED_GRAPH_PATH = "app/data/processed/processed_graph.pkl"
 
 
 def load_graph_from_disk() -> nx.MultiDiGraph:
     """Load the preprocessed graph from disk."""
     if not os.path.exists(PROCESSED_GRAPH_PATH):
-        raise FileNotFoundError(
-            f"Processed graph not found at {PROCESSED_GRAPH_PATH}. "
-            "Run graph_preprocessor.py first to generate the seeded dataset."
+        raise InfrastructureError(
+            message="Processed graph not found. Run graph_preprocessor.py first.",
+            details={"path": PROCESSED_GRAPH_PATH},
         )
 
     with open(PROCESSED_GRAPH_PATH, "rb") as f:
         graph = pickle.load(f)
 
     if not isinstance(graph, nx.MultiDiGraph):
-        raise TypeError("Loaded graph is not a NetworkX MultiDiGraph")
+        raise InfrastructureError(
+            message="Loaded graph has invalid type",
+            details={"expected_type": "networkx.MultiDiGraph"},
+        )
 
     return graph
 

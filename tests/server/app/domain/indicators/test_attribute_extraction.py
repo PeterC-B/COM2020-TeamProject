@@ -1,10 +1,9 @@
-import pytest
+import app.domain.indicators.attribute_extraction as ae
 import geopandas as gpd
 import pandas as pd
-from shapely.geometry import Point, LineString
-from tests.utils.confusion import assert_confusion
+import pytest
+from shapely.geometry import LineString, Point
 
-import server.app.domain.indicators.attribute_extraction as ae
 
 # Lighting extraction tests
 def test_extract_lighting_missing():

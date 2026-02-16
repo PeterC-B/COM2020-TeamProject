@@ -1,8 +1,65 @@
-# Python
-server/.venv/
+# ----- OS / Editor -----
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ----- Secrets / local config -----
+.env
+.env.*
+!.env.example
+!.env.template
+
+# ----- Python -----
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
 
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+server/.venv/
 
-# Vue (Node)
+# Packaging / build output
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ----- Node / frontend -----
+node_modules/
 client/node_modules/
+.npm/
+.pnpm-store/
+.yarn/
+
+# Vite / bundler output
+client/dist/
+client/.vite/
+*.tsbuildinfo
+
+# ----- Runtime / logs -----
+*.log
+*.pid
+*.pid.lock
+
+# ----- Project caches / generated data -----
+cache/
+
+# ----- Elastic Beanstalk -----
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

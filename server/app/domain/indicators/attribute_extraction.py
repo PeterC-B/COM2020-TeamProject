@@ -111,13 +111,13 @@ def extract_surface_quality(edge_data):
     poor = {"paving_stones"}
 
     if surface in good:
-        return 0.1
+        return 0.9
     if surface in medium:
-        return 0.2
+        return 1.0
     if surface in poor:
-        return 0.3
+        return 1.1
 
-    return 0.4
+    return 1.0
 
 
 # Main extraction function
@@ -191,18 +191,18 @@ def compute_amenity_proximity(graph, center_coords, search_radius=450):
 
     return graph
 
-"""if __name__ == "__main__":
+if __name__ == "__main__":
     from server.scripts.visualisation.visualisation_utils import plot_blank_graph, add_lighting_tag, add_surface_tag
     graph = plot_blank_graph((51.460498, -2.585757), 450, "walk")
 
     graph = add_lighting_tag(graph, (51.460498, -2.585757), 450)
     graph = add_surface_tag(graph, (51.460498, -2.585757), 450)
     fig, ax = ox.plot_graph(graph, show=False, close=False, node_size=2)
-    fig.savefig("server/app/domain/indicators/graph.png", dpi=300)
+    #fig.savefig("server/app/domain/indicators/graph.png", dpi=300)
     nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
-    edges_gdf.to_csv("server/app/domain/indicators/surface.csv")
+    edges_gdf.to_csv("app/domain/indicators/surface.csv")
     edges_gdf = attach_edge_indicators(edges_gdf)
-    from server.app.domain.scoring.weight_utils import calculate_weights
+    from app.domain.scoring.weight_utils import calculate_weights
     calculate_weights(edges_gdf, 0.3, 0.5, 0.9)
     edges_export = edges_gdf.copy().reset_index()
     edges_export = edges_export[[
@@ -213,4 +213,4 @@ def compute_amenity_proximity(graph, center_coords, search_radius=450):
         "pollution",
         "surface_quality",
     ]]
-    edges_export.to_csv("server/app/domain/indicators/edges.csv")"""
+    #edges_export.to_csv("server/app/domain/indicators/edges.csv")
