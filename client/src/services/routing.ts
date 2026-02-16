@@ -19,7 +19,6 @@ export type RouteResponse = {
     indicators?: {
         lighting?: number
         greenery?: number
-        pollution?: number
         surface_quality?: number
         amenity_proximity?: number
         weighted_score?: number

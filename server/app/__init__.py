@@ -29,6 +29,7 @@ from app.use_cases.routing.route_yens import RouteYens
 from app.use_cases.users.list_users import ListUsers
 from app.use_cases.users.login_user import LoginUser
 from app.use_cases.users.register_user import RegisterUser
+from app.use_cases.missions.update_mission import UpdateMission
 
 
 def create_app():
@@ -92,13 +93,14 @@ def create_app():
     list_missions_uc = ListMissions(missions_repo)
     get_mission_uc = GetMission(missions_repo)
     create_mission_uc = CreateMission(uow, missions_repo)
+    update_mission_uc = UpdateMission(uow, missions_repo)
 
     # Initialise the Routes
     app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc))
     app.register_blueprint(create_graph_route_blueprint(get_graph_data_uc))
     app.register_blueprint(create_health_routes(get_health_attributes_uc, get_default_weights_uc, explain_edge_cost_uc))
     app.register_blueprint(create_routing_route_blueprint(route_yens_uc))
-    app.register_blueprint(create_missions_blueprint(list_missions_uc, get_mission_uc, create_mission_uc))
+    app.register_blueprint(create_missions_blueprint(list_missions_uc, get_mission_uc, create_mission_uc, update_mission_uc))
 
     # Import error handlers
     register_error_handlers(app)

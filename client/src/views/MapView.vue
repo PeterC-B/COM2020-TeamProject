@@ -26,7 +26,6 @@ const weightFields = [
     { key: 'distance', label: 'Distance' },
     { key: 'lighting', label: 'Lighting' },
     { key: 'greenery', label: 'Greenery' },
-    { key: 'pollution', label: 'Pollution' },
     { key: 'surface_quality', label: 'Surface Quality' },
     { key: 'amenity_proximity', label: 'Amenity Proximity' },
 ] as const
@@ -34,7 +33,6 @@ const weights = ref({
     distance: 5,
     lighting: 5,
     greenery: 5,
-    pollution: 5,
     surface_quality: 5,
     amenity_proximity: 5,
 })
@@ -153,7 +151,6 @@ async function requestRoute() {
                             <th class="px-2 py-2 font-medium text-slate-700">Weighted Score</th>
                             <th class="px-2 py-2 font-medium text-slate-700">Lighting</th>
                             <th class="px-2 py-2 font-medium text-slate-700">Greenery</th>
-                            <th class="px-2 py-2 font-medium text-slate-700">Pollution</th>
                             <th class="px-2 py-2 font-medium text-slate-700">Surface</th>
                             <th class="px-2 py-2 font-medium text-slate-700">Amenities</th>
                         </tr>
@@ -171,9 +168,6 @@ async function requestRoute() {
                             </td>
                             <td class="px-2 py-2">{{ formatScore(route.indicators?.lighting) }}</td>
                             <td class="px-2 py-2">{{ formatScore(route.indicators?.greenery) }}</td>
-                            <td class="px-2 py-2">
-                                {{ formatScore(route.indicators?.pollution) }}
-                            </td>
                             <td class="px-2 py-2">
                                 {{ formatScore(route.indicators?.surface_quality) }}
                             </td>

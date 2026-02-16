@@ -1,11 +1,26 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { fetchMissions, fetchMission, type Mission } from '@/services/missions'
+import { ref, onMounted, computed } from 'vue'
+import {
+    fetchMissions,
+    fetchMission,
+    updateMission,
+    type Mission,
+} from '@/services/missions'
+
+import { useMainStore } from '@/stores/main'
+
+const mainStore = useMainStore()
+
+// Travellers cannot edit
+const canEdit = computed(() => mainStore.userRole !== 'travellers')
 
 const missions = ref<Mission[]>([])
 const selectedMission = ref<Mission | null>(null)
+const editableMission = ref<Mission | null>(null)
+
 const loading = ref(false)
 const error = ref<string | null>(null)
+const saving = ref(false)
 
 async function loadMissions() {
     loading.value = true
@@ -25,11 +40,41 @@ async function selectMission(id: string) {
     error.value = null
 
     try {
-        selectedMission.value = await fetchMission(id)
+        const mission = await fetchMission(id)
+        selectedMission.value = mission
+        editableMission.value = { ...mission } // clone for editing
     } catch {
         error.value = 'Failed to load mission'
     } finally {
         loading.value = false
+    }
+}
+
+async function saveMission() {
+    if (!editableMission.value) return
+
+    // Permission guard
+    if (!canEdit.value) {
+        error.value = 'You do not have permission to edit missions'
+        return
+    }
+
+    saving.value = true
+    error.value = null
+
+    try {
+        const updated = await updateMission(
+            editableMission.value.mission_id,
+            editableMission.value,
+        )
+
+        selectedMission.value = updated
+        editableMission.value = { ...updated }
+        await loadMissions()
+    } catch {
+        error.value = 'Failed to update mission'
+    } finally {
+        saving.value = false
     }
 }
 
@@ -59,29 +104,72 @@ onMounted(loadMissions)
 
             <!-- Mission details -->
             <div
-                v-if="selectedMission"
+                v-if="editableMission"
                 class="rounded border border-slate-300 bg-white p-4"
             >
-                <h2 class="mb-2 text-xl font-semibold">
-                    {{ selectedMission.mission_name }}
+                <h2 class="mb-3 text-xl font-semibold">
+                    {{ canEdit ? 'Edit Mission' : 'Mission Details' }}
                 </h2>
 
-                <p class="mb-3 text-slate-700">
-                    {{ selectedMission.question }}
-                </p>
+                <label class="block mb-2">
+                    <span class="text-sm font-medium">Mission Name</span>
+                    <input
+                        v-model="editableMission.mission_name"
+                        :disabled="!canEdit"
+                        class="mt-1 w-full rounded border p-2 disabled:bg-slate-100"
+                    />
+                </label>
 
-                <h3 class="mb-1 font-medium">Possible answers</h3>
-                <ul class="list-disc pl-5 text-slate-700">
-                    <li
-                        v-for="answer in selectedMission.possible_answers.split(',')"
-                        :key="answer"
-                    >
-                        {{ answer.trim() }}
-                    </li>
-                </ul>
+                <label class="block mb-2">
+                    <span class="text-sm font-medium">Question</span>
+                    <textarea
+                        v-model="editableMission.question"
+                        :disabled="!canEdit"
+                        class="mt-1 w-full rounded border p-2 disabled:bg-slate-100"
+                        rows="3"
+                    />
+                </label>
 
-                <p class="mt-3 text-sm text-slate-600">
-                    Tier: {{ selectedMission.tier }}
+                <label class="block mb-2">
+                    <span class="text-sm font-medium">
+                        Possible Answers (comma-separated)
+                    </span>
+                    <input
+                        v-model="editableMission.possible_answers"
+                        :disabled="!canEdit"
+                        class="mt-1 w-full rounded border p-2 disabled:bg-slate-100"
+                    />
+                </label>
+
+                <label class="block mb-2">
+                    <span class="text-sm font-medium">Correct Answer</span>
+                    <input
+                        v-model="editableMission.answer"
+                        :disabled="!canEdit"
+                        class="mt-1 w-full rounded border p-2 disabled:bg-slate-100"
+                    />
+                </label>
+
+                <label class="block mb-4">
+                    <span class="text-sm font-medium">Tier</span>
+                    <input
+                        v-model="editableMission.tier"
+                        :disabled="!canEdit"
+                        class="mt-1 w-full rounded border p-2 disabled:bg-slate-100"
+                    />
+                </label>
+
+                <button
+                    v-if="canEdit"
+                    class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+                    :disabled="saving"
+                    @click="saveMission"
+                >
+                    {{ saving ? 'Saving…' : 'Save Changes' }}
+                </button>
+
+                <p v-else class="text-sm text-slate-500 italic">
+                    Travellers cannot edit missions.
                 </p>
             </div>
         </div>
