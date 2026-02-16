@@ -16,6 +16,7 @@ export async function fetchMissions(): Promise<Mission[]> {
 
 export async function fetchMission(missionId: string): Promise<Mission> {
     const response = await get<ApiEnvelope<Mission>>(`/missions/${missionId}`)
+    console.log('Fetched mission:', response.data.data)
     return response.data.data
 }
 

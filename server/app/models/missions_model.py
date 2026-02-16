@@ -1,8 +1,8 @@
 # ORM model representation of a user in the database
 import uuid
 
-from app.extensions import db
-from app.models.enums.MISSION_TIER import MissionTier
+from server.app.extensions import db
+from server.app.models.enums.MISSION_TIER import MissionTier
 from sqlalchemy import UUID
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import String

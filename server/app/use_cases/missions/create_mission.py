@@ -1,4 +1,4 @@
-from app.models.missions_model import MissionsModel
+from server.app.models.missions_model import MissionsModel
 
 
 class CreateMission:

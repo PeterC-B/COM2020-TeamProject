@@ -1,4 +1,4 @@
-from app.domain.scoring.cost_functions import HS_ATTRIBUTES
+from server.app.domain.scoring.cost_functions import HS_ATTRIBUTES
 
 
 class GetHealthAttributes:

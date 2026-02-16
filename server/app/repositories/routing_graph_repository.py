@@ -1,4 +1,4 @@
-from app.domain.routing.graph_loader import build_routing_graph
+from server.app.domain.routing.graph_loader import build_routing_graph
 
 
 class RoutingGraphRepository:

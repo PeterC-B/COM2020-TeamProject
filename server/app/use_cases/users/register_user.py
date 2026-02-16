@@ -3,9 +3,9 @@
 import datetime
 from dataclasses import dataclass
 
-from app.domain.errors import ValidationError
-from app.models.enums.ACCESS_TYPE import UserAccessType
-from app.models.user_account_model import UserAccountModel
+from server.app.domain.errors import ValidationError
+from server.app.models.enums.ACCESS_TYPE import UserAccessType
+from server.app.models.user_account_model import UserAccountModel
 
 
 @dataclass(frozen=True)

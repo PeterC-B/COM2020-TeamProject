@@ -1,17 +1,18 @@
-from os import environ
-
-from app import create_app
+from dotenv import load_dotenv
+load_dotenv()
+from os import getenv
+from pathlib import Path
+from server.app import create_app
 
 app = create_app()
 
-
 if __name__ == '__main__':
 
-    host_address = environ.get('HOST')
+    host_address = getenv('HOST')
     if host_address is None:
         raise ValueError("HOST environment variable is not set.")
 
-    backend_port = environ.get('BACKEND_PORT')
+    backend_port = getenv('BACKEND_PORT')
     if backend_port is None:
         raise ValueError("BACKEND_PORT environment variable is not set.")
     
@@ -20,7 +21,7 @@ if __name__ == '__main__':
     else:
         backend_port = int(backend_port)
     
-    debug_mode = environ.get('DEBUG')
+    debug_mode = getenv('DEBUG')
     if debug_mode is None:
         raise ValueError("DEBUG environment variable is not set.")
 
