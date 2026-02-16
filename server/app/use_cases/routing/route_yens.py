@@ -10,4 +10,3 @@ class RouteYens:
         # Keep one access path for graph retrieval at repository layer.
         graph = self.routing_graph_repo.get_cached_graph()
         return process_yens_routing_request(payload, graph=graph)
-        return process_yens_routing_request(payload, graph=graph)
