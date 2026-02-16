@@ -5,7 +5,7 @@ from flask import Blueprint, request
 
 
 def create_health_routes(get_health_attributes_uc, get_default_weights_uc, explain_edge_cost_uc):
-    health_bp = Blueprint("health", __name__, url_prefix="/health")
+    health_bp = Blueprint("health", __name__, url_prefix="/api/health")
 
     @health_bp.route("/attributes", methods=["GET"])
     def get_attributes():

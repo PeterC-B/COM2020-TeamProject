@@ -4,7 +4,7 @@ from flask import Blueprint, request
 
 
 def create_missions_blueprint(list_missions_uc, get_mission_uc, create_mission_uc):
-    bp = Blueprint("missions", __name__, url_prefix="/missions")
+    bp = Blueprint("missions", __name__, url_prefix="/api/missions")
 
     @bp.route("", methods=["GET"])
     def list_missions():

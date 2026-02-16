@@ -1,13 +1,14 @@
 # Holds the routes for user-related operations
 
+from flask import Blueprint, request
+
 from app.api.responses import created, ok
 from app.schemas.user.user_read import UserReadSchema
 from app.schemas.user.user_register import UserRegisterSchema
-from flask import Blueprint, request
 
 
 def create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc):
-    bp = Blueprint("user", __name__, url_prefix="/user")
+    bp = Blueprint("user", __name__, url_prefix="/api/user")
 
     @bp.route("/register", methods=["POST"])
     def register_user():

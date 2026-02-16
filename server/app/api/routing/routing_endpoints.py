@@ -3,8 +3,9 @@
 from app.api.responses import ok
 from flask import Blueprint, request
 
+
 def create_routing_route_blueprint(route_yens_uc):
-    bp = Blueprint("routing", __name__, url_prefix="/routing")
+    bp = Blueprint("routing", __name__, url_prefix="/api/routing")
 
     @bp.route("", methods=["POST"])
     def route_yens():

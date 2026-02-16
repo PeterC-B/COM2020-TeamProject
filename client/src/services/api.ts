@@ -49,7 +49,7 @@ function normalizeApiError(error: unknown): Error {
 
 const http = axios.create({
     // baseURL: "SET THIS TO THE DEPLOYED BACKEND URL",
-    baseURL: 'http://localhost:8000',
+    baseURL: '/api',
     // baseURL: 'https://xxmb1uh225.execute-api.eu-west-2.amazonaws.com/prod',
 })
 
