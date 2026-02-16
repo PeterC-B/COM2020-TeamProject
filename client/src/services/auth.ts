@@ -24,16 +24,15 @@ export async function login(username: string, password: string) {
 }
 
 export async function register(username: string, password: string) {
-    const payload = await postPublic<{ data?: { access_token?: string } }>(
+    const response = await postPublic<ApiEnvelope<{ user_id: string }>>(
         '/user/register',
         { username, password },
-    ).then(({ data }) => data)
+    )
 
-    const token = payload.data?.access_token
-
-    if (!token) {
-        throw new Error('Register response did not include a token')
+    if (!response.data?.data?.user_id) {
+        throw new Error('Register response did not include user id')
     }
 
-    return token
+    return response.data.data.user_id
 }
+

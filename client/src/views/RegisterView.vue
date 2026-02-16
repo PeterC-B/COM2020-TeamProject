@@ -23,21 +23,22 @@ async function handleSubmit() {
         error.value = 'Enter username and password'
         return
     }
+
     error.value = null
 
     try {
-        const token = await register(username.value.trim(), password.value)
-        mainStore.setAccessToken(token)
-        mainStore.setUserRole('user')
+        await register(username.value.trim(), password.value)
 
-        const redirectPath =
-            typeof route.query.redirect === 'string' ? route.query.redirect : '/map'
-
-        await router.push(redirectPath)
+        // After successful registration, go to login
+        await router.push({
+            path: '/login',
+            query: { registered: 'true' },
+        })
     } catch (err) {
         error.value = err instanceof Error ? err.message : 'Registration failed'
     }
 }
+
 </script>
 
 <template>
