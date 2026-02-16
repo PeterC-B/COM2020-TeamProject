@@ -10,7 +10,15 @@ import {
 import { useMainStore } from '@/stores/main'
 
 const mainStore = useMainStore()
-const canEdit = computed(() => mainStore.userRole !== 'travellers')
+const canEdit = computed(() =>
+  mainStore.userRole === 'ADMIN' ||
+  mainStore.userRole === 'STAFF'
+)
+
+if (!canEdit.value) {
+  throw new Error('Forbidden')
+}
+
 
 const missions = ref<Mission[]>([])
 const selectedMission = ref<Mission | null>(null)
@@ -68,6 +76,9 @@ function startCreateMission() {
 }
 
 async function saveMission() {
+    if (mainStore.userRole === 'TRAVELLERS') {
+        throw new Error('Forbidden')
+    }
     if (!editableMission.value || !canEdit.value) return
     saving.value = true
     error.value = null
@@ -93,7 +104,7 @@ onMounted(loadMissions)
 
 <template>
     <section class="mx-auto max-w-5xl p-6 antialiased">
-        <div class="mb-8 flex items-center justify-between">
+        <div class="mb-8 flex items-center justify-between" v-if="editableMission && canEdit">
             <div>
                 <h1 class="text-3xl font-bold text-slate-900">Missions</h1>
                 <p class="text-slate-500">Manage and create quest objectives for travellers.</p>
@@ -142,7 +153,7 @@ onMounted(loadMissions)
             </div>
 
             <div class="md:col-span-8">
-                <div v-if="editableMission" class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div v-if="editableMission && canEdit" class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                     <div class="mb-6 flex items-center justify-between border-b border-slate-100 pb-4">
                         <h2 class="text-xl font-bold text-slate-900">
                             {{ isCreating ? 'New Mission' : canEdit ? 'Edit Mission' : 'Mission Details' }}
@@ -186,7 +197,7 @@ onMounted(loadMissions)
          disabled:bg-slate-50 disabled:text-slate-500" :disabled="!canEdit" />
                         </div>
 
-                        <div v-if="canEdit" class="pt-4">
+                        <div v-if="editableMission && canEdit" class="pt-4">
                             <button
                                 class="w-full flex justify-center items-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-slate-800 focus:ring-4 focus:ring-slate-200 transition-all disabled:opacity-50"
                                 :disabled="saving"
