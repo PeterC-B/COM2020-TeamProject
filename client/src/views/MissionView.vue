@@ -127,7 +127,7 @@ onMounted(loadMissions)
                         :disabled="!canEdit"
                         class="mt-1 w-full rounded border p-2 disabled:bg-slate-100"
                         rows="3"
-                    />
+                    ></textarea>
                 </label>
 
                 <label class="block mb-2">

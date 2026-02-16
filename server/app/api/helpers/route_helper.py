@@ -7,7 +7,7 @@ from app.api.responses import ok
 from app.domain.errors import ValidationError
 from app.domain.routing.algorithms.yen_algorithm import yens
 from app.extensions import db
-from client.public.convert import (build_edges_geojson, build_nodes_geojson,
+from app.data.convert import (build_edges_geojson, build_nodes_geojson,
                                    load_edge_geometries)
 from flask import Blueprint, request
 
