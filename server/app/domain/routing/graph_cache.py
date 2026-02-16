@@ -13,7 +13,7 @@ import pickle
 import networkx as nx
 
 
-CACHE_PATH = "server/app/data/processed/routing_graph_cache.pkl"
+CACHE_PATH = "app/data/processed/routing_graph_cache.pkl"
 CACHE_VERSION = "v1"   # bump this if indicators or scoring change
 
 

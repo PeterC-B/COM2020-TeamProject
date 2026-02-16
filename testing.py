@@ -1,11 +1,11 @@
-from server.app.extensions import db
-from server.app.models.missions_model import MissionsModel
-from server.app.models.location_model import LocationModel
-from server.app.models.edges_model import EdgesModel
-from server.app.models.nodes_model import NodesModel
-from server.app.models.mission_progress_model import MissionProgressModel
-from server.app.models.user_account_model import UserAccountModel
-from server.app.models.enums.MISSION_TIER import MissionTier
+from app.extensions import db
+from app.models.missions_model import MissionsModel
+from app.models.location_model import LocationModel
+from app.models.edges_model import EdgesModel
+from app.models.nodes_model import NodesModel
+from app.models.mission_progress_model import MissionProgressModel
+from app.models.user_account_model import UserAccountModel
+from app.models.enums.MISSION_TIER import MissionTier
 
 from server.app import create_app
 
@@ -35,7 +35,7 @@ def seed_missions():
 
 from datetime import datetime, timezone
 
-from server.app.models.enums.ACCESS_TYPE import UserAccessType
+from app.models.enums.ACCESS_TYPE import UserAccessType
 
 
 def seed_test_user():

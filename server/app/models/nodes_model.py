@@ -1,6 +1,6 @@
 # ORM model representation of a user in the database
-from server.app.extensions import db
-from server.app.models.enums.HIGHWAY_FEATURES import HighwayFeatures
+from app.extensions import db
+from app.models.enums.HIGHWAY_FEATURES import HighwayFeatures
 from sqlalchemy import BigInteger
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import Float

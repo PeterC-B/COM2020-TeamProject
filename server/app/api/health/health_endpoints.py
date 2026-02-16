@@ -1,6 +1,6 @@
 """Health endpoints."""
 
-from server.app.api.responses import ok
+from app.api.responses import ok
 from flask import Blueprint, request
 
 

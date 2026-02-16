@@ -1,6 +1,6 @@
 from flask import Blueprint, request
-from server.app.api.responses import ok, created
-from server.app.domain.missions.missions_read import MissionReadSchema
+from app.api.responses import ok, created
+from app.domain.missions.missions_read import MissionReadSchema
 
 
 def create_missions_blueprint(

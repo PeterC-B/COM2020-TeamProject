@@ -1,5 +1,5 @@
-from server.app.models.missions_model import MissionsModel
-from server.app.repositories.db_error_mapper import map_db_errors
+from app.models.missions_model import MissionsModel
+from app.repositories.db_error_mapper import map_db_errors
 from sqlalchemy import select
 
 
