@@ -232,7 +232,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* Customizing the slider thumb for a nicer look */
+/* Customising the slider thumb for a nicer look */
 input[type='range']::-webkit-slider-thumb {
     @apply h-4 w-4 rounded-full bg-indigo-600 border-2 border-white shadow-md;
     -webkit-appearance: none;
