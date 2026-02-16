@@ -1,3 +1,8 @@
+Done! I’ve added a dedicated footer section that mirrors the registration page’s style. I also cleaned up a small syntax error in your class strings (the trailing ; inside the class attribute) to ensure the Tailwind styles apply perfectly.
+
+Here is the full code:
+
+Code snippet
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -48,7 +53,7 @@ async function handleSubmit() {
         <section class="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
             <div class="h-2 bg-indigo-600"></div>
             
-            <div class="p-8">
+            <div class="p-8 pb-6">
                 <header class="mb-8 text-center">
                     <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Welcome</h1>
                     <p class="mt-2 text-sm text-slate-500">Sign in to your account to continue.</p>
@@ -64,29 +69,27 @@ async function handleSubmit() {
                             v-model="username"
                             type="text"
                             autocomplete="username"
-                            placeholder="username"
-                            class="block w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 outline-none;"
+                            placeholder="Enter username"
+                            class="block w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 outline-none"
                         />
                     </div>
 
                     <div class="space-y-1">
-                        <div class="flex items-center justify-between">
-                            <label for="password" class="text-xs font-bold uppercase tracking-wider text-slate-500">
-                                Password
-                            </label>
-                        </div>
+                        <label for="password" class="text-xs font-bold uppercase tracking-wider text-slate-500">
+                            Password
+                        </label>
                         <input
                             id="password"
                             v-model="password"
                             type="password"
                             autocomplete="current-password"
                             placeholder="••••••••"
-                            class="block w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 outline-none;"
+                            class="block w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 outline-none"
                         />
                     </div>
 
                     <div v-if="error" class="rounded-lg bg-red-50 p-3 text-sm text-red-600 border border-red-100 flex items-center gap-2">
-                        <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="h-4 w-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                         </svg>
                         {{ error }}
@@ -108,9 +111,14 @@ async function handleSubmit() {
                     </button>
                 </form>
 
-                <footer class="mt-8 text-center">
-                    <p class="text-xs text-slate-400 italic">
-                        Please note: this is not real-time safety advice, see our disclaimer (next page). 
+                <footer class="mt-8 border-t border-slate-100 pt-6 text-center">
+                    <p class="text-sm text-slate-500">
+                        Don't have an account? 
+                        <router-link to="/register" class="font-bold text-indigo-600 hover:text-indigo-500 transition-colors">Register here</router-link>
+                    </p>
+                    <p class="mt-4 text-[10px] text-slate-400 italic leading-tight">
+                        Note: this is not real-time safety advice. 
+                        Please refer to our disclaimer for more information.
                     </p>
                 </footer>
             </div>
