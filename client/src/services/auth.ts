@@ -37,6 +37,5 @@ export async function register(payload: RegisterPayload) {
         '/user/register',
         payload,
     )
-    console.log('Registration successful for user:', payload.username)
 }
 

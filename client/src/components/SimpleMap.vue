@@ -95,6 +95,7 @@ function buildRouteFeatureCollection(routes: Array<Array<[number, number]>>): Ge
     }
 }
 
+
 function renderRoutes(routes: Array<Array<[number, number]>> = []) {
     if (!map || !map.isStyleLoaded()) return
 
@@ -155,7 +156,7 @@ onMounted(() => {
                 map.addSource('edges', {
                     type: 'geojson',
                     data: edgeCollection,
-                })
+                })  
                 map.addSource('nodes', {
                     type: 'geojson',
                     data: nodeCollection,
@@ -253,5 +254,5 @@ watch(
 </script>
 
 <template>
-    <div ref="mapEl" class="h-[calc(100vh-64px)] w-full" />
+    <div ref="mapEl" class="h-[calc(100vh-48px)] w-full" />
 </template>

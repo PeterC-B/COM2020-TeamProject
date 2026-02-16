@@ -169,7 +169,7 @@ onMounted(() => {
 
             <div class="space-y-6 lg:col-span-8">
                 <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-sm ring-1 ring-slate-100">
-                    <SimpleMap :routes="routeGeometries" @selection-change="onSelectionChange" class="h-[600px] rounded-xl" />
+                    <SimpleMap :routes="routeGeometries" @selection-change="onSelectionChange" class="h-[700px] rounded-xl" />
                 </div>
 
                 <div v-if="routeData" class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">

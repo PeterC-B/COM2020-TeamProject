@@ -9,7 +9,6 @@ const navItems = computed(() => {
         { label: 'Map', path: '/map' },
         { label: 'Missions', path: '/missions' },
         { label: 'Profile', path: '/profile' },
-        { label: 'Register', path: '/register' },
     ]
 })
 </script>
