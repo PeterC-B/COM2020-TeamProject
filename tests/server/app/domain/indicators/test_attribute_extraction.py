@@ -1,4 +1,4 @@
-import app.domain.indicators.attribute_extraction as ae
+import server.app.domain.indicators.attribute_extraction as ae
 import geopandas as gpd
 import pandas as pd
 import pytest

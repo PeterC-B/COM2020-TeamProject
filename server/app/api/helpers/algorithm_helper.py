@@ -1,13 +1,13 @@
-#from app.domain.routing.algorithms.yen_algorithm import yens
-#from app.domain.routing.algorithms.dijkstra_algorithm import dijkstra
+#from server.app.domain.routing.algorithms.yen_algorithm import yens
+#from server.app.domain.routing.algorithms.dijkstra_algorithm import dijkstra
 import geopandas as gpd
 import networkx as nx
 import osmnx as ox
 import pandas as pd
-from app.extensions import db
-from app.models.edges_model import EdgesModel
-from app.models.location_model import LocationModel
-from app.models.nodes_model import NodesModel
+from server.app.extensions import db
+from server.app.models.edges_model import EdgesModel
+from server.app.models.location_model import LocationModel
+from server.app.models.nodes_model import NodesModel
 from shapely import wkt
 from shapely.geometry import Point
 from shapely.ops import unary_union
@@ -32,7 +32,7 @@ def get_dict_of_edges(graph : nx.MultiDiGraph):
 
     return all_edges
 
-def nodes_csv_to_gdf(csv_path: str = "app/data/processed/nodes_table.csv", crs="EPSG:4326") -> gpd.GeoDataFrame:
+def nodes_csv_to_gdf(csv_path: str = "server/app/data/processed/nodes_table.csv", crs="EPSG:4326") -> gpd.GeoDataFrame:
     df = pd.read_csv(csv_path)
 
     geometry = [
@@ -52,8 +52,8 @@ def nodes_csv_to_gdf(csv_path: str = "app/data/processed/nodes_table.csv", crs="
     return gdf
 
 def edges_csv_to_gdf(
-    edges_csv: str = "app/data/processed/edges_table.csv",
-    geom_csv: str = "app/data/processed/edges_geometry.csv",
+    edges_csv: str = "server/app/data/processed/edges_table.csv",
+    geom_csv: str = "server/app/data/processed/edges_geometry.csv",
     crs="EPSG:4326"
 ) -> gpd.GeoDataFrame:
 

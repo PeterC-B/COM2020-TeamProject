@@ -1,4 +1,4 @@
-from app.domain.errors import NotFoundError
+from server.app.domain.errors import NotFoundError
 
 
 class GetMission:

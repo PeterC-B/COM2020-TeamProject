@@ -1,5 +1,7 @@
 import { postPublic, type ApiEnvelope } from '@/services/api'
 
+import { defineStore } from 'pinia'
+
 type LoginResponse = {
     access_token?: string
     role?: string

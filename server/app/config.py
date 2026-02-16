@@ -4,10 +4,10 @@ import os
 
 from dotenv import load_dotenv
 
-from app.domain.errors import ValidationError
+from server.app.domain.errors import ValidationError
 
 # Load environment variables from a .env file into the system's environment variables
-load_dotenv()
+load_dotenv(".env")
 
 config_dict = os.environ
 

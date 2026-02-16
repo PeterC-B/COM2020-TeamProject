@@ -1,9 +1,9 @@
 import uuid
 
-from app.extensions import db
-from app.models.enums.MISSION_STATUS import MissionStatus
-from app.models.missions_model import MissionsModel
-from app.models.user_account_model import UserAccountModel
+from server.app.extensions import db
+from server.app.models.enums.MISSION_STATUS import MissionStatus
+from server.app.models.missions_model import MissionsModel
+from server.app.models.user_account_model import UserAccountModel
 from sqlalchemy import UUID
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import ForeignKey, Integer

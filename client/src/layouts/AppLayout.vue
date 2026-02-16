@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import { computed } from 'vue'
 
-const navItems = [
-    { label: 'Home', path: '/' },
-    { label: 'Map', path: '/map' },
-    { label: 'Profile', path: '/profile' },
-    { label: 'Missions', path: '/missions' }
-]
+
+const navItems = computed(() => {
+    return [
+        { label: 'Home', path: '/' },
+        { label: 'Map', path: '/map' },
+        { label: 'Missions', path: '/missions' },
+        { label: 'Profile', path: '/profile' },
+    ]
+})
 </script>
 
 <template>

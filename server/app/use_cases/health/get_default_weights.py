@@ -1,4 +1,4 @@
-from app.domain.scoring.weight_utils import DEFAULT_WEIGHTS
+from server.app.domain.scoring.weight_utils import DEFAULT_WEIGHTS
 
 
 class GetDefaultWeights:

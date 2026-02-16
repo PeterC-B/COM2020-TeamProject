@@ -8,7 +8,7 @@ from sqlalchemy.exc import (
     SQLAlchemyError,
 )
 
-from app.domain.errors import (
+from server.app.domain.errors import (
     DatabaseConflictError,
     DatabaseConnectionError,
     DatabaseTransactionError,

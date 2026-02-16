@@ -95,6 +95,7 @@ function buildRouteFeatureCollection(routes: Array<Array<[number, number]>>): Ge
     }
 }
 
+
 function renderRoutes(routes: Array<Array<[number, number]>> = []) {
     if (!map || !map.isStyleLoaded()) return
 
@@ -131,7 +132,9 @@ onMounted(() => {
         container: mapEl.value!,
         style: 'https://demotiles.maplibre.org/style.json',
         center: [-2.585757, 51.460498],
-        zoom: 13,
+        zoom: 12,
+        maxZoom: 18,
+        minZoom: 2,
     })
     setMap(map)
 
@@ -153,7 +156,7 @@ onMounted(() => {
                 map.addSource('edges', {
                     type: 'geojson',
                     data: edgeCollection,
-                })
+                })  
                 map.addSource('nodes', {
                     type: 'geojson',
                     data: nodeCollection,
@@ -214,9 +217,8 @@ onMounted(() => {
                     bounds.extend([lng, lat])
                 }
                 if (!bounds.isEmpty()) {
-                    map.fitBounds(bounds, { padding: 24, maxZoom: 16 })
+                    map.fitBounds(bounds, { padding: 40, maxZoom: 20 })
                     // Keep camera constrained to the dataset extent.
-                    map.setMaxBounds(bounds)
                     map.setRenderWorldCopies(false)
                 }
         })
@@ -252,5 +254,5 @@ watch(
 </script>
 
 <template>
-    <div ref="mapEl" class="h-[calc(100vh-64px)] w-full" />
+    <div ref="mapEl" class="h-[calc(100vh-48px)] w-full" />
 </template>
