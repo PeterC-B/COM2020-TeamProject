@@ -6,6 +6,13 @@ type LoginResponse = {
     username?: string
 }
 
+type RegisterPayload = {
+    username: string
+    email: string
+    password: string
+    role?: string
+}
+
 export async function login(username: string, password: string) {
     const response = await postPublic<ApiEnvelope<LoginResponse>>('/user/login', {
         username,
@@ -23,17 +30,10 @@ export async function login(username: string, password: string) {
     return token
 }
 
-export async function register(username: string, password: string) {
-    const payload = await postPublic<{ data?: { access_token?: string } }>(
+export async function register(payload: RegisterPayload) {
+    await postPublic<ApiEnvelope<{ user_id: string }>>(
         '/user/register',
-        { username, password },
-    ).then(({ data }) => data)
-
-    const token = payload.data?.access_token
-
-    if (!token) {
-        throw new Error('Register response did not include a token')
-    }
-
-    return token
+        payload,
+    )
 }
+

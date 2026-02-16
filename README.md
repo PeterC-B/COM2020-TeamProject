@@ -9,7 +9,7 @@
 
 Responsibilites:
  - Creating the scrum board
- - Organising group responsibilities and things to do
+ - Organising group responsibilities 
  - Managing the team
  - Creating the ERD
  - Creating the location and mission progress models

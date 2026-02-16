@@ -1,39 +1,48 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 import { register } from '@/services/auth'
-import { useMainStore } from '@/stores/main'
 
-const mainStore = useMainStore()
 const router = useRouter()
-const route = useRoute()
 
 const username = ref('')
+const email = ref('')
 const password = ref('')
-const error = ref<string | null>(null)
+const role = ref<'travellers' | 'administrators' | 'developers'>('travellers')
 
-// Basic input check
+const error = ref<string | null>(null)
+const success = ref(false)
+
 const canSubmit = computed(
-    () => username.value.trim().length > 0 && password.value.trim().length > 0,
+    () =>
+        username.value.trim().length > 0 &&
+        email.value.trim().length > 0 &&
+        password.value.trim().length > 0,
 )
 
 async function handleSubmit() {
     if (!canSubmit.value) {
-        error.value = 'Enter username and password'
+        error.value = 'All fields are required'
         return
     }
+
     error.value = null
+    success.value = false
 
     try {
-        const token = await register(username.value.trim(), password.value)
-        mainStore.setAccessToken(token)
-        mainStore.setUserRole('user')
+        await register({
+            username: username.value.trim(),
+            email: email.value.trim(),
+            password: password.value,
+            role: role.value,
+        })
 
-        const redirectPath =
-            typeof route.query.redirect === 'string' ? route.query.redirect : '/map'
+        success.value = true
 
-        await router.push(redirectPath)
+        setTimeout(() => {
+            router.push('/login')
+        }, 800)
     } catch (err) {
         error.value = err instanceof Error ? err.message : 'Registration failed'
     }
@@ -57,6 +66,16 @@ async function handleSubmit() {
             </label>
 
             <label class="grid gap-1 text-sm">
+                <span>Email</span>
+                <input
+                    v-model="email"
+                    type="email"
+                    autocomplete="email"
+                    class="rounded border border-slate-300 px-3 py-2"
+                />
+            </label>
+
+            <label class="grid gap-1 text-sm">
                 <span>Password</span>
                 <input
                     v-model="password"
@@ -66,7 +85,22 @@ async function handleSubmit() {
                 />
             </label>
 
+            <label class="grid gap-1 text-sm">
+                <span>Role</span>
+                <select
+                    v-model="role"
+                    class="rounded border border-slate-300 px-3 py-2"
+                >
+                    <option value="travellers">Traveller</option>
+                    <option value="administrators">Administrator</option>
+                    <option value="developers">Developer</option>
+                </select>
+            </label>
+
             <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+            <p v-if="success" class="text-sm text-green-600">
+                Account created! Redirecting to login…
+            </p>
 
             <button
                 type="submit"
