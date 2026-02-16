@@ -7,17 +7,23 @@ import { register } from '@/services/auth'
 const router = useRouter()
 
 const username = ref('')
+const email = ref('')
 const password = ref('')
+const role = ref<'travellers' | 'administrators' | 'developers'>('travellers')
+
 const error = ref<string | null>(null)
 const success = ref(false)
 
 const canSubmit = computed(
-    () => username.value.trim().length > 0 && password.value.trim().length > 0,
+    () =>
+        username.value.trim().length > 0 &&
+        email.value.trim().length > 0 &&
+        password.value.trim().length > 0,
 )
 
 async function handleSubmit() {
     if (!canSubmit.value) {
-        error.value = 'Enter username and password'
+        error.value = 'All fields are required'
         return
     }
 
@@ -25,10 +31,15 @@ async function handleSubmit() {
     success.value = false
 
     try {
-        await register(username.value.trim(), password.value)
+        await register({
+            username: username.value.trim(),
+            email: email.value.trim(),
+            password: password.value,
+            role: role.value,
+        })
+
         success.value = true
 
-        // Small delay so the user sees success feedback
         setTimeout(() => {
             router.push('/login')
         }, 800)
@@ -55,6 +66,16 @@ async function handleSubmit() {
             </label>
 
             <label class="grid gap-1 text-sm">
+                <span>Email</span>
+                <input
+                    v-model="email"
+                    type="email"
+                    autocomplete="email"
+                    class="rounded border border-slate-300 px-3 py-2"
+                />
+            </label>
+
+            <label class="grid gap-1 text-sm">
                 <span>Password</span>
                 <input
                     v-model="password"
@@ -62,6 +83,18 @@ async function handleSubmit() {
                     autocomplete="new-password"
                     class="rounded border border-slate-300 px-3 py-2"
                 />
+            </label>
+
+            <label class="grid gap-1 text-sm">
+                <span>Role</span>
+                <select
+                    v-model="role"
+                    class="rounded border border-slate-300 px-3 py-2"
+                >
+                    <option value="travellers">Traveller</option>
+                    <option value="administrators">Administrator</option>
+                    <option value="developers">Developer</option>
+                </select>
             </label>
 
             <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
