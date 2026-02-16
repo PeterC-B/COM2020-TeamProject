@@ -153,13 +153,13 @@ onMounted(loadMissions)
                         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                             <div class="sm:col-span-1">
                                 <label class="block text-sm font-semibold text-slate-700 mb-1">Mission Name</label>
-                                <input v-model="editableMission.mission_name" type="text" placeholder="e.g. The Dragon's Lair" class="w-full rounded-lg border border-slate-200 text-sm shadow-sm transition-all
+                                <input v-model="editableMission.mission_name" type="text" placeholder="e.g. Avoid Crossings" class="w-full rounded-lg border border-slate-200 text-sm shadow-sm transition-all
          focus:border-indigo-500 focus:ring-indigo-500
          disabled:bg-slate-50 disabled:text-slate-500" :disabled="!canEdit" />
                             </div>
                             <div class="sm:col-span-1">
                                 <label class="block text-sm font-semibold text-slate-700 mb-1">Tier</label>
-                                <input v-model="editableMission.tier" type="text" placeholder="e.g. Bronze" class="w-full rounded-lg border border-slate-200 text-sm shadow-sm transition-all
+                                <input v-model="editableMission.tier" type="text" placeholder="e.g. Easy" class="w-full rounded-lg border border-slate-200 text-sm shadow-sm transition-all
          focus:border-indigo-500 focus:ring-indigo-500
          disabled:bg-slate-50 disabled:text-slate-500" :disabled="!canEdit" />
                             </div>
