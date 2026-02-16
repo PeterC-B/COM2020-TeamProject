@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
+import Disclaimer from '@/components/Disclaimer.vue'
 import SimpleMap from '@/components/SimpleMap.vue'
 import { fetchYensRoutes, type YensRoutesResponse } from '@/services/routing'
 
@@ -21,6 +22,7 @@ const selection = ref<SelectionPayload>({
 const loadingRoute = ref(false)
 const routeError = ref<string | null>(null)
 const routeData = ref<YensRoutesResponse | null>(null)
+const showDisclaimer = ref(false)
 const routeGeometries = computed(() => routeData.value?.routes.map((route) => route.geometry) ?? [])
 const weightFields = [
     { key: 'distance', label: 'Distance' },
@@ -82,11 +84,17 @@ async function requestRoute() {
         loadingRoute.value = false
     }
 }
+
+onMounted(() => {
+    showDisclaimer.value = true
+})
+
 </script>
 
 <template>
     <section class="space-y-4">
         <h1 class="text-2xl font-semibold">Map</h1>
+        <Disclaimer :open="showDisclaimer" @close="showDisclaimer = false" />
 
         <div class="rounded border border-slate-300 bg-white p-4">
             <p class="text-sm text-slate-700">
