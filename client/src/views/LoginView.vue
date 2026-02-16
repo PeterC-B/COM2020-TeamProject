@@ -64,8 +64,8 @@ async function handleSubmit() {
                             v-model="username"
                             type="text"
                             autocomplete="username"
-                            placeholder="your.name"
-                            class="input-field"
+                            placeholder="username"
+                            class="block w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 outline-none;"
                         />
                     </div>
 
@@ -81,7 +81,7 @@ async function handleSubmit() {
                             type="password"
                             autocomplete="current-password"
                             placeholder="••••••••"
-                            class="input-field"
+                            class="block w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 outline-none;"
                         />
                     </div>
 
@@ -117,9 +117,3 @@ async function handleSubmit() {
         </section>
     </div>
 </template>
-
-<style scoped>
-.input-field {
-    @apply block w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 outline-none;
-}
-</style>
