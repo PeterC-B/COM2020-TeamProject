@@ -1,4 +1,4 @@
-import { get, put, type ApiEnvelope } from '@/services/api'
+import { get, post, put, type ApiEnvelope } from '@/services/api'
 
 export type Mission = {
     mission_id: string
@@ -16,6 +16,11 @@ export async function fetchMissions(): Promise<Mission[]> {
 
 export async function fetchMission(missionId: string): Promise<Mission> {
     const response = await get<ApiEnvelope<Mission>>(`/missions/${missionId}`)
+    return response.data.data
+}
+
+export async function createMission(mission: Mission): Promise<Mission> {
+    const response = await post<ApiEnvelope<Mission>>('/missions', mission)
     return response.data.data
 }
 

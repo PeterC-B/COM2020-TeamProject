@@ -14,6 +14,23 @@
             <button class="px-4 py-2 border rounded hover:bg-gray-50">Menu</button> 
         </nav>
 
+        <div id="disclaimer-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full mx-4">
+                <div class="text-center">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                    <span class="text-red-600 text-xl font-bold">!</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Project Disclaimer</h3>
+                <p class="text-sm text-gray-600 mb-6">
+                This website is a student project. The route suggestions and safety scores are for <strong>demonstration purposes only</strong>. This is not real-time safety advice.
+                </p>
+                <button id="close-modal" class="w-full bg-red-700 text-white font-bold py-3 rounded-lg hover:bg-red-800 transition-colors">
+                I Understand
+                </button>
+                </div>
+            </div>
+        </div>
+
         <div class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
 
             <aside class="lg:col-span-1 space-y-6 bg-white p-6 rounded-xl shadow">
