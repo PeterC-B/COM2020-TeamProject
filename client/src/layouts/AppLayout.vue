@@ -5,7 +5,8 @@ const navItems = [
     { label: 'Home', path: '/' },
     { label: 'Map', path: '/map' },
     { label: 'Profile', path: '/profile' },
-    { label: 'Register', path: '/register' }
+    { label: 'Register', path: '/register' },
+    { label: 'Missions', path: '/missions' }
 ]
 </script>
 
