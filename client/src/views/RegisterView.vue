@@ -1,8 +1,4 @@
-To wrap up your site's transformation, we’ll give the Registration page the same premium treatment as the Login page.
 
-The main addition here is styling the select dropdown and the Success State, ensuring that when a user registers, they get a satisfying visual confirmation before being redirected.
-
-Code snippet
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
