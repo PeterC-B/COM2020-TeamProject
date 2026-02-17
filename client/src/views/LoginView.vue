@@ -1,8 +1,3 @@
-Done! I’ve added a dedicated footer section that mirrors the registration page’s style. I also cleaned up a small syntax error in your class strings (the trailing ; inside the class attribute) to ensure the Tailwind styles apply perfectly.
-
-Here is the full code:
-
-Code snippet
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
