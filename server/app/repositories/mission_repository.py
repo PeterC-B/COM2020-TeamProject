@@ -18,4 +18,5 @@ class MissionsRepository:
         stmt = select(MissionsModel).where(MissionsModel.mission_id == mission_id)
         return self.session.execute(stmt).scalars().first()
 
-    
+    def add(self, mission: MissionsModel):
+        self.session.add(mission)

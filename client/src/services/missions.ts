@@ -16,31 +16,19 @@ export async function fetchMissions(): Promise<Mission[]> {
 
 export async function fetchMission(missionId: string): Promise<Mission> {
     const response = await get<ApiEnvelope<Mission>>(`/missions/${missionId}`)
-    console.log('Fetched mission:', response.data.data)
     return response.data.data
 }
 
 export async function createMission(mission: Mission): Promise<Mission> {
     const { mission_id, ...payload } = mission
 
-    const res = await fetch('/api/missions', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-    })
-
-    console.log('Create mission response:', res)
     console.log("payload;", payload)
 
-    if (!res.ok) {
-        const errorText = await res.text()
-        console.log('Create mission failed:', errorText)
-        throw new Error(errorText || 'Failed to create mission')
-    }
+    const res = await post<ApiEnvelope<Mission>>(`/missions`, payload)
 
-    return res.json()
+    console.log('Create mission response:', res)
+
+    return res.data.data
 }
 
 export async function updateMission(
