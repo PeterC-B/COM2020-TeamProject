@@ -7,10 +7,10 @@ Thumbs.db
 *.swo
 
 # ----- Secrets / local config -----
-.env
-.env.*
-!.env.example
-!.env.template
+#.env
+#.env.*
+#!.env.example
+#!.env.template
 
 # ----- Python -----
 __pycache__/
