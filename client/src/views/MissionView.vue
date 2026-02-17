@@ -22,6 +22,7 @@ const selectedMission = ref<Mission | null>(null)
 const editableMission = ref<Mission | null>(null)
 
 const isCreating = ref(false)
+const isEditing = ref(false)
 const loading = ref(false)
 const saving = ref(false)
 const error = ref<string | null>(null)
@@ -77,6 +78,21 @@ function startCreateMission() {
     editableMission.value = emptyMission()
 }
 
+function startEditMission() {
+    if (!canEdit.value) {
+        error.value = 'You do not have permission to edit missions'
+        return
+    }
+
+    if (!selectedMission.value) {
+        error.value = 'Please select a mission to edit'
+        return
+    }
+
+    isEditing.value = true
+    editableMission.value = { ...selectedMission.value }
+}
+
 async function saveMission() {
     if (!canEdit.value) {
         error.value = 'You do not have permission to modify missions'
@@ -99,6 +115,7 @@ async function saveMission() {
         selectedMission.value = result
         editableMission.value = { ...result }
         isCreating.value = false
+        isEditing.value = false
         await loadMissions()
     } catch {
         error.value = isCreating.value
@@ -133,6 +150,22 @@ const answerOptions = computed(() => {
     return shuffled
 })
 
+const tierProxy = computed({
+    get() {
+        return {
+            EASY: "1",
+            MEDIUM: "2",
+            HARD: "3",
+        }[editableMission.value?.tier ?? "EASY"]
+    },
+    set(value) {
+        editableMission.value!.tier = {
+            "1": "EASY",
+            "2": "MEDIUM",
+            "3": "HARD",
+        }[value] as any
+    },
+})
 
 // Handle answer selection
 function pickAnswer(answer: string) {
@@ -155,13 +188,23 @@ onMounted(loadMissions)
             </div>
 
             <!-- Create button (admins/staff only) -->
-            <button
-                v-if="canEdit"
-                class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                @click="startCreateMission"
-            >
-                <span class="text-lg">+</span> New Mission
-            </button>
+            <div v-if="canEdit" class="flex items-center gap-3">
+                <button
+                    class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    @click="startCreateMission"
+                >
+                    <span class="text-lg">+</span> New Mission
+                </button>
+
+                <button
+                    v-if="selectedMission != null"
+                    class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    @click="startEditMission"
+                >
+                    Edit Mission
+                </button>
+            </div>
+
         </div>
 
         <!-- Error -->
@@ -223,7 +266,7 @@ onMounted(loadMissions)
                         <h2 class="text-xl font-bold text-slate-900">
                             {{ isCreating
                                 ? 'New Mission'
-                                : canEdit
+                                : canEdit && isEditing
                                 ? 'Edit Mission'
                                 : 'Mission Details' }}
                         </h2>
@@ -237,7 +280,7 @@ onMounted(loadMissions)
                                 </label>
                                 <input
                                     v-model="editableMission.mission_name"
-                                    :disabled="!canEdit"
+                                    :disabled="!(canEdit && isEditing)"
                                     class="w-full rounded-lg border border-slate-200 p-2 text-sm disabled:bg-slate-50"
                                 />
                             </div>
@@ -247,13 +290,13 @@ onMounted(loadMissions)
                                     Tier
                                 </label>
                                 <select
-                                    v-model="editableMission.tier"
-                                    :disabled="!canEdit"
+                                    v-model="tierProxy"
+                                    :disabled="!(canEdit && isEditing)"
                                     class="w-full rounded-lg border border-slate-200 p-2 text-sm disabled:bg-slate-50"
                                 >
-                                <option value=1>Easy</option>
-                                <option value=2>Medium</option>
-                                <option value=3>Hard</option>
+                                <option value="1">Easy</option>
+                                <option value="2">Medium</option>
+                                <option value="3">Hard</option>
                                 </select>
                             </div>
                         </div>
@@ -265,13 +308,13 @@ onMounted(loadMissions)
                             <textarea
                                 v-model="editableMission.question"
                                 rows="3"
-                                :disabled="!canEdit"
+                                :disabled="!(canEdit && isEditing)"
                                 class="w-full rounded-lg border border-slate-200 p-2 text-sm disabled:bg-slate-50"
                             />
                         </div>
 
                         <!-- Possible Answers (admin/dev only) -->
-                        <div v-if="canEdit">
+                        <div v-if="canEdit && isEditing">
                             <label class="mb-1 block text-sm font-semibold text-slate-700">
                                 Possible Answers
                                 <span class="ml-1 text-xs text-slate-400">(comma separated)</span>
@@ -290,13 +333,14 @@ onMounted(loadMissions)
                         </div>
 
                         <!-- Correct Answer (admin/dev only) -->
-                        <div v-if="canEdit">
+                        <div v-if="canEdit && isEditing">
                             <label class="mb-1 block text-sm font-semibold text-slate-700">
                                 Correct Answer
                             </label>
 
                             <input
                                 v-model="editableMission.answer"
+                                :disabled="!isEditing"
                                 placeholder="Must match one of the possible answers"
                                 class="w-full rounded-lg border border-slate-200 p-2 text-sm"
                             />
@@ -305,7 +349,7 @@ onMounted(loadMissions)
 
 
                         <!-- Traveller Answer Selection -->
-                        <div v-if="!canEdit && answerOptions.length">
+                        <div v-if="!(canEdit && isEditing && answerOptions.length)">
                             <label class="mb-2 block text-sm font-semibold text-slate-700">
                                 Choose your answer
                             </label>
@@ -327,7 +371,7 @@ onMounted(loadMissions)
                         </div>
 
                         <p
-                            v-if="selectedAnswer"
+                            v-if="selectedAnswer && !(isCreating || (canEdit && isEditing))"
                             class="mt-3 text-sm font-semibold"
                             :class="
                                 selectedAnswer === editableMission.answer
@@ -338,7 +382,7 @@ onMounted(loadMissions)
                             You selected: <strong>{{ selectedAnswer }}</strong>
                         </p>
 
-                        <div v-if="selectedAnswer">
+                        <div v-if="selectedAnswer && !(isCreating || (canEdit && isEditing))">
                             <label class="mb-1 block text-sm font-semibold text-slate-700">
                                 Correct Answer
                             </label>
@@ -350,7 +394,7 @@ onMounted(loadMissions)
                         </div>
 
                         <!-- Save button -->
-                        <div v-if="canEdit" class="pt-4">
+                        <div v-if="canEdit && isEditing" class="pt-4">
                             <button
                                 class="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50"
                                 :disabled="saving"
