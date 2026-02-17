@@ -1,12 +1,12 @@
 import { get, post, put, type ApiEnvelope } from '@/services/api'
 
-export type Mission = {
-    mission_id: string
+export interface Mission {
+    mission_id?: string       
     mission_name: string
     question: string
     possible_answers: string
     answer: string
-    tier: string
+    tier: 'EASY' | 'MEDIUM' | 'HARD'
 }
 
 export async function fetchMissions(): Promise<Mission[]> {
@@ -21,8 +21,26 @@ export async function fetchMission(missionId: string): Promise<Mission> {
 }
 
 export async function createMission(mission: Mission): Promise<Mission> {
-    const response = await post<ApiEnvelope<Mission>>('/missions', mission)
-    return response.data.data
+    const { mission_id, ...payload } = mission
+
+    const res = await fetch('/api/missions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+    })
+
+    console.log('Create mission response:', res)
+    console.log("payload;", payload)
+
+    if (!res.ok) {
+        const errorText = await res.text()
+        console.log('Create mission failed:', errorText)
+        throw new Error(errorText || 'Failed to create mission')
+    }
+
+    return res.json()
 }
 
 export async function updateMission(

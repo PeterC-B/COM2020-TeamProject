@@ -13,8 +13,8 @@ const mainStore = useMainStore()
 
 // Single source of truth
 const canEdit = computed(() =>
-    mainStore.userRole === 'ADMIN' ||
-    mainStore.userRole === 'STAFF'
+    mainStore.userRole === 'administrators' ||
+    mainStore.userRole === 'developers'
 )
 
 const missions = ref<Mission[]>([])
@@ -33,7 +33,7 @@ function emptyMission(): Mission {
         question: '',
         possible_answers: '',
         answer: '',
-        tier: '',
+        tier: 'EASY',
     }
 }
 
@@ -92,7 +92,7 @@ async function saveMission() {
         const result = isCreating.value
             ? await createMission(editableMission.value)
             : await updateMission(
-                  editableMission.value.mission_id,
+                  editableMission.value.mission_id!,
                   editableMission.value,
               )
 
@@ -198,7 +198,7 @@ onMounted(loadMissions)
                                 'bg-indigo-50 ring-1 ring-inset ring-indigo-500/20':
                                     selectedMission?.mission_id === mission.mission_id,
                             }"
-                            @click="selectMission(mission.mission_id)"
+                            @click="selectMission(mission.mission_id!)"
                         >
                             <p class="font-semibold text-slate-900">
                                 {{ mission.mission_name || 'Untitled Mission' }}
@@ -246,11 +246,15 @@ onMounted(loadMissions)
                                 <label class="mb-1 block text-sm font-semibold text-slate-700">
                                     Tier
                                 </label>
-                                <input
+                                <select
                                     v-model="editableMission.tier"
                                     :disabled="!canEdit"
                                     class="w-full rounded-lg border border-slate-200 p-2 text-sm disabled:bg-slate-50"
-                                />
+                                >
+                                <option value=1>Easy</option>
+                                <option value=2>Medium</option>
+                                <option value=3>Hard</option>
+                                </select>
                             </div>
                         </div>
 
@@ -265,6 +269,40 @@ onMounted(loadMissions)
                                 class="w-full rounded-lg border border-slate-200 p-2 text-sm disabled:bg-slate-50"
                             />
                         </div>
+
+                        <!-- Possible Answers (admin/dev only) -->
+                        <div v-if="canEdit">
+                            <label class="mb-1 block text-sm font-semibold text-slate-700">
+                                Possible Answers
+                                <span class="ml-1 text-xs text-slate-400">(comma separated)</span>
+                            </label>
+
+                            <textarea
+                                v-model="editableMission.possible_answers"
+                                rows="2"
+                                placeholder="Answer A, Answer B, Answer C"
+                                class="w-full rounded-lg border border-slate-200 p-2 text-sm"
+                            />
+
+                            <p class="mt-1 text-xs text-slate-400">
+                                These will be shuffled for travellers.
+                            </p>
+                        </div>
+
+                        <!-- Correct Answer (admin/dev only) -->
+                        <div v-if="canEdit">
+                            <label class="mb-1 block text-sm font-semibold text-slate-700">
+                                Correct Answer
+                            </label>
+
+                            <input
+                                v-model="editableMission.answer"
+                                placeholder="Must match one of the possible answers"
+                                class="w-full rounded-lg border border-slate-200 p-2 text-sm"
+                            />
+                        </div>
+
+
 
                         <!-- Traveller Answer Selection -->
                         <div v-if="!canEdit && answerOptions.length">

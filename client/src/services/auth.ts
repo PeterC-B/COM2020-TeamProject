@@ -29,7 +29,7 @@ export async function login(username: string, password: string) {
         throw new Error('Login response did not include a token')
     }
 
-    return token
+    return {token, role: response.data?.data?.role, username: response.data?.data?.username}
 }
 
 export async function register(payload: RegisterPayload) {
