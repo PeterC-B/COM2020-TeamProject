@@ -77,7 +77,7 @@ On desktop:
 'npm run build'
 
 Use scp to copy the dist/ contents over to the EC2 instance
-'scp -i "C:\Users\{USERNAME}\.ssh\id_ed25519" -r dist/\* ubuntu@18.133.229.114:/var/www/frontend/''
+'scp -i "C:\Users\{USERNAME}\.ssh\id_ed25519" -r dist/\* ubuntu@18.133.229.114:/var/www/frontend/'
 
 Move from temp to frontend
 sudo mv ~/temp/\* /var/www/frontend/
