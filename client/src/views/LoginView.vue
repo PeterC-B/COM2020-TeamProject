@@ -1,3 +1,4 @@
+
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -29,9 +30,9 @@ async function handleSubmit() {
     isLoading.value = true
 
     try {
-        const login_result = await login(username.value.trim(), password.value)
-        mainStore.setAccessToken(login_result.token)
-        mainStore.setUserRole(login_result.role?.toLowerCase() as 'travellers' | 'administrators' | 'developers' || 'travellers')
+        const token = await login(username.value.trim(), password.value)
+        mainStore.setAccessToken(token)
+        mainStore.setUserRole('user')
 
         const redirectPath = typeof route.query.redirect === 'string' ? route.query.redirect : '/map'
         await router.push(redirectPath)

@@ -313,7 +313,6 @@ onMounted(loadMissions)
                             />
                         </div>
 
-                        <!-- Possible Answers (admin/dev only) -->
                         <div v-if="canEdit && isEditing">
                             <label class="mb-1 block text-sm font-semibold text-slate-700">
                                 Possible Answers
@@ -332,7 +331,6 @@ onMounted(loadMissions)
                             </p>
                         </div>
 
-                        <!-- Correct Answer (admin/dev only) -->
                         <div v-if="canEdit && isEditing">
                             <label class="mb-1 block text-sm font-semibold text-slate-700">
                                 Correct Answer
@@ -347,8 +345,6 @@ onMounted(loadMissions)
                         </div>
 
 
-
-                        <!-- Traveller Answer Selection -->
                         <div v-if="!(canEdit && isEditing && answerOptions.length)">
                             <label class="mb-2 block text-sm font-semibold text-slate-700">
                                 Choose your answer
@@ -393,7 +389,6 @@ onMounted(loadMissions)
                             />
                         </div>
 
-                        <!-- Save button -->
                         <div v-if="canEdit && isEditing" class="pt-4">
                             <button
                                 class="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50"
