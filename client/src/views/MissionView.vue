@@ -280,7 +280,7 @@ onMounted(loadMissions)
                                 </label>
                                 <input
                                     v-model="editableMission.mission_name"
-                                    :disabled="!(canEdit && isEditing)"
+                                    :disabled="!((canEdit && isEditing) || isCreating)"
                                     class="w-full rounded-lg border border-slate-200 p-2 text-sm disabled:bg-slate-50"
                                 />
                             </div>
@@ -291,7 +291,7 @@ onMounted(loadMissions)
                                 </label>
                                 <select
                                     v-model="tierProxy"
-                                    :disabled="!(canEdit && isEditing)"
+                                    :disabled="!((canEdit && isEditing) || isCreating)"
                                     class="w-full rounded-lg border border-slate-200 p-2 text-sm disabled:bg-slate-50"
                                 >
                                 <option value="1">Easy</option>
@@ -308,13 +308,12 @@ onMounted(loadMissions)
                             <textarea
                                 v-model="editableMission.question"
                                 rows="3"
-                                :disabled="!(canEdit && isEditing)"
+                                :disabled="!((canEdit && isEditing) || isCreating)"
                                 class="w-full rounded-lg border border-slate-200 p-2 text-sm disabled:bg-slate-50"
                             />
                         </div>
 
-                        <!-- Possible Answers (admin/dev only) -->
-                        <div v-if="canEdit && isEditing">
+                        <div v-if="(canEdit && isEditing) || isCreating">
                             <label class="mb-1 block text-sm font-semibold text-slate-700">
                                 Possible Answers
                                 <span class="ml-1 text-xs text-slate-400">(comma separated)</span>
@@ -332,8 +331,7 @@ onMounted(loadMissions)
                             </p>
                         </div>
 
-                        <!-- Correct Answer (admin/dev only) -->
-                        <div v-if="canEdit && isEditing">
+                        <div v-if="(canEdit && isEditing) || isCreating">
                             <label class="mb-1 block text-sm font-semibold text-slate-700">
                                 Correct Answer
                             </label>
@@ -347,9 +345,7 @@ onMounted(loadMissions)
                         </div>
 
 
-
-                        <!-- Traveller Answer Selection -->
-                        <div v-if="!(canEdit && isEditing && answerOptions.length)">
+                        <div v-if="(!isEditing && answerOptions.length && !isCreating)">
                             <label class="mb-2 block text-sm font-semibold text-slate-700">
                                 Choose your answer
                             </label>
@@ -393,7 +389,6 @@ onMounted(loadMissions)
                             />
                         </div>
 
-                        <!-- Save button -->
                         <div v-if="canEdit && isEditing" class="pt-4">
                             <button
                                 class="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50"
