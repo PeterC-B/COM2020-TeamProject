@@ -35,7 +35,7 @@
                 </div>
                 <h3 class="text-lg font-bold text-slate-900">Safety First</h3>
                 <p class="mt-2 text-sm leading-relaxed text-slate-500">
-                    Choose your route based on lighting, surgace quality, and other safety indicators. 
+                    Choose your route based on lighting, surface quality, and other safety indicators. 
                 </p>
             </div>
             <div class="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition hover:shadow-md">
@@ -68,7 +68,7 @@
             <div class="mx-auto max-w-2xl text-center">
                 <h2 class="text-2xl font-bold text-slate-900">Ready to transform your commute?</h2>
                 <p class="mt-4 text-slate-600 leading-relaxed">
-                    By collecting and analyzing street-level data, we're helping cities become more walkable, safer, and more enjoyable.
+                    By collecting and analysing street-level data, we're helping cities become more walkable, safer, and more enjoyable.
                 </p>
             </div>
         </div>
