@@ -338,7 +338,6 @@ onMounted(loadMissions)
 
                             <input
                                 v-model="editableMission.answer"
-                                :disabled="!isEditing"
                                 placeholder="Must match one of the possible answers"
                                 class="w-full rounded-lg border border-slate-200 p-2 text-sm"
                             />
@@ -384,12 +383,12 @@ onMounted(loadMissions)
                             </label>
                             <input
                                 v-model="editableMission.answer"
-                                :disabled="!canEdit"
+                                :disabled="!canEdit || isEditing || !isCreating"
                                 class="w-full rounded-lg border border-slate-200 p-2 text-sm disabled:bg-slate-50"
                             />
                         </div>
 
-                        <div v-if="canEdit && isEditing" class="pt-4">
+                        <div v-if="(canEdit && isEditing) || isCreating" class="pt-4">
                             <button
                                 class="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50"
                                 :disabled="saving"
