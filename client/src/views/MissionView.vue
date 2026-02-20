@@ -6,6 +6,7 @@ import {
     updateMission,
     createMission,
     type Mission,
+    deleteMission,
 } from '@/services/missions'
 import { useMainStore } from '@/stores/main'
 
@@ -91,6 +92,26 @@ function startEditMission() {
 
     isEditing.value = true
     editableMission.value = { ...selectedMission.value }
+}
+
+async function startDeleteMission() {
+    if(!canEdit.value){
+        error.value = 'You do not have permission to delete missions'
+        return
+    }
+
+    const mission = selectedMission.value
+
+    if (!mission || !mission.mission_id){
+        error.value = 'Please select a mission to delete'
+        return
+    }
+
+    await deleteMission(mission.mission_id)
+
+    await loadMissions()
+    selectedMission.value = null
+    editableMission.value = null
 }
 
 async function saveMission() {
@@ -202,6 +223,14 @@ onMounted(loadMissions)
                     @click="startEditMission"
                 >
                     Edit Mission
+                </button>
+
+                <button
+                    v-if="selectedMission != null"
+                    class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    @click="startDeleteMission"
+                >
+                    Delete Mission
                 </button>
             </div>
 

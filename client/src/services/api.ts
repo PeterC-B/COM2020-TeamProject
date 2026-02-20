@@ -1,6 +1,7 @@
 import router from '@/router'
 import { useMainStore } from '@/stores/main'
 import axios from 'axios'
+import type { T } from 'vue-router/dist/router-CWoNjPRp.mjs'
 
 export type ApiEnvelope<T, M = Record<string, unknown>> = {
     data: T
@@ -91,4 +92,10 @@ export function put<T = unknown>(endpoint: string, data: unknown) {
 
 export function postPublic<T = unknown>(endpoint: string, data: unknown) {
     return http.post<T>(endpoint, data)
+}
+
+export function deleteRequest<T = unknown>(endpoint: string) {
+    return http.delete<T>(endpoint, {
+        headers: getHeaders()
+    })
 }

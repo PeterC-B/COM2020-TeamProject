@@ -7,10 +7,10 @@ Thumbs.db
 *.swo
 
 # ----- Secrets / local config -----
-#.env
-#.env.*
-#!.env.example
-#!.env.template
+.env
+.env.*
+!.env.example
+!.env.template
 
 # ----- Python -----
 __pycache__/
@@ -27,11 +27,11 @@ __pycache__/
 htmlcov/
 
 # Virtual environments
-.venv/
-venv/
-ENV/
-env/
-server/.venv/
+#.venv/
+#venv/
+#ENV/
+#env/
+#server/.venv/
 
 # Packaging / build output
 build/

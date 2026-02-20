@@ -20,3 +20,7 @@ class MissionsRepository:
 
     def add(self, mission: MissionsModel):
         self.session.add(mission)
+
+    def delete(self, mission: MissionsModel):
+        self.session.delete(mission)
+        self.session.commit()
