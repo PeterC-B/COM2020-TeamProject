@@ -193,6 +193,11 @@ function pickAnswer(answer: string) {
     selectedAnswer.value = answer
 }
 
+function capital_case(word: string): string{
+    const lower = word.toLowerCase()
+    return lower.charAt(0).toUpperCase() + lower.slice(1)
+}
+
 onMounted(loadMissions)
 </script>
 
@@ -278,7 +283,7 @@ onMounted(loadMissions)
                             <span
                                 class="mt-1 inline-flex rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600"
                             >
-                                Tier {{ mission.tier }}
+                                Tier: {{ capital_case(mission.tier) }}
                             </span>
                         </li>
                     </ul>

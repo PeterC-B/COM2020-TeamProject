@@ -1,8 +1,11 @@
 import subprocess
 import time
 import webbrowser
-import os
+import signal
 import sys
+
+backend_process = None
+frontend_process = None
 
 def run_command(command, cwd=None):
     """Run a command as a subprocess."""
@@ -35,6 +38,12 @@ def wait_for_db():
 
 
 def main():
+    global backend_process, frontend_process
+
+    # Catch Ctrl+C
+    signal.signal(signal.SIGINT, handle_signal)
+
+    
     print("Starting Docker...")
     subprocess.run("docker compose up -d", shell=True, check=True, cwd="server")
 
@@ -55,6 +64,35 @@ def main():
 
     backend.wait()
     frontend.wait()
+
+def stop():
+    print("\nStopping development environment...")
+
+    global backend_process, frontend_process
+
+    # Stop backend
+    if backend_process:
+        backend_process.terminate()
+        backend_process.wait()
+
+    # Stop frontend
+    if frontend_process:
+        frontend_process.terminate()
+        frontend_process.wait()
+
+    # Stop docker
+    subprocess.run(
+        "docker compose down",
+        shell=True,
+        cwd="server"
+    )
+
+    print("Everything stopped.")
+    sys.exit(0)
+
+
+def handle_signal(sig, frame):
+    stop()
 
 
 if __name__ == "__main__":

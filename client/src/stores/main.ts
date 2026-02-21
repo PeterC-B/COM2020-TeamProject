@@ -4,6 +4,9 @@ import { computed, ref } from 'vue'
 export const useMainStore = defineStore('main', () => {
     const accessToken = ref<string | null>(null)
     const userRole = ref<string | null>(null)
+    const username = ref<string | null>(null)
+    const password = ref<string | null>(null)
+    const email = ref<string | null>(null)
     const isAuthenticated = computed(() => Boolean(accessToken.value))
 
     function setAccessToken(token: string | null) {
@@ -19,5 +22,11 @@ export const useMainStore = defineStore('main', () => {
         userRole.value = role
     }
 
-    return { accessToken, userRole, isAuthenticated, setAccessToken, setUserRole, clearAccessToken }
+    function setUserDetails(user_name: string | null, pass_word: string | null, email_address: string | null){
+        username.value = user_name
+        password.value = pass_word
+        email.value = email_address
+    }
+
+    return { accessToken, userRole, isAuthenticated, username, password, email, setAccessToken, setUserRole, clearAccessToken, setUserDetails}
 })

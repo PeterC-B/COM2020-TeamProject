@@ -8,6 +8,9 @@ const router = useRouter()
 
 const statusLabel = computed(() => (mainStore.isAuthenticated ? 'Authenticated' : 'Guest Mode'))
 const roleLabel = computed(() => mainStore.userRole ?? 'guest')
+const username = computed(() => (mainStore.username))
+const password = computed(() => (mainStore.password))
+const email = computed(() => (mainStore.email))
 
 function handleLogin() {
     void router.push('/login')
@@ -75,4 +78,10 @@ function handleLogout() {
             </div>
         </div>
     </nav>
+
+    <div>
+        <span>Username: {{ username }}</span><br>
+        <span>Email: {{ email }}</span><br>
+        <span>Password: ••••••••</span>
+    </div>
 </template>
