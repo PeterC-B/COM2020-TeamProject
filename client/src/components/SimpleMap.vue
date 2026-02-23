@@ -130,12 +130,30 @@ function renderRoutes(routes: Array<Array<[number, number]>> = []) {
 onMounted(() => {
     map! = new maplibregl.Map({
         container: mapEl.value!,
-        style: 'https://demotiles.maplibre.org/style.json',
+        style: {
+            version: 8,
+            sources: {
+                osm: {
+                    type: 'raster',
+                    tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+                    tileSize: 256,
+                    attribution: '© OpenStreetMap contributors',
+                },
+            },
+            layers: [
+                {
+                    id: 'osm',
+                    type: 'raster',
+                    source: 'osm',
+                },
+            ],
+        },
         center: [-2.585757, 51.460498],
         zoom: 12,
         maxZoom: 18,
         minZoom: 2,
     })
+
     setMap(map)
 
     map.addControl(new maplibregl.NavigationControl(), 'top-right')
@@ -221,6 +239,14 @@ onMounted(() => {
                     // Keep camera constrained to the dataset extent.
                     map.setRenderWorldCopies(false)
                 }
+
+                //map.setLayoutProperty('edges-line', 'visibility', 'none')
+                //map.setLayoutProperty('edges-line-hit', 'visibility', 'none')
+                //map.setLayoutProperty('edges-line-highlight', 'visibility', 'none')
+
+                map.setLayoutProperty('nodes-circle', 'visibility', 'none')
+                map.setLayoutProperty('nodes-circle-hit', 'visibility', 'none')
+                map.setLayoutProperty('nodes-circle-highlight', 'visibility', 'none')
         })
     })
 })

@@ -15,3 +15,15 @@ export function fetchGraphData(params: Record<string, unknown> = {}) {
         ({ data }) => data.data,
     )
 }
+
+export async function fetchGraphByLocation(location: string) {
+    const response = await fetch(
+        `/api${GRAPH_ENDPOINT}/coordinates?location=${location}`
+    )
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch graph data")
+    }
+
+    return response.json()
+}

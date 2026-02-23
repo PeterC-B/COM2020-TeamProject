@@ -45,6 +45,8 @@ def create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc):
                 "access_token": result.access_token,
                 "role": result.role,
                 "username": result.username,
+                "email": result.email,
+                "password": result.password,
             }
         )
     

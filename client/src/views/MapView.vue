@@ -4,6 +4,7 @@ import '@/assets/main.css'
 import Disclaimer from '@/components/Disclaimer.vue'
 import SimpleMap from '@/components/SimpleMap.vue'
 import { fetchYensRoutes, type YensRoutesResponse } from '@/services/routing'
+import { fetchGraphByLocation, fetchGraphData } from '@/services/graph'
 
 type SelectionPayload = {
     start: [number, number] | null
@@ -23,6 +24,8 @@ const loadingRoute = ref(false)
 const routeError = ref<string | null>(null)
 const routeData = ref<YensRoutesResponse | null>(null)
 const showDisclaimer = ref(false)
+const mapKey = ref(0)
+const chosen_location = ref('')
 const routeGeometries = computed(() => routeData.value?.routes.map((route) => route.geometry) ?? [])
 
 const weightFields = [
@@ -58,6 +61,14 @@ function formatScore(value: number | null | undefined) {
     if (value === null || value === undefined || Number.isNaN(value)) return 'N/A'
     return value.toFixed(2)
 }
+
+async function findLocation(){
+    await fetchGraphByLocation(chosen_location.value)
+    await fetchGraphData()
+
+    mapKey.value++
+}
+
 
 async function requestRoute() {
     if (!selection.value.start || !selection.value.end) return
@@ -97,6 +108,10 @@ onMounted(() => {
             <div>
                 <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Route Planner</h1>
                 <p class="text-slate-500 text-sm italic">Customise your journey preferences and find the best path.</p>
+            </div>
+            <div>
+                <input v-model="chosen_location" type="text" placeholder="Enter a location">
+                <button type="button" @click="findLocation">Search</button>
             </div>
         </header>
 
@@ -169,7 +184,7 @@ onMounted(() => {
 
             <div class="space-y-6 lg:col-span-8">
                 <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-sm ring-1 ring-slate-100">
-                    <SimpleMap :routes="routeGeometries" @selection-change="onSelectionChange" class="h-[700px] rounded-xl" />
+                    <SimpleMap :key="mapKey" :routes="routeGeometries" @selection-change="onSelectionChange" class="h-[700px] rounded-xl" />
                 </div>
 
                 <div v-if="routeData" class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">

@@ -29,9 +29,10 @@ async function handleSubmit() {
     isLoading.value = true
 
     try {
-        const login_result = await login(username.value.trim(), password.value)
-        mainStore.setAccessToken(login_result.token)
-        mainStore.setUserRole(login_result.role?.toLowerCase() as 'travellers' | 'administrators' | 'developers' || 'travellers')
+        const login_info = await login(username.value.trim(), password.value)
+        mainStore.setAccessToken(login_info.token)
+        mainStore.setUserRole(login_info.user_details.role?.toLowerCase() as 'travellers' | 'administrators' | 'developers' || 'travellers')
+        mainStore.setUserDetails(login_info.user_details?.username ?? 'guest', login_info.user_details?.password ?? 'temp_pass', login_info.user_details?.email ?? 'no email found') 
 
         const redirectPath = typeof route.query.redirect === 'string' ? route.query.redirect : '/map'
         await router.push(redirectPath)

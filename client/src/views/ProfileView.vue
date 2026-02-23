@@ -8,6 +8,9 @@ const router = useRouter()
 
 const statusLabel = computed(() => (mainStore.isAuthenticated ? 'Authenticated' : 'Guest Mode'))
 const roleLabel = computed(() => mainStore.userRole ?? 'guest')
+const username = computed(() => (mainStore.username))
+const password = computed(() => (mainStore.password))
+const email = computed(() => (mainStore.email))
 
 function handleLogin() {
     void router.push('/login')
@@ -75,4 +78,54 @@ function handleLogout() {
             </div>
         </div>
     </nav>
+
+    <main class="mx-auto max-w-4xl px-4 py-12 antialiased sm:px-6 lg:px-8">
+        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+            <div class="border-b border-slate-100 bg-slate-50/50 px-6 py-8">
+                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">User Profile</h1>
+                <p class="mt-1 text-sm text-slate-500">Personal Information and Account Settings</p>
+            </div>
+
+            <div class="divide-y divide-slate-100">
+                <div class="grid grid-cols-1 px-6 py-6 sm:grid-cols-3 sm:gap-4">
+                    <dt class="text-sm font-bold uppercase tracking-wider text-slate-400">Username</dt>
+                    <dd class="mt-1 text-sm font-semibold text-slate-900 sm:col-span-2 sm:mt-0">
+                        {{ username || 'N/A' }}
+                    </dd>
+                </div>
+
+                <div class="grid grid-cols-1 px-6 py-6 sm:grid-cols-3 sm:gap-4">
+                    <dt class="text-sm font-bold uppercase tracking-wider text-slate-400">Email Address</dt>
+                    <dd class="mt-1 text-sm font-semibold text-slate-900 sm:col-span-2 sm:mt-0">
+                        {{ email || 'N/A' }}
+                    </dd>
+                </div>
+
+                <div class="grid grid-cols-1 px-6 py-6 sm:grid-cols-3 sm:gap-4">
+                    <dt class="text-sm font-bold uppercase tracking-wider text-slate-400">Account Type</dt>
+                    <dd class="mt-1 text-sm sm:col-span-2 sm:mt-0">
+                        <span class="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-xs font-bold text-indigo-700 ring-1 ring-inset ring-indigo-700/10 capitalize">
+                            {{ roleLabel }}
+                        </span>
+                    </dd>
+                </div>
+
+                <div class="grid grid-cols-1 px-6 py-6 sm:grid-cols-3 sm:gap-4">
+                    <dt class="text-sm font-bold uppercase tracking-wider text-slate-400">Password</dt>
+                    <dd class="mt-1 flex items-center gap-2 text-sm font-semibold text-slate-900 sm:col-span-2 sm:mt-0">
+                        <span>••••••••••••</span>
+                        <button class="text-[10px] font-bold uppercase tracking-tighter text-indigo-600 hover:text-indigo-500 underline decoration-indigo-200 underline-offset-4">
+                            Change
+                        </button>
+                    </dd>
+                </div>
+            </div>
+
+            <div class="bg-slate-50/50 px-6 py-4 border-t border-slate-100">
+                <p class="text-[11px] text-slate-400 italic">
+                    To update your profile information, please contact the administrator
+                </p>
+            </div>
+        </div>
+    </main>
 </template>

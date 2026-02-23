@@ -9,6 +9,8 @@ class LoginUserResult:
     access_token: str
     role: str
     username: str
+    email: str
+    password: str
 
 
 class LoginUser:
@@ -19,13 +21,11 @@ class LoginUser:
         username = payload.get("username")
         password = payload.get("password")
 
-        print("Username and password received:", username, password)
-
         if not username or not password:
             raise ValidationError(message="Username and password are required")
-
         
         user = self.user_repo.get_by_username(username)
+
         if user is None or user.password_hash != f"hashed-{password}":
             raise AuthError(message="Invalid username or password")
 
@@ -34,4 +34,6 @@ class LoginUser:
             access_token=access_token,
             role=user.role.value,
             username=user.username,
+            email=user.email,
+            password=user.password_hash
         )

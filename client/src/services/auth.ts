@@ -6,6 +6,8 @@ type LoginResponse = {
     access_token?: string
     role?: string
     username?: string
+    email?: string
+    password?: string
 }
 
 type RegisterPayload = {
@@ -21,15 +23,13 @@ export async function login(username: string, password: string) {
         password,
     })
 
-    console.log('Login response:', response)
-
     const token = response.data?.data?.access_token
 
     if (!token) {
         throw new Error('Login response did not include a token')
     }
 
-    return {token, role: response.data?.data?.role, username: response.data?.data?.username}
+    return {token, user_details: response.data?.data}
 }
 
 export async function register(payload: RegisterPayload) {
