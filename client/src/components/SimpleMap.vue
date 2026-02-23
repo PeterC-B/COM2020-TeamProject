@@ -128,14 +128,31 @@ function renderRoutes(routes: Array<Array<[number, number]>> = []) {
 
 // Initialize map and load graph data.
 onMounted(() => {
-    map! = new maplibregl.Map({
+    map = new maplibregl.Map({
         container: mapEl.value!,
-        style: 'https://demotiles.maplibre.org/style.json',
+        style: {
+            version: 8,
+            sources: {
+                osm: {
+                    type: 'raster',
+                    tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+                    tileSize: 256,
+                    attribution: '© OpenStreetMap contributors',
+                },
+            },
+            layers: [
+                {
+                    id: 'osm',
+                    type: 'raster',
+                    source: 'osm',
+                },
+            ],
+        },
         center: [-2.585757, 51.460498],
         zoom: 12,
-        maxZoom: 18,
-        minZoom: 2,
     })
+
+
     setMap(map)
 
     map.addControl(new maplibregl.NavigationControl(), 'top-right')

@@ -43,7 +43,7 @@ def main():
     # Catch Ctrl+C
     signal.signal(signal.SIGINT, handle_signal)
 
-    
+        
     print("Starting Docker...")
     subprocess.run("docker compose up -d", shell=True, check=True, cwd="server")
 
