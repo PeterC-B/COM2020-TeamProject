@@ -243,9 +243,9 @@ onMounted(() => {
                 //map.setLayoutProperty('edges-line-hit', 'visibility', 'none')
                 //map.setLayoutProperty('edges-line-highlight', 'visibility', 'none')
 
-                map.setLayoutProperty('nodes-circle', 'visibility', 'none')
-                map.setLayoutProperty('nodes-circle-hit', 'visibility', 'none')
-                map.setLayoutProperty('nodes-circle-highlight', 'visibility', 'none')
+                //map.setLayoutProperty('nodes-circle', 'visibility', 'none')
+                //map.setLayoutProperty('nodes-circle-hit', 'visibility', 'none')
+                //map.setLayoutProperty('nodes-circle-highlight', 'visibility', 'none')
         })
     })
 })

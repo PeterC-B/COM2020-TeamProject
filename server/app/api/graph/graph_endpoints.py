@@ -1,6 +1,7 @@
 from server.app.api.responses import ok
 from flask import Blueprint, request
 import osmnx as ox
+from server.app.api.error_handlers import ValidationError
 
 
 def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_uc):
@@ -15,7 +16,7 @@ def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_u
         location = request.args.get("location")
 
         if location is None:
-            return {"error": "invalid location"}, 400
+            return ValidationError(message="Unable to fetch location")
 
         lat, lon = ox.geocode(location)
 

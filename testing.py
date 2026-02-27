@@ -5,7 +5,8 @@ from server.app.models.edges_model import EdgesModel
 from server.app.models.nodes_model import NodesModel
 from server.app.models.mission_progress_model import MissionProgressModel
 from server.app.models.user_account_model import UserAccountModel
-from server.app.models.enums.MISSION_TIER import MissionTier
+from server.app.models.enums.MISSION_TIER import MissionTier#
+import osmnx as ox
 
 from server.app import create_app
 
@@ -57,7 +58,4 @@ def seed_test_user():
 
 
 if __name__ == "__main__":
-    with app.app_context():
-    
-        seed_missions()
-        seed_test_user()
+    print(ox.geocode("exeter university"))

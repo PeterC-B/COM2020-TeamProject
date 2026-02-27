@@ -1,13 +1,14 @@
 import osmnx as ox
 import os
 import geopandas as gpd
+from server.app.domain.routing.graph_cache import save_cached_graph
 
 class FetchDataForCoordinates:
     def __init__(self, graph_data_repo):
         self.graph_data_repo = graph_data_repo
 
     def execute(self, coords : tuple[float, float]):
-        graph = ox.graph_from_point(coords, 500, network_type="walk", dist_type="network")
+        graph = ox.graph_from_point(coords, 500, network_type="walk", dist_type="bbox")
         graph = ox.add_edge_speeds(graph)
         graph = ox.add_edge_travel_times(graph)
 
@@ -109,3 +110,5 @@ class FetchDataForCoordinates:
             os.path.join(output_dir, "edges_geometry.csv"),
             index=False
         )
+
+        save_cached_graph(graph)
