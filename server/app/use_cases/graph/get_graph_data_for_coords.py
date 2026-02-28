@@ -2,20 +2,24 @@ import osmnx as ox
 import os
 import geopandas as gpd
 from server.app.domain.routing.graph_cache import save_cached_graph
+from server.app.domain.errors import NotFoundError
 
 class FetchDataForCoordinates:
     def __init__(self, graph_data_repo):
         self.graph_data_repo = graph_data_repo
 
     def execute(self, coords : tuple[float, float]):
-        graph = ox.graph_from_point(coords, 500, network_type="walk", dist_type="bbox")
+        graph = ox.graph_from_point(coords, 700, network_type="walk", dist_type="network")
         graph = ox.add_edge_speeds(graph)
         graph = ox.add_edge_travel_times(graph)
 
         tags = {"amenity" : True}
-        amenities = ox.features_from_point(coords, tags, 500)
-        amenities = amenities[amenities.geometry.notnull()].copy()
-        amenities["geometry"] = amenities.geometry.centroid
+        try:
+            amenities = ox.features_from_point(coords, tags, 500)
+            amenities = amenities[amenities.geometry.notnull()].copy()
+            amenities["geometry"] = amenities.geometry.centroid
+        except:
+            return NotFoundError(message="Unable to find amenities")
 
         sample_size = min(80, len(amenities))
         random_amenities = amenities.sample(n=sample_size, random_state=42)
@@ -48,13 +52,16 @@ class FetchDataForCoordinates:
             index=False
         )
 
-        drink_places = ox.features_from_point(
-            coords,
-            tags={"amenity":[
-                    "bar", "biergarten", "pub", "casino", "nightclub", "gambling"
-                ]},
-            dist=450,
-        )
+        try:
+            drink_places = ox.features_from_point(
+                coords,
+                tags={"amenity":[
+                        "bar", "biergarten", "pub", "casino", "nightclub", "gambling"
+                    ]},
+                dist=450,
+            )
+        except:
+            return NotFoundError(message="Unable to find drinking places")
 
         edges_m = edges_gdf.to_crs(epsg=27700)
         amenities_m = drink_places.to_crs(epsg=27700)

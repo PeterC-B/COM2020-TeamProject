@@ -22,8 +22,20 @@ export async function fetchGraphByLocation(location: string) {
     )
 
     if (!response.ok) {
-        throw new Error("Failed to fetch graph data")
-    }
+        throw new Error(`Failed to fetch graph data`)
+    }   
+
+    return response.json()
+}
+
+export async function fetchLikeLocations(start: string){
+    const response = await fetch(
+        `/api${GRAPH_ENDPOINT}/locations?like_string=${start}`
+    )
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch graph data`)
+    }   
 
     return response.json()
 }

@@ -4,7 +4,7 @@ import '@/assets/main.css'
 import Disclaimer from '@/components/Disclaimer.vue'
 import SimpleMap from '@/components/SimpleMap.vue'
 import { fetchYensRoutes, type YensRoutesResponse } from '@/services/routing'
-import { fetchGraphByLocation, fetchGraphData } from '@/services/graph'
+import { fetchGraphByLocation, fetchGraphData, fetchLikeLocations } from '@/services/graph'
 
 type SelectionPayload = {
     start: [number, number] | null
@@ -69,6 +69,13 @@ async function findLocation(){
     mapKey.value++
 }
 
+async function getLikeLocations(){
+    if (chosen_location.value !== null){
+        const data = await fetchLikeLocations(chosen_location.value)
+        console.log(data)
+    }
+}
+
 async function requestRoute() {
     if (!selection.value.start || !selection.value.end) return
 
@@ -110,7 +117,7 @@ onMounted(() => {
             </div>
 
             <div>
-                <input v-model="chosen_location" type="text" placeholder="Enter a location">
+                <input v-model="chosen_location" type="text" placeholder="Enter a location" @keyup="getLikeLocations">
                 <button type="button" @click="findLocation">Search</button>
             </div>
         </header>
