@@ -19,6 +19,7 @@ from server.app.repositories.routing_graph_repository import RoutingGraphReposit
 from server.app.repositories.user_repository import UserRepository
 from server.app.unit_of_work.sqlalchemy_uow import SqlAlchemyUnitOfWork
 from server.app.use_cases.graph.get_graph_data import GetGraphData
+from server.app.use_cases.graph.get_graph_data_for_coords import FetchDataForCoordinates
 from server.app.use_cases.health.explain_edge_cost import ExplainEdgeCost
 from server.app.use_cases.health.get_attributes import GetHealthAttributes
 from server.app.use_cases.health.get_default_weights import GetDefaultWeights
@@ -26,6 +27,7 @@ from server.app.use_cases.missions.create_mission import CreateMission
 from server.app.use_cases.missions.get_mission import GetMission
 from server.app.use_cases.missions.list_missions import ListMissions
 from server.app.use_cases.missions.delete_mission import DeleteMission
+from server.app.use_cases.missions.save_mission_progress import SaveMissionProgress
 from server.app.use_cases.routing.route_yens import RouteYens
 from server.app.use_cases.users.list_users import ListUsers
 from server.app.use_cases.users.login_user import LoginUser
@@ -88,6 +90,7 @@ def create_app():
     list_users_uc = ListUsers(user_repo)
     login_user_uc = LoginUser(user_repo)
     get_graph_data_uc = GetGraphData(graph_data_repo)
+    get_graph_data_for_coords_uc = FetchDataForCoordinates(graph_data_repo)
     get_health_attributes_uc = GetHealthAttributes()
     get_default_weights_uc = GetDefaultWeights()
     explain_edge_cost_uc = ExplainEdgeCost()
@@ -97,13 +100,14 @@ def create_app():
     create_mission_uc = CreateMission(uow, missions_repo)
     update_mission_uc = UpdateMission(uow, missions_repo)
     delete_mission_uc = DeleteMission(uow, missions_repo)
+    save_mission_progress_uc = SaveMissionProgress(uow, missions_repo)
 
     # Initialise the Routes
     app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc))
-    app.register_blueprint(create_graph_route_blueprint(get_graph_data_uc))
+    app.register_blueprint(create_graph_route_blueprint(get_graph_data_uc, get_graph_data_for_coords_uc))
     app.register_blueprint(create_health_routes(get_health_attributes_uc, get_default_weights_uc, explain_edge_cost_uc))
     app.register_blueprint(create_routing_route_blueprint(route_yens_uc))
-    app.register_blueprint(create_missions_blueprint(list_missions_uc, get_mission_uc, create_mission_uc, update_mission_uc, delete_mission_uc))
+    app.register_blueprint(create_missions_blueprint(list_missions_uc, get_mission_uc, create_mission_uc, update_mission_uc, delete_mission_uc, save_mission_progress_uc))
 
     # Import error handlers
     register_error_handlers(app)

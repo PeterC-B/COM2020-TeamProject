@@ -238,6 +238,14 @@ onMounted(() => {
                     // Keep camera constrained to the dataset extent.
                     map.setRenderWorldCopies(false)
                 }
+
+                //map.setLayoutProperty('edges-line', 'visibility', 'none')
+                //map.setLayoutProperty('edges-line-hit', 'visibility', 'none')
+                //map.setLayoutProperty('edges-line-highlight', 'visibility', 'none')
+
+                //map.setLayoutProperty('nodes-circle', 'visibility', 'none')
+                //map.setLayoutProperty('nodes-circle-hit', 'visibility', 'none')
+                //map.setLayoutProperty('nodes-circle-highlight', 'visibility', 'none')
         })
     })
 })

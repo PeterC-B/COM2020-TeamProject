@@ -15,3 +15,10 @@
  - ProfileView.vue
  - routes.py (server.app.api.users)
  - login_user.py
+
+## 23/02/2026 - Max
+ - SimpleMap.vue
+ - graph.ts
+ - MapView.vue
+ - graph_endpoints.py
+ - get_graph_data_for_coords.py
