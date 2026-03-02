@@ -64,6 +64,7 @@ def create_app():
 
     # Register the models
     from app.models import (
+        database_change_log_model,
         edges_model,
         location_model,
         mission_progress_model,

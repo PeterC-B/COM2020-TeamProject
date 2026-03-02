@@ -1,3 +1,4 @@
+from app.models.database_change_log_model import DatabaseChangeLogModel
 from app.models.edges_model import EdgesModel
 from app.models.missions_model import MissionsModel
 from app.models.nodes_model import NodesModel
