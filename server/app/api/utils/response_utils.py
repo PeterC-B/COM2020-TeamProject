@@ -22,7 +22,7 @@ def compute_path_distance(graph: nx.MultiDiGraph, path):
 
     return total
 
-def compute_indicator_summary(graph, path, weights):
+def compute_indicator_summary(graph:nx.MultiDiGraph, path, weights):
     """
     Compute average indicator values and weighted score for a route.
     """
@@ -46,9 +46,17 @@ def compute_indicator_summary(graph, path, weights):
         first_key = next(iter(edge_data))
         data = edge_data[first_key]
 
+        if edge_count == 0:
+            print(data)
+
         # Sum indicators
         for key in totals:
+            if edge_count == 0:
+                print(key)
             totals[key] += data.get(key, 0.0)
+
+        if edge_count == 0:
+            print(totals)
 
         # Weighted score
         for key, w in weights.items():
@@ -57,6 +65,7 @@ def compute_indicator_summary(graph, path, weights):
             if key in data:
                 weighted_score += data[key] * w
 
+        print(edge_count)
         edge_count += 1
 
     if edge_count == 0:
@@ -97,16 +106,14 @@ def format_route_response(path, graph, geometry=None, metadata=None, weights=Non
     Returns:
         dict formatted for JSON response
     """
-
     total_distance = compute_path_distance(graph, path)
 
     if geometry is None:
         geometry = build_geometry_from_graph(graph, path)
-    
+
     indicators = {}
     if weights is not None:
         indicators = compute_indicator_summary(graph, path, weights)
-
 
     return {
         "path": path,

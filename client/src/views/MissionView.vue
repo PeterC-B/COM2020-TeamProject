@@ -8,11 +8,11 @@ import {
     type Mission,
     deleteMission,
 } from '@/services/missions'
+import { saveMissionProgress, type MissionProgress } from '@/services/leaderboard'
 import { useMainStore } from '@/stores/main'
 
 const mainStore = useMainStore()
 
-// Single source of truth
 const canEdit = computed(() =>
     mainStore.userRole === 'administrators' ||
     mainStore.userRole === 'developers'
@@ -21,6 +21,8 @@ const canEdit = computed(() =>
 const missions = ref<Mission[]>([])
 const selectedMission = ref<Mission | null>(null)
 const editableMission = ref<Mission | null>(null)
+
+const missionProgress = ref<MissionProgress | null>(null)
 
 const isCreating = ref(false)
 const isEditing = ref(false)
@@ -35,7 +37,7 @@ function emptyMission(): Mission {
         question: '',
         possible_answers: '',
         answer: '',
-        tier: 'EASY',
+        tier: 'MEDIUM',
     }
 }
 
@@ -191,6 +193,26 @@ const tierProxy = computed({
 // Handle answer selection
 function pickAnswer(answer: string) {
     selectedAnswer.value = answer
+    saveProgress()
+}
+
+async function saveProgress(){
+    if (!selectedMission.value || !selectedAnswer.value) return
+
+    const correct =
+        selectedAnswer.value === selectedMission.value.answer
+
+    const progress : MissionProgress = {
+        user_id: mainStore.user_id || 'unknown_user',
+        mission_id: selectedMission.value.mission_id!,
+        status: correct ? "correct" : "incorrect",
+        tier: selectedMission.value.tier,
+    }
+    try{
+        await saveMissionProgress(progress)
+    } catch (e) {
+        error.value = `Failed to save mission progress: ${e}`
+    }
 }
 
 function capital_case(word: string): string{

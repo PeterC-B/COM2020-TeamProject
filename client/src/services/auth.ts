@@ -8,6 +8,7 @@ type LoginResponse = {
     username?: string
     email?: string
     password?: string
+    user_id?: string
 }
 
 type RegisterPayload = {
@@ -22,8 +23,6 @@ export async function login(username: string, password: string) {
         username,
         password,
     })
-
-    console.log("Response: ", response.data.data)
 
     const token = response.data?.data?.access_token
 

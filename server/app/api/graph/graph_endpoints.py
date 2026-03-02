@@ -14,24 +14,29 @@ def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_u
     
     @bp.route("/coordinates", methods=["GET"])
     def get_graph_data_by_coords():
-        location = request.args.get("location")
-
-        if location is None:
-            return ValidationError(message="Unable to fetch location")
-
-        lat, lon = ox.geocode(location)
-
-        if lat is None or lon is None:
-            return ValidationError(message="Unable to fetch location")
-
         try:
-            coords = (float(lat), float(lon))
-        except ValueError:
-            return {"error": "lat and lon are invalid"}, 400
-        
-        data = get_graph_data_from_coords_uc.execute(coords)
+            location = request.args.get("location")
 
-        return ok(data=data)
+            if location is None:
+                return ValidationError(message="Unable to fetch location")
+
+            lat, lon = ox.geocode(location)
+
+            if lat is None or lon is None:
+                return ValidationError(message="Unable to fetch location")
+
+            try:
+                coords = (float(lat), float(lon))
+            except ValueError:
+                return {"error": "lat and lon are invalid"}, 400
+            
+            data = get_graph_data_from_coords_uc.execute(coords)
+            return ok(data=data)
+        except Exception as e:
+            print("Error:", e)
+            raise
+
+        
     
     @bp.route("/locations", methods=["GET"])
     def get_like_locations():

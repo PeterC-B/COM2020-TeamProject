@@ -10,6 +10,11 @@ const statusLabel = computed(() => (mainStore.isAuthenticated ? 'Authenticated' 
 const roleLabel = computed(() => mainStore.userRole ?? 'guest')
 const username = computed(() => (mainStore.username))
 const email = computed(() => (mainStore.email))
+const user_id = computed(() => (mainStore.user_id))
+
+const seeID = computed(() =>
+    mainStore.userRole === 'developers'
+)
 
 function handleLogin() {
     void router.push('/login')
@@ -79,6 +84,12 @@ function handleLogout() {
             </div>
 
             <div class="divide-y divide-slate-100">
+                <div class="grid grid-cols-1 px-6 py-6 sm:grid-cols-3 sm:gap-4" v-if="seeID">
+                    <dt class="text-sm font-bold uppercase tracking-wider text-slate-400">User ID (developers only)</dt>
+                    <dd class="mt-1 text-sm font-semibold text-slate-900 sm:col-span-2 sm:mt-0">
+                        {{ user_id || 'N/A' }}
+                    </dd>
+                </div>
                 <div class="grid grid-cols-1 px-6 py-6 sm:grid-cols-3 sm:gap-4">
                     <dt class="text-sm font-bold uppercase tracking-wider text-slate-400">Username</dt>
                     <dd class="mt-1 text-sm font-semibold text-slate-900 sm:col-span-2 sm:mt-0">

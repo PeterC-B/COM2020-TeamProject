@@ -47,6 +47,7 @@ def create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc):
                 "username": result.username,
                 "email": result.email,
                 "password": result.password,
+                "user_id": result.user_id
             }
         )
     

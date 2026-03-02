@@ -11,6 +11,7 @@ class LoginUserResult:
     username: str
     email: str
     password: str
+    user_id: str
 
 
 class LoginUser:
@@ -35,5 +36,6 @@ class LoginUser:
             role=user.role.value,
             username=user.username,
             email=user.email,
-            password=user.password_hash
+            password=user.password_hash,
+            user_id = user.user_id
         )
