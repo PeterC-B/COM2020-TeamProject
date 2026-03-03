@@ -19,6 +19,10 @@ function handleLogout() {
     mainStore.clearAccessToken()
     void router.push('/login')
 }
+
+function resetPassword(){
+    router.push('/forgot-password')
+}
 </script>
 
 <template>
@@ -106,7 +110,7 @@ function handleLogout() {
                     <dt class="text-sm font-bold uppercase tracking-wider text-slate-400">Password</dt>
                     <dd class="mt-1 flex items-center gap-2 text-sm font-semibold text-slate-900 sm:col-span-2 sm:mt-0">
                         <span>••••••••••••</span>
-                        <button class="text-[10px] font-bold uppercase tracking-tighter text-indigo-600 hover:text-indigo-500 underline decoration-indigo-200 underline-offset-4">
+                        <button class="text-[10px] font-bold uppercase tracking-tighter text-indigo-600 hover:text-indigo-500 underline decoration-indigo-200 underline-offset-4" @click="resetPassword">
                             Change
                         </button>
                     </dd>

@@ -25,7 +25,6 @@ class UserRepository:
     @map_db_errors("user:get_by_username")
     def get_by_username(self, username: str):
         stmt = select(UserAccountModel).where(UserAccountModel.username == username)
-        print(stmt)
         return self.session.execute(stmt).scalars().first()
     
     @map_db_errors("user:get_by_email")
