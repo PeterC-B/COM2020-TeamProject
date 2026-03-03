@@ -27,8 +27,10 @@ class RegisterUser:
 
         created_at = datetime.datetime.now(tz=datetime.timezone.utc)
 
-        # Hash password simply here for now but will move to a service later
-        hashed_password = f"hashed-{password}"
+        if len(password) < 6:
+            raise ValidationError(message="Password must be of length 6")
+
+        hashed_password = hash_password(password)
 
         role_map = {
             "travellers": UserAccessType.TRAVELLERS,
@@ -44,7 +46,7 @@ class RegisterUser:
             user = UserAccountModel(
                 username=username,
                 email=email,
-                password_hash=hashed_password(password),
+                password_hash=hashed_password,
                 role=role_enum,
                 created_at=created_at
             )
