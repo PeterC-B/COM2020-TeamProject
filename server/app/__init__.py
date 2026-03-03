@@ -104,7 +104,7 @@ def create_app():
     save_mission_progress_uc = SaveMissionProgress(uow, missions_repo)
 
     # Initialise the Routes
-    app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc))
+    app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc, forgot_password_uc))
     app.register_blueprint(create_graph_route_blueprint(get_graph_data_uc, get_graph_data_for_coords_uc))
     app.register_blueprint(create_health_routes(get_health_attributes_uc, get_default_weights_uc, explain_edge_cost_uc))
     app.register_blueprint(create_routing_route_blueprint(route_yens_uc))
