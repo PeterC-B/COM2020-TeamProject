@@ -89,7 +89,7 @@ def create_app():
     register_user_uc = RegisterUser(uow, user_repo)
     list_users_uc = ListUsers(user_repo)
     login_user_uc = LoginUser(user_repo)
-    forgot_password_uc = ForgotPassword(user_repo)
+    forgot_password_uc = ForgotPassword(uow, user_repo)
     get_graph_data_uc = GetGraphData(graph_data_repo)
     get_graph_data_for_coords_uc = FetchDataForCoordinates(graph_data_repo)
     get_health_attributes_uc = GetHealthAttributes()

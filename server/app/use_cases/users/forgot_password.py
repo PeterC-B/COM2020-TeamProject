@@ -6,7 +6,8 @@ class ForgotPasswordResult:
     reset: bool
 
 class ForgotPassword:
-    def __init__(self, user_repo):
+    def __init__(self, uow, user_repo):
+        self.uow = uow
         self.user_repo = user_repo
 
     def execute(self, username: str, email: str, new_password: str) -> ForgotPasswordResult:
@@ -20,5 +21,7 @@ class ForgotPassword:
 
         new_hash = f"hashed-{new_password}"
         self.user_repo.update_password(user.user_id, new_hash)
+
+        self.uow.commit()
 
         return ForgotPasswordResult(reset=True)
