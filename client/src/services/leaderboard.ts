@@ -4,11 +4,10 @@ export interface MissionProgress {
     user_id: string
     mission_id: string
     status: 'incorrect' | 'correct'
-    tier: 'EASY' | 'MEDIUM' | 'HARD'
+    score: number
 }
 
 export async function saveMissionProgress(payload: MissionProgress){
-    console.log("Getting here")
     const response = await postPublic<ApiEnvelope<MissionProgress>>(
         `/leaderboard`,
         payload

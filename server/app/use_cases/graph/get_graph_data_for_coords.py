@@ -15,8 +15,6 @@ class FetchDataForCoordinates:
         graph = ox.graph_from_point(coords, dist=700, network_type="walk", dist_type="network")
         graph = ox.add_edge_speeds(graph)
         graph = ox.add_edge_travel_times(graph)
-        graph = add_lighting_tag(graph, coords, 700)
-        graph = add_surface_tag(graph, coords, 700)
 
         try:
             amenities = ox.features_from_point(coords, tags={"amenity": True}, dist=500)
@@ -62,12 +60,6 @@ class FetchDataForCoordinates:
 
         edges_gdf["score_band"] = nearest["access_score"].values  
 
-        # TODO: Add weightings
-        edges_gdf = attach_edge_indicators(edges_gdf)
-        edges_gdf = calculate_weights(edges_gdf, coords)
-        print("Saving csv")
-        edges_gdf.to_csv("edge.csv")
-
         output_dir = "server/app/data/processed"
         os.makedirs(output_dir, exist_ok=True)
 
@@ -79,7 +71,7 @@ class FetchDataForCoordinates:
         # Edges CSV
         edges_export = edges_gdf.reset_index().rename(columns={"u": "from_node", "v": "to_node"})
         edges_export["edge_id"] = edges_export.index
-        edges_main = edges_export[["edge_id", "from_node", "to_node", "key", "length", "travel_time", "safety_score", "speed_score", "greenery_score", "weight"]]
+        edges_main = edges_export[["edge_id", "from_node", "to_node", "key", "length", "travel_time"]]
         edges_main.to_csv(os.path.join(output_dir, "edges_table.csv"), index=False)
 
         # Edges geometry CSV

@@ -1,4 +1,4 @@
-import { postPublic, type ApiEnvelope } from '@/services/api'
+import { postPublic, get, type ApiEnvelope } from '@/services/api'
 
 import { defineStore } from 'pinia'
 
@@ -16,6 +16,14 @@ type RegisterPayload = {
     email: string
     password: string
     role?: string
+}
+
+export interface Users {
+    user_id: string
+    username: string
+    password: string
+    role: string
+    rank: number
 }
 
 export async function login(username: string, password: string) {
@@ -40,3 +48,12 @@ export async function register(payload: RegisterPayload) {
     )
 }
 
+export async function list_all_users(): Promise<Users[]>{
+    const response = await get<ApiEnvelope<Users[]>>(
+        '/user/list'
+    )
+    return response.data.data.map((user, index) => ({
+        ...user,
+        rank: index + 1
+    }))
+}

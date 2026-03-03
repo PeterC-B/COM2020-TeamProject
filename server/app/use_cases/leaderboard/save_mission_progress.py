@@ -19,16 +19,14 @@ class SaveMissionProgress:
             raise ValidationError(message="Invalid UUID format")
         
         status = payload.get('status')
-        tier = payload.get('tier')
-
-        print(user_id, mission_id, status, tier)
+        score = payload.get('score')
 
         missing = [
             field for field, value in {
                 "user_id": user_id,
                 "mission_id": mission_id,
                 "status": status,
-                "tier": tier,
+                "score": score,
             }.items() if not value
         ]
 
@@ -38,18 +36,10 @@ class SaveMissionProgress:
                 details={"missing": missing}
             )
 
-        score_map = {
-            "EASY": 10,
-            "MEDIUM": 20,
-            "HARD": 30,
-        }
-
         completion_map = {
             "correct": MissionStatus.CORRECT,
             "incorrect": MissionStatus.INCORRECT,
         }
-
-        score_value = score_map.get(tier, 0)
         
         status_value = completion_map.get((status or "incorrect").lower())
 
@@ -62,7 +52,7 @@ class SaveMissionProgress:
                 user_id=user_id,
                 mission_id=mission_id,
                 status=status_value,
-                score=score_value
+                score=score
             )
 
             self.leaderboard_repo.add(progress)

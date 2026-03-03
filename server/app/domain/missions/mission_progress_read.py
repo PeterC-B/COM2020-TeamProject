@@ -1,4 +1,4 @@
-from server.app.models.enums.MISSION_TIER import MissionTier
+from server.app.models.enums.MISSION_STATUS import MissionStatus
 from server.app.models.mission_progress_model import MissionProgressModel
 from marshmallow import Schema, fields
 
@@ -9,6 +9,6 @@ class MissionProgressReadSchema(Schema):
 
     user_id = fields.UUID(required=True)
     mission_id = fields.UUID(required=True)
-    status = fields.String(required=True) 
+    status = fields.Enum(MissionStatus, by_value=True, required=True)
     score = fields.Integer(required=True)
     

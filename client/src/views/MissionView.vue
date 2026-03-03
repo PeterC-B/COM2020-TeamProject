@@ -8,7 +8,7 @@ import {
     type Mission,
     deleteMission,
 } from '@/services/missions'
-import { saveMissionProgress, type MissionProgress } from '@/services/leaderboard'
+import { saveMissionProgress, fetchMissionProgress, type MissionProgress } from '@/services/leaderboard'
 import { useMainStore } from '@/stores/main'
 
 const mainStore = useMainStore()
@@ -26,6 +26,7 @@ const missionProgress = ref<MissionProgress | null>(null)
 
 const isCreating = ref(false)
 const isEditing = ref(false)
+const completedMission = ref(false)
 const loading = ref(false)
 const saving = ref(false)
 const error = ref<string | null>(null)
@@ -60,9 +61,15 @@ async function selectMission(id: string) {
 
     try {
         const mission = await fetchMission(id)
-        selectedMission.value = mission
         editableMission.value = { ...mission }
         selectedAnswer.value = null
+        selectedMission.value = { ...mission}
+        try{
+            missionProgress.value = await fetchMissionProgress(id, mainStore.user_id ? mainStore.user_id : 'n/a')
+            completedMission.value = true
+        } catch {
+            completedMission.value = false
+        }
     } catch {
         error.value = 'Failed to load mission'
     } finally {
@@ -149,10 +156,8 @@ async function saveMission() {
     }
 }
 
-// User-selected answer (for travellers)
 const selectedAnswer = ref<string | null>(null)
 
-// Split possible answers safely
 const answerOptions = computed(() => {
     if (!editableMission.value?.possible_answers) return []
 
@@ -190,10 +195,17 @@ const tierProxy = computed({
     },
 })
 
-// Handle answer selection
 function pickAnswer(answer: string) {
     selectedAnswer.value = answer
     saveProgress()
+}
+
+function completedText(correct: boolean){
+    if (correct){
+        return ", please try another."
+    } else {
+        return ", contact an admin to try again."
+    }
 }
 
 async function saveProgress(){
@@ -206,13 +218,24 @@ async function saveProgress(){
         user_id: mainStore.user_id || 'unknown_user',
         mission_id: selectedMission.value.mission_id!,
         status: correct ? "correct" : "incorrect",
-        tier: selectedMission.value.tier,
+        score: get_score_from_tier(selectedMission.value.tier),
     }
     try{
         await saveMissionProgress(progress)
     } catch (e) {
         error.value = `Failed to save mission progress: ${e}`
     }
+}
+
+function get_score_from_tier(tier: string): number{
+    if(tier === "EASY"){
+        return 10
+    } else if (tier === "MEDIUM"){
+        return 20
+    } else if (tier === "HARD"){
+        return 30
+    }
+    return 0
 }
 
 function capital_case(word: string): string{
@@ -400,7 +423,7 @@ onMounted(loadMissions)
                         </div>
 
 
-                        <div v-if="(!isEditing && answerOptions.length && !isCreating)">
+                        <div v-if="(!isEditing && answerOptions.length && !isCreating && !completedMission)">
                             <label class="mb-2 block text-sm font-semibold text-slate-700">
                                 Choose your answer
                             </label>
@@ -419,6 +442,12 @@ onMounted(loadMissions)
                                     {{ answer }}
                                 </button>
                             </div>
+                        </div>
+
+                        <div v-if="completedMission">
+                            <p class="mt-3 text-sm font-semibold">
+                                You have already completed this mission and got it {{ missionProgress?.status }}{{ completedText(missionProgress?.status === "correct") }}
+                            </p>
                         </div>
 
                         <p
