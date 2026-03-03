@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from server.app.domain.errors import ValidationError
-
+from server.app.security.passwords import hash_password
 @dataclass(frozen=True)
 class ForgotPasswordResult:
     reset: bool
@@ -19,7 +19,7 @@ class ForgotPassword:
         if user is None or user.email != email:
             raise ValidationError("Username and email do not match")
 
-        new_hash = f"hashed-{new_password}"
+        new_hash = hash_password(new_password)
         self.user_repo.update_password(user.user_id, new_hash)
 
         self.uow.commit()

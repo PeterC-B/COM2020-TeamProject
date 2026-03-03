@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from server.app.domain.errors import ValidationError
 from server.app.models.enums.ACCESS_TYPE import UserAccessType
 from server.app.models.user_account_model import UserAccountModel
-
+from server.app.security.passwords import hash_password
 
 @dataclass(frozen=True)
 class RegisterUserResult:
@@ -44,7 +44,7 @@ class RegisterUser:
             user = UserAccountModel(
                 username=username,
                 email=email,
-                password_hash=hashed_password,
+                password_hash=hashed_password(password),
                 role=role_enum,
                 created_at=created_at
             )
