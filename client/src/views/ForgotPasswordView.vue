@@ -56,27 +56,27 @@ async function handleSubmit() {
                 <form class="space-y-5" @submit.prevent="handleSubmit" v-if="!success">
                     <div>
                         <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Username</label>
-                        <input v-model="username" type="text" class="input" placeholder="Enter username" />
+                        <input v-model="username" type="text" class="block w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 outline-none;" placeholder="Enter username" />
                     </div>
 
                     <div>
                         <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Email</label>
-                        <input v-model="email" type="email" class="input" placeholder="Enter email" />
+                        <input v-model="email" type="email" class="block w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 outline-none;" placeholder="Enter email" />
                     </div>
 
                     <div>
                         <label class="text-xs font-bold uppercase tracking-wider text-slate-500">New Password</label>
-                        <input v-model="newPassword" type="password" class="input" placeholder="New password" />
+                        <input v-model="newPassword" type="password" class="block w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 outline-none;" placeholder="New password" />
                     </div>
 
                     <div>
                         <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Confirm Password</label>
-                        <input v-model="confirmPassword" type="password" class="input" placeholder="Confirm password" />
+                        <input v-model="confirmPassword" type="password" class="block w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 outline-none;" placeholder="Confirm password" />
                     </div>
 
-                    <div v-if="error" class="error-box">{{ error }}</div>
+                    <div v-if="error" class="rounded-lg bg-red-50 p-3 text-sm text-red-600 border border-red-100;">{{ error }}</div>
 
-                    <button type="submit" class="btn-primary" :disabled="!canSubmit">
+                    <button type="submit" class="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white shadow-lg hover:bg-slate-800 transition-all;" :disabled="!canSubmit">
                         <span v-if="isLoading">Resetting...</span>
                         <span v-else>Reset Password</span>
                     </button>
@@ -84,21 +84,9 @@ async function handleSubmit() {
 
                 <div v-else class="text-center space-y-4">
                     <p class="text-green-600 font-semibold">Your password has been reset successfully.</p>
-                    <router-link to="/login" class="btn-primary block text-center">Return to Login</router-link>
+                    <router-link to="/login" class="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white shadow-lg hover:bg-slate-800 transition-all block text-center">Return to Login</router-link>
                 </div>
             </div>
         </section>
     </div>
 </template>
-
-<style scoped>
-.input {
-    @apply block w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 outline-none;
-}
-.btn-primary {
-    @apply w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white shadow-lg hover:bg-slate-800 transition-all;
-}
-.error-box {
-    @apply rounded-lg bg-red-50 p-3 text-sm text-red-600 border border-red-100;
-}
-</style>
