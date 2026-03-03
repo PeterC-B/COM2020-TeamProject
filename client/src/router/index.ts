@@ -9,6 +9,7 @@ const routes: RouteRecordRaw[] = [
     { path: '/', component: () => import('@/views/HomeView.vue'), meta: { requiresAuth: true } },
     { path: '/map', component: () => import('@/views/MapView.vue'), meta: { requiresAuth: true } },
     { path: '/missions', component: () => import('@/views/MissionView.vue'), meta: { requiresAuth: true } },
+    { path: '/forgot-password', component: () => import('@/views/ForgotPasswordView.vue') },
     {
         path: '/profile',
         component: () => import('@/views/ProfileView.vue'),
