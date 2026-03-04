@@ -36,8 +36,8 @@ from server.app.use_cases.routing.route_yens import RouteYens
 from server.app.use_cases.users.list_users import ListUsers
 from server.app.use_cases.users.login_user import LoginUser
 from server.app.use_cases.users.register_user import RegisterUser
+from server.app.use_cases.users.forgot_password import ForgotPassword
 from server.app.use_cases.missions.update_mission import UpdateMission
-
 
 def create_app():
     # Application instance
@@ -94,6 +94,7 @@ def create_app():
     register_user_uc = RegisterUser(uow, user_repo)
     list_users_uc = ListUsers(user_repo)
     login_user_uc = LoginUser(user_repo)
+    forgot_password_uc = ForgotPassword(uow, user_repo)
     get_graph_data_uc = GetGraphData(graph_data_repo)
     get_graph_data_for_coords_uc = FetchDataForCoordinates(graph_data_repo)
     get_health_attributes_uc = GetHealthAttributes()
@@ -110,7 +111,7 @@ def create_app():
     get_mission_progress_uc = GetMissionProgress(leaderboard_repo)
 
     # Initialise the Routes
-    app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc))
+    app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc, forgot_password_uc))
     app.register_blueprint(create_graph_route_blueprint(get_graph_data_uc, get_graph_data_for_coords_uc))
     app.register_blueprint(create_health_routes(get_health_attributes_uc, get_default_weights_uc, explain_edge_cost_uc))
     app.register_blueprint(create_routing_route_blueprint(route_yens_uc))

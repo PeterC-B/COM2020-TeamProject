@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from server.app.domain.errors import AuthError, ValidationError
 from flask_jwt_extended import create_access_token
-
+from server.app.security.passwords import verify_password
 
 @dataclass(frozen=True)
 class LoginUserResult:
@@ -24,10 +24,10 @@ class LoginUser:
 
         if not username or not password:
             raise ValidationError(message="Username and password are required")
-        
+                
         user = self.user_repo.get_by_username(username)
 
-        if user is None or user.password_hash != f"hashed-{password}":
+        if user is None or not verify_password(password, user.password_hash):
             raise AuthError(message="Invalid username or password")
 
         access_token = create_access_token(identity=str(user.user_id))

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from server.app.domain.errors import ValidationError
 from server.app.models.enums.ACCESS_TYPE import UserAccessType
 from server.app.models.user_account_model import UserAccountModel
-
+from server.app.security.passwords import hash_password
 
 @dataclass(frozen=True)
 class RegisterUserResult:
@@ -27,8 +27,10 @@ class RegisterUser:
 
         created_at = datetime.datetime.now(tz=datetime.timezone.utc)
 
-        # Hash password simply here for now but will move to a service later
-        hashed_password = f"hashed-{password}"
+        if len(password) < 6:
+            raise ValidationError(message="Password must be of length 6")
+
+        hashed_password = hash_password(password)
 
         role_map = {
             "travellers": UserAccessType.TRAVELLERS,

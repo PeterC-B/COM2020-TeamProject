@@ -1,5 +1,4 @@
-import { postPublic, get, type ApiEnvelope } from '@/services/api'
-
+import { postPublic, put, type ApiEnvelope } from '@/services/api'
 import { defineStore } from 'pinia'
 
 type LoginResponse = {
@@ -18,6 +17,9 @@ type RegisterPayload = {
     role?: string
 }
 
+type ForgotPasswordResponse = {
+    reset: boolean
+}
 export interface Users {
     user_id: string
     username: string
@@ -46,6 +48,19 @@ export async function register(payload: RegisterPayload) {
         '/user/register',
         payload,
     )
+}
+
+export async function forgotPassword(username: string, email: string, newPassword: string) {
+    const response = await postPublic<ApiEnvelope<ForgotPasswordResponse>>(
+        '/user/forgot-password',
+        {
+            username,
+            email,
+            new_password: newPassword,
+        }
+    )
+
+    return response.data.data
 }
 
 export async function list_all_users(): Promise<Users[]>{
