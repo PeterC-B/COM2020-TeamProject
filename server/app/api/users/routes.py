@@ -50,6 +50,7 @@ def create_user_route_blueprint(
                 "role": result.role,
                 "username": result.username,
                 "email": result.email,
+                "user_id": result.user_id
             }
         )
     

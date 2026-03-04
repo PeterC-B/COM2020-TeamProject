@@ -6,6 +6,7 @@ export const useMainStore = defineStore('main', () => {
     const userRole = ref<string | null>(null)
     const username = ref<string | null>(null)
     const email = ref<string | null>(null)
+    const user_id = ref<string | null>(null)
     const isAuthenticated = computed(() => Boolean(accessToken.value))
 
     function setAccessToken(token: string | null) {
@@ -24,6 +25,7 @@ export const useMainStore = defineStore('main', () => {
     function setUserDetails(user_name: string | null, email_address: string | null){
         username.value = user_name
         email.value = email_address
+        user_id.value = user_ID
     }
 
     return { accessToken, userRole, isAuthenticated, username, email, setAccessToken, setUserRole, clearAccessToken, setUserDetails}

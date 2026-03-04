@@ -52,6 +52,7 @@ def build_nodes_geojson(nodes_path: Path) -> Dict[str, object]:
                     "type": "Feature",
                     "geometry": {"type": "Point", "coordinates": [x, y]},
                     "properties": {"node_id": node_id},
+                    "highway" : row["highway"]
                 }
             )
     return {"type": "FeatureCollection", "features": features}
@@ -81,7 +82,10 @@ def build_edges_geojson(
                         "key": key,
                         "length": float(row["length"]),
                         "travel_time": float(row["travel_time"]),
-                        "access_score": float(row["access_score"]),
+                        "safety_score": float(row["safety_score"]),
+                        "speed_score": float(row["speed_score"]),
+                        "greenery_score": float(row["greenery_score"]),
+                        "weight": float(row["weight"]),
                     },
                 }
             )

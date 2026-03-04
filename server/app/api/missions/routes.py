@@ -9,7 +9,6 @@ def create_missions_blueprint(
     create_mission_uc,
     update_mission_uc,
     delete_mission_uc,
-    save_mission_progress_uc,
 ):
     bp = Blueprint("missions", __name__, url_prefix="/api/missions")
 
@@ -46,14 +45,5 @@ def create_missions_blueprint(
             mission_id
         )
         return {"message": "Mission deleted"}, 200
-    
-    @bp.route("/save_mission/<uuid:mission_id>", methods=["PUT"])
-    def save_mission_progress(mission_id, user_id):
-        save_mission_progress_uc.execute(
-            user_id,
-            mission_id,
-            request.get_json()
-        )
-        return ok()
 
     return bp

@@ -7,6 +7,7 @@ type LoginResponse = {
     username?: string
     email?: string
     password?: string
+    user_id?: string
 }
 
 type RegisterPayload = {
@@ -19,14 +20,19 @@ type RegisterPayload = {
 type ForgotPasswordResponse = {
     reset: boolean
 }
+export interface Users {
+    user_id: string
+    username: string
+    password: string
+    role: string
+    rank: number
+}
 
 export async function login(username: string, password: string) {
     const response = await postPublic<ApiEnvelope<LoginResponse>>('/user/login', {
         username,
         password,
     })
-
-    console.log("Response: ", response.data.data)
 
     const token = response.data?.data?.access_token
 
@@ -55,4 +61,14 @@ export async function forgotPassword(username: string, email: string, newPasswor
     )
 
     return response.data.data
+}
+
+export async function list_all_users(): Promise<Users[]>{
+    const response = await get<ApiEnvelope<Users[]>>(
+        '/user/list'
+    )
+    return response.data.data.map((user, index) => ({
+        ...user,
+        rank: index + 1
+    }))
 }
