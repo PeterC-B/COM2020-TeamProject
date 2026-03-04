@@ -43,9 +43,6 @@ class SaveMissionProgress:
         
         status_value = completion_map.get((status or "incorrect").lower())
 
-        if(status == "correct"):
-            status_value = MissionStatus.CORRECT
-
         with self.uow:
 
             progress = MissionProgressModel(

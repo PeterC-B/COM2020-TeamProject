@@ -36,6 +36,6 @@ class LoginUser:
             role=user.role.value,
             username=user.username,
             email=user.email,
-            password=user.password_hash,
+            password=user.password_hash, # TODO: Take this out b4 deployment
             user_id = user.user_id
         )

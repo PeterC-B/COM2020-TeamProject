@@ -213,11 +213,11 @@ async function saveProgress(){
 
     const correct =
         selectedAnswer.value === selectedMission.value.answer
-
+    const status = correct ? 'correct' : 'incorrect'
     const progress : MissionProgress = {
         user_id: mainStore.user_id || 'unknown_user',
         mission_id: selectedMission.value.mission_id!,
-        status: correct ? "correct" : "incorrect",
+        status: status,
         score: get_score_from_tier(selectedMission.value.tier),
     }
     try{
@@ -462,13 +462,13 @@ onMounted(loadMissions)
                             You selected: <strong>{{ selectedAnswer }}</strong>
                         </p>
 
-                        <div v-if="selectedAnswer && !(isCreating || (canEdit && isEditing))">
+                        <div v-if="(selectedAnswer && !(isCreating || (canEdit && isEditing))) || completedMission">
                             <label class="mb-1 block text-sm font-semibold text-slate-700">
                                 Correct Answer
                             </label>
                             <input
                                 v-model="editableMission.answer"
-                                :disabled="!canEdit || isEditing || !isCreating"
+                                :disabled="(!canEdit || isEditing || !isCreating)"
                                 class="w-full rounded-lg border border-slate-200 p-2 text-sm disabled:bg-slate-50"
                             />
                         </div>

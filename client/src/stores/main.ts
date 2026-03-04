@@ -22,11 +22,11 @@ export const useMainStore = defineStore('main', () => {
         userRole.value = role
     }
 
-    function setUserDetails(user_name: string | null, email_address: string | null){
+    function setUserDetails(user_name: string | null, email_address: string | null, user_ID: string | null){
         username.value = user_name
         email.value = email_address
         user_id.value = user_ID
     }
 
-    return { accessToken, userRole, isAuthenticated, username, email, setAccessToken, setUserRole, clearAccessToken, setUserDetails}
+    return { accessToken, userRole, isAuthenticated, username, email, user_id, setAccessToken, setUserRole, clearAccessToken, setUserDetails}
 })

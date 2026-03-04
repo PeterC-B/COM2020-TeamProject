@@ -5,6 +5,8 @@ Response utilities:
 """
 
 import networkx as nx
+import osmnx as ox
+from server.app.domain.indicators.attribute_extraction import attach_edge_indicators
 
 def compute_path_distance(graph: nx.MultiDiGraph, path):
     """Compute total distance along a path in a MultiDiGraph."""
@@ -18,7 +20,7 @@ def compute_path_distance(graph: nx.MultiDiGraph, path):
 
         # Use the first edge key (OSMnx graphs rarely have parallel edges)
         first_key = next(iter(edge_data))
-        total += edge_data[first_key].get("distance", 0.0)
+        total += edge_data[first_key].get("length", 0.0)
 
     return total
 
@@ -110,6 +112,14 @@ def format_route_response(path, graph, geometry=None, metadata=None, weights=Non
 
     if geometry is None:
         geometry = build_geometry_from_graph(graph, path)
+
+    nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
+
+    edges_gdf = attach_edge_indicators(edges_gdf)
+
+    edges_gdf.to_csv("edge.csv")
+
+    graph = ox.graph_from_gdfs(nodes_gdf, edges_gdf)
 
     indicators = {}
     if weights is not None:

@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { forgotPassword } from '@/services/auth'
+import { useMainStore } from '@/stores/main'
 
 const router = useRouter()
 
@@ -22,6 +23,8 @@ const canSubmit = computed(() =>
     !isLoading.value
 )
 
+const mainStore = useMainStore()
+
 async function handleSubmit() {
     if (!canSubmit.value) {
         error.value = 'Please fill out all fields correctly.'
@@ -34,6 +37,8 @@ async function handleSubmit() {
     try {
         await forgotPassword(username.value.trim(), email.value.trim(), newPassword.value)
         success.value = true
+        mainStore.clearAccessToken()
+        router.push("/login")
     } catch (err) {
         error.value = err instanceof Error ? err.message : 'Unable to reset password.'
     } finally {

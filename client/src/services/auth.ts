@@ -1,4 +1,4 @@
-import { postPublic, put, type ApiEnvelope } from '@/services/api'
+import { postPublic, put, get, type ApiEnvelope } from '@/services/api'
 import { defineStore } from 'pinia'
 
 type LoginResponse = {
