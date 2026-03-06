@@ -129,7 +129,6 @@ def attach_edge_indicators(edges_gdf: gpd.GeoDataFrame):
 
     edges_gdf_copy = edges_gdf.copy()
 
-    edges_gdf_copy["distance"] = edges_gdf_copy["length"]
     edges_gdf_copy["lighting"] = edges_gdf_copy.apply(extract_lighting, axis=1)
     edges_gdf_copy["greenery"] = edges_gdf_copy.apply(extract_greenery, axis=1)
     edges_gdf_copy["pollution"] = edges_gdf_copy.apply(extract_pollution, axis=1)

@@ -21,6 +21,8 @@ import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 const props = defineProps<{
     routes?: Array<Array<[number, number]>>
+    nodes?: GeoJson | null
+    edges?: GeoJson | null
 }>()
 
 const emit = defineEmits<{
@@ -263,6 +265,24 @@ watch(selectedNodeId, (nodeId) => {
     const value = nodeId ?? -1
     map!.setFilter('nodes-circle-highlight', ['==', ['get', 'node_id'], value])
 })
+
+watch(
+    () => props.nodes,
+    (newNodes) => {
+        if (!map || !newNodes) return
+        const source = map.getSource('nodes') as maplibregl.GeoJSONSource
+        if (source) source.setData(newNodes)
+    },
+)
+
+watch(
+    () => props.edges,
+    (newEdges) => {
+        if (!map || !newEdges) return
+        const source = map.getSource('edges') as maplibregl.GeoJSONSource
+        if (source) source.setData(newEdges)
+    },
+)
 
 onBeforeUnmount(() => {
     dispose()

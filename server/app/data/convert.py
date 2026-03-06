@@ -1,11 +1,17 @@
 import argparse
 import csv
 import json
+import networkx as nx
 from pathlib import Path
 from typing import Dict, Iterable, List, Tuple
+import pandas as pd
+import geopandas as gpd
+from shapely import wkt
+from server.app.domain.scoring.weight_utils import calculate_weights
 
 Coord = List[float]
 EdgeKey = Tuple[int, int, int]
+Scores = List[Dict[str, float]]
 
 
 def parse_linestring_wkt(wkt: str) -> List[Coord]:
@@ -38,64 +44,98 @@ def load_edge_geometries(path: Path) -> Dict[EdgeKey, List[Coord]]:
             geometries[(u, v, key)] = parse_linestring_wkt(row["geometry"])
     return geometries
 
+def edges_from_db_to_gdf(edges):
+    df = pd.DataFrame([
+        {
+            "u": e.from_node,
+            "v": e.to_node,
+            "key": e.key,
+            "length": e.length,
+            "travel_time": e.travel_time,
+            "access_score": e.access_score,
+            "geometry": wkt.loads(e.geometry)
+        }
+        for e in edges
+    ])
 
-def build_nodes_geojson(nodes_path: Path) -> Dict[str, object]:
+    edges_gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
+
+    return edges_gdf
+
+def build_nodes_geojson(nodes_list: list) -> Dict[str, object]:
     features = []
-    with nodes_path.open(newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            node_id = int(row["node_id"])
-            x = float(row["x"])
-            y = float(row["y"])
-            features.append(
-                {
-                    "type": "Feature",
-                    "geometry": {"type": "Point", "coordinates": [x, y]},
-                    "properties": {"node_id": node_id},
-                    "highway" : row["highway"]
-                }
-            )
+    for node in nodes_list:
+        node_id = int(node.node_id)
+        x = float(node.x_coordinate)
+        y = float(node.y_coordinate)
+        highway = node.feature
+        features.append(
+            {
+                "type": "Feature",
+                "geometry": {"type": "Point", "coordinates": [x, y]},
+                "properties": {"node_id": node_id, "highway": highway},
+            }
+        )
     return {"type": "FeatureCollection", "features": features}
 
 
 def build_edges_geojson(
-    edges_path: Path, geometries: Dict[EdgeKey, List[Coord]]
+    edges_list: list
 ) -> Dict[str, object]:
     features = []
-    with edges_path.open(newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            from_node = int(row["from_node"])
-            to_node = int(row["to_node"])
-            key = int(row["key"])
-            geom = geometries.get((from_node, to_node, key))
-            if not geom:
-                continue
-            features.append(
-                {
-                    "type": "Feature",
-                    "geometry": {"type": "LineString", "coordinates": geom},
-                    "properties": {
-                        "edge_id": int(row["edge_id"]),
-                        "from_node": from_node,
-                        "to_node": to_node,
-                        "key": key,
-                        "length": float(row["length"]),
-                        "travel_time": float(row["travel_time"]),
-                        "safety_score": float(row["safety_score"]),
-                        "speed_score": float(row["speed_score"]),
-                        "greenery_score": float(row["greenery_score"]),
-                        "weight": float(row["weight"]),
-                    },
-                }
-            )
+    for edge in edges_list:
+        from_node = int(edge.from_node_id)
+        to_node = int(edge.to_node_id)
+        key = int(edge.key)
+        geom = edge.geometry
+        if not geom:
+            continue
+        features.append(
+            {
+                "type": "Feature",
+                "geometry": {"type": "LineString", "coordinates": geom},
+                "properties": {
+                    "edge_id": int(edge.edge_id),
+                    "from_node": from_node,
+                    "to_node": to_node,
+                    "key": key,
+                    "length": float(edge.length),
+                    "travel_time": float(edge.travel_time),
+                },
+            }
+        )
     return {"type": "FeatureCollection", "features": features}
+
+def build_graph(nodes, edges):
+    G = nx.MultiDiGraph()
+
+    for node in nodes:
+        G.add_node(
+            node.nodes_id,
+            x=node.x,
+            y=node.y,
+            highway=node.highway
+        )
+
+    for edge in edges:
+        G.add_edge(
+            edge.from_node,
+            edge.to_node,
+            key=edge.key,
+            length=edge.length,
+            travel_time=edge.travel_time,
+            access_score=edge.access_score,
+            geometry=wkt.loads(edge.geometry) if edge.geometry else None
+        )
+
+    return G
 
 
 def write_geojson(path: Path, data: Dict[str, object]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=True)
+
 
 
 def main(argv: Iterable[str] | None = None) -> int:

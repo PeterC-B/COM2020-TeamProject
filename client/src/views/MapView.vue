@@ -5,6 +5,7 @@ import Disclaimer from '@/components/Disclaimer.vue'
 import SimpleMap from '@/components/SimpleMap.vue'
 import { fetchYensRoutes, type YensRoutesResponse } from '@/services/routing'
 import { fetchGraphByLocation, fetchGraphData, fetchLikeLocations } from '@/services/graph'
+import { assertFeatureCollection, type GeoJson } from '@/components/simple-map/geoJsonUtils'
 
 type SelectionPayload = {
     start: [number, number] | null
@@ -20,11 +21,13 @@ const selection = ref<SelectionPayload>({
     endNodeId: null,
 })
 
+const nodes = ref<GeoJson | null>(null)
+const edges = ref<GeoJson | null>(null)
+
 const loadingRoute = ref(false)
 const routeError = ref<string | null>(null)
 const routeData = ref<YensRoutesResponse | null>(null)
 const showDisclaimer = ref(false)
-const mapKey = ref(0)
 const chosen_location = ref('')
 const routeGeometries = computed(() => routeData.value?.routes.map((route) => route.geometry) ?? [])
 
@@ -64,9 +67,10 @@ function formatScore(value: number | null | undefined) {
 
 async function findLocation(){
     await fetchGraphByLocation(chosen_location.value)
-    await fetchGraphData()
+    const graphData = await fetchGraphData()
 
-    mapKey.value++
+    nodes.value = assertFeatureCollection(graphData.features?.nodes, 'nodes')
+    edges.value = assertFeatureCollection(graphData.features?.edges, 'edges')
 }
 
 async function requestRoute() {
@@ -184,7 +188,7 @@ onMounted(() => {
 
             <div class="space-y-6 lg:col-span-8">
                 <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-sm ring-1 ring-slate-100">
-                    <SimpleMap :key="mapKey" :routes="routeGeometries" @selection-change="onSelectionChange" class="h-[700px] rounded-xl" />
+                    <SimpleMap :routes="routeGeometries" :nodes="nodes" :edges="edges" @selection-change="onSelectionChange" class="h-[700px] rounded-xl" />
                 </div>
 
                 <div v-if="routeData" class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">

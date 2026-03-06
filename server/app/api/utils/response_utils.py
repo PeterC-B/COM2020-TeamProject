@@ -117,8 +117,6 @@ def format_route_response(path, graph, geometry=None, metadata=None, weights=Non
 
     edges_gdf = attach_edge_indicators(edges_gdf)
 
-    edges_gdf.to_csv("edge.csv")
-
     graph = ox.graph_from_gdfs(nodes_gdf, edges_gdf)
 
     indicators = {}
