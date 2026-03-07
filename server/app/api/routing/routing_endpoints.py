@@ -1,16 +1,52 @@
 """Routing API endpoint for Yen's algorithm."""
 
-from server.app.api.responses import ok
 from flask import Blueprint, request
+from flask_jwt_extended import current_user
+
+from server.app.api.responses import ok
+from server.app.schemas.route_query_schema import RouteQuerySchema
+from server.app.extensions import login_required, admin_required
 
 
-def create_routing_route_blueprint(route_yens_uc):
+def create_routing_route_blueprint(route_yens_uc, log_route_query_uc, list_route_queries_uc):
     bp = Blueprint("routing", __name__, url_prefix="/api/routing")
 
     @bp.route("", methods=["POST"])
     def route_yens():
-        data = request.get_json(silent=True)
+        data = request.get_json(silent=True) or {}
+
         payload, status = route_yens_uc.execute(data)
+
+        start = data.get("start")
+        end = data.get("end")
+        weights = data.get("weights") or {}
+
+        routes = payload.get("routes", [])
+        chosen = routes[0] if routes else None
+
+        chosen_route_rank = chosen["metadata"].get("rank", 1)
+        chosen_route_path = chosen["path"]
+
+        # Safely extract user_id if authenticated
+        user_id = getattr(current_user, "user_id", None)
+
+        log_route_query_uc.execute(
+            user_id=user_id,
+            start=str(start),
+            end=str(end),
+            weights_json=weights,
+            chosen_route_rank=chosen_route_rank,
+            chosen_route_path=chosen_route_path,
+        )
+
         return ok(data=payload, status=status)
+
+    @bp.route("/queries", methods=["GET"])
+    @login_required
+    @admin_required
+    def list_route_queries():
+        result = list_route_queries_uc.execute()
+        data = RouteQuerySchema(many=True).dump(result)
+        return ok(data=data)
 
     return bp

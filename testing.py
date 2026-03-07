@@ -40,13 +40,16 @@ from server.app.models.enums.ACCESS_TYPE import UserAccessType
 
 
 def seed_test_user():
+    from server.app.security.passwords import hash_password
+
     test_user = UserAccountModel(
         username="dev",
         email="dev@example.com",
-        password_hash="hashed-dev123",  # matches your login logic
+        password_hash=hash_password("dev123"),  # real bcrypt hash
         role=UserAccessType.MAINTAINERS,
         created_at=datetime.now(tz=timezone.utc),
     )
+
 
     db.session.add(test_user)
     db.session.commit()
