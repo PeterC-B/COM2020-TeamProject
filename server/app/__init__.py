@@ -19,6 +19,7 @@ from server.app.repositories.mission_repository import MissionsRepository
 from server.app.repositories.leaderboard_repository import LeaderboardRepository
 from server.app.repositories.routing_graph_repository import RoutingGraphRepository
 from server.app.repositories.user_repository import UserRepository
+from server.app.repositories.route_query_repository import RouteQueryRepository
 from server.app.unit_of_work.sqlalchemy_uow import SqlAlchemyUnitOfWork
 from server.app.use_cases.graph.get_graph_data import GetGraphData
 from server.app.use_cases.graph.fetch_edge_data import FetchEdgeData
@@ -40,6 +41,8 @@ from server.app.use_cases.users.login_user import LoginUser
 from server.app.use_cases.users.register_user import RegisterUser
 from server.app.use_cases.users.forgot_password import ForgotPassword
 from server.app.use_cases.missions.update_mission import UpdateMission
+from server.app.use_cases.route_queries.log_route_query import LogRouteQuery
+from server.app.use_cases.route_queries.list_route_queries import ListRouteQueries
 
 def create_app():
     # Application instance
@@ -78,6 +81,7 @@ def create_app():
         missions_model,
         nodes_model,
         user_account_model,
+        route_query_model
     )
 
     # Initialise the services
@@ -91,6 +95,7 @@ def create_app():
     routing_graph_repo = RoutingGraphRepository(session)
     missions_repo = MissionsRepository(session)
     leaderboard_repo = LeaderboardRepository(session)
+    route_query_repo = RouteQueryRepository(session)
 
     # Initialise the Use Cases
     register_user_uc = RegisterUser(uow, user_repo)
@@ -113,14 +118,18 @@ def create_app():
     get_leaderboard_uc = GetLeaderboard(leaderboard_repo)
     save_mission_progress_uc = SaveMissionProgress(uow, leaderboard_repo)
     get_mission_progress_uc = GetMissionProgress(leaderboard_repo)
+    log_route_query_uc = LogRouteQuery(uow, route_query_repo)
+    list_route_queries_uc = ListRouteQueries(route_query_repo)
 
     # Initialise the Routes
     app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc, forgot_password_uc))
     app.register_blueprint(create_graph_route_blueprint(get_graph_data_uc, get_graph_data_for_coords_uc, fetch_node_data_uc, fetch_edge_data_uc))
     app.register_blueprint(create_health_routes(get_health_attributes_uc, get_default_weights_uc, explain_edge_cost_uc))
-    app.register_blueprint(create_routing_route_blueprint(route_yens_uc))
     app.register_blueprint(create_missions_blueprint(list_missions_uc, get_mission_uc, create_mission_uc, update_mission_uc, delete_mission_uc))
     app.register_blueprint(create_leaderboard_blueprint(get_leaderboard_uc, get_mission_progress_uc, save_mission_progress_uc))
+    app.register_blueprint(create_routing_route_blueprint(route_yens_uc, log_route_query_uc, list_route_queries_uc)
+)
+
 
     # Import error handlers
     register_error_handlers(app)

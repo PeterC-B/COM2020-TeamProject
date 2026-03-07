@@ -50,7 +50,7 @@ def main():
     wait_for_db()
 
     print("Starting backend server...")
-    backend = run_command("py -m server.run")
+    backend = run_command("python -m server.run")
     
     time.sleep(5)
 
