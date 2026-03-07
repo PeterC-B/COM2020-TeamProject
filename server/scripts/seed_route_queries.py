@@ -7,8 +7,11 @@ from server.app.models.route_query_model import RouteQuery
 app = create_app()
 app.app_context().push()
 
-# Load all seeded locations
+# Load all seeded locations from the database
 locations = LocationModel.query.all()
+
+if len(locations) < 2:
+    raise RuntimeError(f"Not enough locations in DB. Found {len(locations)}.")
 
 def to_coord_string(loc):
     lat = loc.node.y_coordinate
@@ -36,7 +39,7 @@ for _ in range(200):
         end=to_coord_string(end),
         weights_json=random_weights(),
         chosen_route_rank=1,
-        chosen_route_path=[],  # seeded queries don't need real paths
+        chosen_route_path=[],
     )
 
     entries.append(q)
@@ -44,4 +47,4 @@ for _ in range(200):
 
 db.session.commit()
 
-print("Seeded 200+ route queries.")
+print("Seeded 200+ route queries from DB locations.")

@@ -48,8 +48,6 @@ def create_routing_route_blueprint(route_yens_uc, log_route_query_uc, list_route
             raise(ValidationError(message=e))
 
     @bp.route("/queries", methods=["GET"])
-    @login_required
-    @admin_required
     def list_route_queries():
         result = list_route_queries_uc.execute()
         data = RouteQuerySchema(many=True).dump(result)

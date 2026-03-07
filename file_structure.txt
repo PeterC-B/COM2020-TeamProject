@@ -15143,6 +15143,7 @@ C:.
 |   |           
 |   +---cache
 |   +---scripts
+|   |   |   check_locations.py
 |   |   |   seed_route_queries.py
 |   |   |   setup_fresh_db.py
 |   |   |   
@@ -15164,6 +15165,7 @@ C:.
 |   |   |           visualisation_utils.cpython-314.pyc
 |   |   |           
 |   |   \---__pycache__
+|   |           check_locations.cpython-314.pyc
 |   |           seed_route_queries.cpython-314.pyc
 |   |           
 |   \---__pycache__
