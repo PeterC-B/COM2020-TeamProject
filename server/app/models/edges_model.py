@@ -31,3 +31,4 @@ class EdgesModel(db.Model):
     greenery: Mapped[float] = mapped_column(Float(), nullable=False)
     pollution: Mapped[float] = mapped_column(Float(), nullable=False)
     surface_quality: Mapped[float] = mapped_column(Float(), nullable=False)
+    pub_distance: Mapped[float] = mapped_column(Float(), nullable=False)

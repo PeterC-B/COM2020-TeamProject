@@ -8,10 +8,17 @@ import pandas as pd
 import geopandas as gpd
 from shapely import wkt
 from server.app.domain.scoring.weight_utils import calculate_weights
+from server.app.models.enums.LOCATION_TYPE import LocationType
 
 Coord = List[float]
 EdgeKey = Tuple[int, int, int]
 Scores = List[Dict[str, float]]
+
+type_map = {
+    LocationType.GENERAL_AMENITY: "Amenity",
+    LocationType.BUS_STOP:"Bus Stop",
+    LocationType.DRINKING_AREA:"Drinking Area"
+}
 
 
 def parse_linestring_wkt(wkt: str) -> List[Coord]:
@@ -87,7 +94,7 @@ def build_edges_geojson(
         from_node = int(edge.from_node_id)
         to_node = int(edge.to_node_id)
         key = int(edge.key)
-        geom = edge.geometry
+        geom = parse_linestring_wkt(edge.geometry)
         if not geom:
             continue
         features.append(
@@ -99,33 +106,60 @@ def build_edges_geojson(
                     "from_node": from_node,
                     "to_node": to_node,
                     "key": key,
-                    "length": float(edge.length),
-                    "travel_time": float(edge.travel_time),
+                    "length": round(float(edge.length), 2),
+                    "travel_time": round(float(edge.travel_time), 3),
+                    "access_score": float(edge.access_score),
+                    "lighting": float(edge.lighting),
+                    "greenery": float(edge.greenery),
+                    "pollution": float(edge.pollution),
+                    "surface_quality": float(edge.surface_quality),
                 },
             }
         )
     return {"type": "FeatureCollection", "features": features}
+
+def build_locations_geojson(locations_list: list, nodes_list: list) -> Dict[str, object]:
+    features = []
+    for location, node in zip(locations_list, nodes_list):
+        type = type_map.get(location.type, "Amenity")
+        features.append(
+            {
+                "type": "Feature",
+                "geometry": {"type": "Point", "coordinates": [float(node.x_coordinate), float(node.y_coordinate)]},
+                "properties": {
+                    "type": type,
+                    "name": location.information,
+                    "node_id": node.node_id
+                }
+            }
+        )
+    return {"type": "FeatureCollection", "features": features}
+
 
 def build_graph(nodes, edges):
     G = nx.MultiDiGraph()
 
     for node in nodes:
         G.add_node(
-            node.nodes_id,
-            x=node.x,
-            y=node.y,
-            highway=node.highway
+            node.node_id,
+            x=node.x_coordinate,
+            y=node.y_coordinate,
+            highway=node.feature
         )
 
     for edge in edges:
         G.add_edge(
-            edge.from_node,
-            edge.to_node,
+            edge.from_node_id,
+            edge.to_node_id,
             key=edge.key,
             length=edge.length,
             travel_time=edge.travel_time,
             access_score=edge.access_score,
-            geometry=wkt.loads(edge.geometry) if edge.geometry else None
+            geometry=wkt.loads(edge.geometry) if edge.geometry else None,
+            lighting=edge.lighting,
+            greenery=edge.greenery,
+            pollution=edge.pollution,
+            surface_quality=edge.surface_quality,
         )
 
     return G

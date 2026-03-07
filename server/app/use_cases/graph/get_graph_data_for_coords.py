@@ -1,11 +1,42 @@
 import osmnx as ox
 import geopandas as gpd
 from server.app.domain.routing.graph_cache import save_cached_graph
-from server.app.domain.indicators.attribute_extraction import attach_edge_indicators
+from server.app.domain.indicators.attribute_extraction import attach_edge_indicators, compute_amenity_proximity
 from server.scripts.visualisation.visualisation_utils import add_lighting_tag, add_surface_tag
+from server.app.domain.scoring.weight_utils import add_pub_distance, normalize_pub_distance
 from server.app.domain.errors import NotFoundError
 from server.app.models.nodes_model import NodesModel
 from server.app.models.edges_model import EdgesModel
+from server.app.models.location_model import LocationModel
+from server.app.models.enums.LOCATION_TYPE import LocationType
+import numpy as np
+import pandas as pd
+
+AMENITY_IMPORTANCE = {
+    "hospital": 10,
+    "police": 9,
+    "fire_station": 9,
+    "pharmacy": 9,
+
+    "bus_station": 8,
+    "taxi": 8,
+    "parking": 7,
+
+    "pub": 8,
+    "bar": 8,
+    "restaurant": 8,
+    "cafe": 7,
+
+    "bank": 7,
+    "atm": 6,
+    "post_office": 7,
+    "marketplace": 6,
+
+    "cinema": 6,
+    "theatre": 6,
+    "nightclub": 6,
+    "casino": 6,
+}
 
 class FetchDataForCoordinates:
     def __init__(self, uow, graph_data_repo=None):
@@ -19,23 +50,20 @@ class FetchDataForCoordinates:
         graph = add_lighting_tag(graph, coords, 500)
         graph = add_surface_tag(graph, coords, 500)
 
+        nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
+        
         try:
-            amenities = ox.features_from_point(coords, tags={"amenity": True}, dist=500)
+            polygon = nodes_gdf.unary_union.convex_hull
+            amenities = ox.features_from_polygon(
+                polygon,
+                tags={"amenity": True}
+            )
             amenities = amenities[amenities.geometry.notnull()].copy()
             amenities["geometry"] = amenities.geometry.centroid
+            amenities["importance"] = amenities["amenity"].map(AMENITY_IMPORTANCE).fillna(1)
+            amenities = amenities.sort_values("importance", ascending=False)
         except Exception:
             raise NotFoundError(message="Unable to find amenities")
-
-        sample_size = min(80, len(amenities))
-        random_amenities = amenities.sample(n=sample_size, random_state=42)
-
-        for _, row in random_amenities.iterrows():
-            x, y = row.geometry.x, row.geometry.y
-            nearest_node = ox.distance.nearest_nodes(graph, X=x, Y=y)
-            graph.nodes[nearest_node]["amenity"] = row.get("amenity")
-            graph.nodes[nearest_node]["amenity_name"] = row.get("name")
-
-        nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
 
         try:
             drink_places = ox.features_from_point(
@@ -64,15 +92,18 @@ class FetchDataForCoordinates:
         edges_gdf["score_band"] = nearest["access_score"].values  
 
         edges_gdf = attach_edge_indicators(edges_gdf)
+        edges_gdf = add_pub_distance(coords, edges_gdf, 500)
+        edges_gdf["normalised_pub_distance"]= (
+            edges_gdf["distance_to_pub"]
+            .apply(normalize_pub_distance)
+        )
 
         nodes_df = nodes_gdf.reset_index().rename(columns={"osmid": "node_id"})
         edges_df = edges_gdf.reset_index()
         edges_df["geometry"] = edges_df["geometry"].to_wkt()
 
         with self.uow:
-            print("Clearing tables")
             self.graph_data_repo.clear_tables()
-
             nodes = [NodesModel(
                 node_id=row["node_id"],
                 x_coordinate=row["x"],
@@ -82,7 +113,6 @@ class FetchDataForCoordinates:
             for _, row in nodes_df.iterrows()
             ]
             self.graph_data_repo.bulk_add(nodes)
-            print("Adding nodes")
             self.uow.commit()
             
             edges = [
@@ -99,11 +129,34 @@ class FetchDataForCoordinates:
                     greenery=row["greenery"],
                     pollution=row["pollution"],
                     surface_quality=row["surface_quality"],
+                    pub_distance=row["normalised_pub_distance"]
                 )
                 for i, row in edges_df.iterrows()
             ]
             self.graph_data_repo.bulk_add(edges)
-            print("Adding edges")
             self.uow.commit()
+        
+        locations_to_add = []
+
+        xs = amenities.geometry.x.values
+        ys = amenities.geometry.y.values
+
+        nearest_nodes = ox.distance.nearest_nodes(graph, X=xs, Y=ys)
+
+        for (_, row), node in zip(amenities.iterrows(), nearest_nodes):
+            location = LocationModel(
+                name=row.get("name") or row.get("amenity") or "Unnamed Amenity",
+                node_id=int(node),
+                type=LocationType.GENERAL_AMENITY,
+                information=row.get("amenity"),
+                in_use=True
+            )
+
+            locations_to_add.append(location)
+
+        with self.uow:
+            self.graph_data_repo.bulk_add(locations_to_add)
+            self.uow.commit()
+
 
         #save_cached_graph(graph)

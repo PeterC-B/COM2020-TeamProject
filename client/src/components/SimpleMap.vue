@@ -42,6 +42,7 @@ let map: Map | null = null
 
 const nodes = ref<GeoJson | null>(null)
 const edges = ref<GeoJson | null>(null)
+const locations = ref<GeoJson | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
 const {
@@ -169,9 +170,18 @@ onMounted(() => {
                 if (!map) return
                 const nodeCollection = assertFeatureCollection(graphData.features?.nodes, 'nodes')
                 const edgeCollection = assertFeatureCollection(graphData.features?.edges, 'edges')
+                const locationCollection = assertFeatureCollection(graphData.features?.locations, 'locations')
                 nodes.value = nodeCollection
                 edges.value = edgeCollection
+                locations.value = locationCollection
 
+                console.log(locationCollection)
+
+                const locationNodeIds = locationCollection.features
+                    .map((f) => f.properties?.node_id)
+                    .filter((id) => id !== undefined)
+
+                console.log(locationNodeIds)
                 map.addSource('edges', {
                     type: 'geojson',
                     data: edgeCollection,
@@ -188,6 +198,18 @@ onMounted(() => {
                 map.addLayer(NODE_BASE_LAYER)
                 map.addLayer(NODE_HIT_LAYER)
                 map.addLayer(NODE_HIGHLIGHT_LAYER)
+
+                map.setFilter('nodes-circle', [
+                    'in',
+                    ['get', 'node_id'],
+                    ['literal', locationNodeIds],
+                ])
+
+                map.setFilter('nodes-circle-hit', [
+                    'in',
+                    ['get', 'node_id'],
+                    ['literal', locationNodeIds],
+                ])
                 renderRoutes(props.routes)
 
                 // Hit layers make node and edge selection easier.
@@ -241,13 +263,13 @@ onMounted(() => {
                     map.setRenderWorldCopies(false)
                 }
 
-                //map.setLayoutProperty('edges-line', 'visibility', 'none')
-                //map.setLayoutProperty('edges-line-hit', 'visibility', 'none')
-                //map.setLayoutProperty('edges-line-highlight', 'visibility', 'none')
+                map.setLayoutProperty('edges-line', 'visibility', 'visible')
+                map.setLayoutProperty('edges-line-hit', 'visibility', 'visible')
+                map.setLayoutProperty('edges-line-highlight', 'visibility', 'visible')
 
-                //map.setLayoutProperty('nodes-circle', 'visibility', 'none')
-                //map.setLayoutProperty('nodes-circle-hit', 'visibility', 'none')
-                //map.setLayoutProperty('nodes-circle-highlight', 'visibility', 'none')
+                map.setLayoutProperty('nodes-circle', 'visibility', 'visible')
+                map.setLayoutProperty('nodes-circle-hit', 'visibility', 'visible')
+                map.setLayoutProperty('nodes-circle-highlight', 'visibility', 'visible')
         })
     })
 })
@@ -257,6 +279,13 @@ watch(selectedEdgeId, (edgeId) => {
     if (!map!.getLayer('edges-line-highlight')) return
     const value = edgeId ?? -1
     map!.setFilter('edges-line-highlight', ['==', ['get', 'edge_id'], value])
+})
+
+watch(selectedNodeId, (nodeId) => {
+    if (!map!) return
+    if (!map!.getLayer('nodes-circle-highlight')) return
+    const value = nodeId ?? -1
+    map!.setFilter('nodes-circle-highlight', ['==', ['get', 'node_id'], value])
 })
 
 watch(selectedNodeId, (nodeId) => {

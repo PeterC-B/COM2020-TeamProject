@@ -7,6 +7,7 @@ export type GraphDataResponse = {
     features: {
         nodes: FeatureCollection
         edges: FeatureCollection
+        locations: FeatureCollection
     }
 }
 
@@ -15,7 +16,6 @@ export function fetchGraphData(params: Record<string, unknown> = {}) {
     const response = get<ApiEnvelope<GraphDataResponse>>(GRAPH_ENDPOINT, params).then(
         ({ data }) => data.data,
     )
-
     return response
 }
 

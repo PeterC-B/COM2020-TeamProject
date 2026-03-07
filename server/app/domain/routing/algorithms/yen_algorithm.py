@@ -12,6 +12,7 @@ from server.app.domain.routing.nearest_node import get_nearest_node
 from server.app.domain.scoring.cost_functions import healthy_cost
 from server.app.domain.scoring.weight_utils import (apply_default_weights,
                                                     validate_weights)
+from server.app.data.convert import build_graph, build_edges_geojson, build_nodes_geojson
 
 
 def parse_coordinates(coords):

@@ -7,6 +7,7 @@ Response utilities:
 import networkx as nx
 import osmnx as ox
 from server.app.domain.indicators.attribute_extraction import attach_edge_indicators
+from server.scripts.visualisation.visualisation_utils import add_lighting_tag, add_surface_tag
 
 def compute_path_distance(graph: nx.MultiDiGraph, path):
     """Compute total distance along a path in a MultiDiGraph."""
@@ -48,17 +49,9 @@ def compute_indicator_summary(graph:nx.MultiDiGraph, path, weights):
         first_key = next(iter(edge_data))
         data = edge_data[first_key]
 
-        if edge_count == 0:
-            print(data)
-
         # Sum indicators
         for key in totals:
-            if edge_count == 0:
-                print(key)
             totals[key] += data.get(key, 0.0)
-
-        if edge_count == 0:
-            print(totals)
 
         # Weighted score
         for key, w in weights.items():
@@ -67,7 +60,6 @@ def compute_indicator_summary(graph:nx.MultiDiGraph, path, weights):
             if key in data:
                 weighted_score += data[key] * w
 
-        print(edge_count)
         edge_count += 1
 
     if edge_count == 0:
@@ -81,16 +73,45 @@ def compute_indicator_summary(graph:nx.MultiDiGraph, path, weights):
 
 
 def build_geometry_from_graph(graph: nx.MultiDiGraph, path):
-    """Return list of (lat, lon) for each node in the path."""
+    """
+    Build a route geometry using edge geometries instead of node straight lines.
+    Returns list of (lat, lon) coordinates.
+    """
+
     geometry = []
 
-    for node in path:
-        data = graph.nodes[node]
-        lat = data.get("y")
-        lon = data.get("x")
+    for u, v in zip(path[:-1], path[1:]):
+        edge_data = graph.get_edge_data(u, v)
 
-        if lat is not None and lon is not None:
-            geometry.append((lat, lon))
+        if not edge_data:
+            continue
+
+        first_key = next(iter(edge_data))
+        data = edge_data[first_key]
+
+        if "geometry" in data:
+            line = data["geometry"]
+
+            xs, ys = line.xy
+
+            coords = list(zip(ys, xs))
+
+            if geometry and geometry[-1] == coords[0]:
+                geometry.extend(coords[1:])
+            else:
+                geometry.extend(coords)
+
+        else:
+            u_data = graph.nodes[u]
+            v_data = graph.nodes[v]
+
+            u_coord = (u_data["y"], u_data["x"])
+            v_coord = (v_data["y"], v_data["x"])
+
+            if not geometry:
+                geometry.append(u_coord)
+
+            geometry.append(v_coord)
 
     return geometry
 
@@ -113,11 +134,8 @@ def format_route_response(path, graph, geometry=None, metadata=None, weights=Non
     if geometry is None:
         geometry = build_geometry_from_graph(graph, path)
 
-    nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
-
-    edges_gdf = attach_edge_indicators(edges_gdf)
-
-    graph = ox.graph_from_gdfs(nodes_gdf, edges_gdf)
+    if "crs" not in graph.graph:
+        graph.graph["crs"] = "EPSG:4326"
 
     indicators = {}
     if weights is not None:
