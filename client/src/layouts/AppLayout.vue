@@ -8,6 +8,7 @@ const navItems = computed(() => {
         { label: 'Home', path: '/' },
         { label: 'Map', path: '/map' },
         { label: 'Missions', path: '/missions' },
+        { label: 'Leaderboard', path: '/leaderboard' },
         { label: 'Profile', path: '/profile' },
     ]
 })

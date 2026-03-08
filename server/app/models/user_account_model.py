@@ -21,3 +21,5 @@ class UserAccountModel(db.Model):
 
     role: Mapped[UserAccessType] = mapped_column(SQLEnum(UserAccessType), nullable=False, default=UserAccessType.TRAVELLERS)
     created_at: Mapped[datetime] = mapped_column(DateTime(), nullable=False, default=datetime.now)
+    reset_token: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    reset_token_expiry: Mapped[datetime | None] = mapped_column(DateTime(), nullable=True)

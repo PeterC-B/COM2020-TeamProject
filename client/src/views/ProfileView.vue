@@ -10,6 +10,11 @@ const statusLabel = computed(() => (mainStore.isAuthenticated ? 'Authenticated' 
 const roleLabel = computed(() => mainStore.userRole ?? 'guest')
 const username = computed(() => (mainStore.username))
 const email = computed(() => (mainStore.email))
+const user_id = computed(() => (mainStore.user_id))
+
+const seeID = computed(() =>
+    mainStore.userRole === 'developers'
+)
 
 function handleLogin() {
     void router.push('/login')
@@ -18,6 +23,10 @@ function handleLogin() {
 function handleLogout() {
     mainStore.clearAccessToken()
     void router.push('/login')
+}
+
+function resetPassword(){
+    router.push('/forgot-password')
 }
 </script>
 
@@ -79,6 +88,12 @@ function handleLogout() {
             </div>
 
             <div class="divide-y divide-slate-100">
+                <div class="grid grid-cols-1 px-6 py-6 sm:grid-cols-3 sm:gap-4" v-if="seeID">
+                    <dt class="text-sm font-bold uppercase tracking-wider text-slate-400">User ID (developers only)</dt>
+                    <dd class="mt-1 text-sm font-semibold text-slate-900 sm:col-span-2 sm:mt-0">
+                        {{ user_id || 'N/A' }}
+                    </dd>
+                </div>
                 <div class="grid grid-cols-1 px-6 py-6 sm:grid-cols-3 sm:gap-4">
                     <dt class="text-sm font-bold uppercase tracking-wider text-slate-400">Username</dt>
                     <dd class="mt-1 text-sm font-semibold text-slate-900 sm:col-span-2 sm:mt-0">
@@ -106,7 +121,7 @@ function handleLogout() {
                     <dt class="text-sm font-bold uppercase tracking-wider text-slate-400">Password</dt>
                     <dd class="mt-1 flex items-center gap-2 text-sm font-semibold text-slate-900 sm:col-span-2 sm:mt-0">
                         <span>••••••••••••</span>
-                        <button class="text-[10px] font-bold uppercase tracking-tighter text-indigo-600 hover:text-indigo-500 underline decoration-indigo-200 underline-offset-4">
+                        <button class="text-[10px] font-bold uppercase tracking-tighter text-indigo-600 hover:text-indigo-500 underline decoration-indigo-200 underline-offset-4" @click="resetPassword">
                             Change
                         </button>
                     </dd>

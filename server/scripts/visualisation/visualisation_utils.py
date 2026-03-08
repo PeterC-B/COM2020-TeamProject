@@ -79,7 +79,7 @@ def add_feature_to_graph(graph, ax, coords, feature):
         color=feature[2],
         label=feature[0],
         alpha=feature[3],
-        markersize=feature[4],
+        markersize=feature[4],  
     )
 
 def add_lighting_tag(graph, coords, distance) -> nx.MultiDiGraph:

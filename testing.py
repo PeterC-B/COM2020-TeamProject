@@ -41,10 +41,10 @@ from server.app.models.enums.ACCESS_TYPE import UserAccessType
 
 def seed_test_user():
     test_user = UserAccountModel(
-        username="testuser",
-        email="testuser@example.com",
-        password_hash="hashed-password123",  # matches your login logic
-        role=UserAccessType.TRAVELLERS,
+        username="dev",
+        email="dev@example.com",
+        password_hash="hashed-dev123",  # matches your login logic
+        role=UserAccessType.MAINTAINERS,
         created_at=datetime.now(tz=timezone.utc),
     )
 
@@ -56,9 +56,12 @@ def seed_test_user():
     print("   password: password123")
 
 
+def reset_db():
+    db.drop_all()
+    db.create_all()
+    seed_missions()
+    seed_test_user()
 
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()
-        seed_missions()
-        seed_test_user()
+        reset_db()
