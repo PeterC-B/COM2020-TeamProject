@@ -219,7 +219,14 @@ onMounted(() => {
                                     :key="index"
                                     class="group transition-colors hover:bg-slate-50"
                                 >
-                                    <td class="rounded-l-lg bg-slate-50 px-4 py-3 font-bold text-slate-700 group-hover:bg-indigo-50 group-hover:text-indigo-700">
+                                    <td
+                                        :class="[
+                                            'rounded-l-lg px-4 py-3 font-bold transition-all',
+                                            index === 0 ? 'route-blue' : '',
+                                            index === 1 ? 'route-red' : '',
+                                            index === 2 ? 'route-green' : '',
+                                        ]"
+                                    >
                                         #{{ index + 1 }}
                                     </td>
                                     <td class="px-2 py-3 font-medium">{{ formatScore(route.distance) }}</td>
@@ -252,3 +259,19 @@ onMounted(() => {
         </div>
     </section>
 </template>
+
+<style scoped>
+/* mapping table route options to map line colours */
+.route-blue {
+    background-color: rgba(37, 99, 235, 0.08);
+    color: #2563eb;
+}
+.route-red {
+    background-color: rgba(239, 68, 68, 0.08);
+    color: #ef4444;
+}
+.route-green {
+    background-color: rgba(22, 163, 74, 0.08);
+    color: #16a34a;
+}
+</style>
