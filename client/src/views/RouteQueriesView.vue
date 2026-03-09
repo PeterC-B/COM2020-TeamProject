@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useMainStore } from '@/stores/main'
+import { FetchRouteQueries, type RouteQueriesResponse } from '@/services/route_queries'
 
 const mainStore = useMainStore()
 const queries = ref<any[]>([])
@@ -10,16 +11,12 @@ const error = ref<string | null>(null)
 
 onMounted(async () => {
     try {
-        const response = await axios.get('/api/routing/queries', {
-            headers: {
-                Authorization: `Bearer ${mainStore.accessToken}`
-            }
-        })
-        queries.value = response.data.data
+        queries.value = await FetchRouteQueries()
     } catch (err: any) {
         error.value = 'Failed to load route queries.'
     } finally {
         loading.value = false
+        console.log(queries.value)
     }
 })
 </script>
@@ -52,7 +49,7 @@ onMounted(async () => {
                     <td class="border p-2">{{ q.chosen_route_rank }}</td>
                     <td class="border p-2">{{ q.chosen_route_path }}</td>
                     <td class="border p-2">{{ q.timestamp }}</td>
-                    <td class="border p-2">{{ q.user_id ?? 'Anonymous' }}</td>
+                    <td class="border p-2">{{ q.name ?? 'Anonymous' }}</td>
                 </tr>
             </tbody>
         </table>

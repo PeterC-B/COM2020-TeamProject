@@ -44,7 +44,7 @@ export type YensRoutesResponse = {
 }
 
 export function fetchYensRoutes({ start, end, k, weights, user_id }: YensRouteRequest) {
-    console.log('Fetching Yens routes with parameters:', { start, end, k, weights })
+    console.log(user_id)
     const response = post<ApiEnvelope<YensRoutesResponse>>(ROUTE_ENDPOINTS.yens, {
         start,
         end,
@@ -54,6 +54,5 @@ export function fetchYensRoutes({ start, end, k, weights, user_id }: YensRouteRe
     }).then(
         ({ data }) => data.data,
     )
-    console.log(response)
     return response
 }

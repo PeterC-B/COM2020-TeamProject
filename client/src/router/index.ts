@@ -54,7 +54,7 @@ router.beforeEach((to) => {
     }
 
     // Require admin role
-    if (to.meta.requiresAdmin && mainStore.userRole !== 'administrators') {
+    if (to.meta.requiresAdmin && (mainStore.userRole !== 'administrators' && mainStore.userRole !== 'developers')) {
         return '/'
     }
 

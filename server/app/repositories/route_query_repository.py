@@ -1,4 +1,5 @@
 from server.app.models.route_query_model import RouteQuery
+from server.app.models.user_account_model import UserAccountModel
 
 class RouteQueryRepository:
     def __init__(self, session):
@@ -9,7 +10,8 @@ class RouteQueryRepository:
 
     def list_all(self):
         return (
-            self.session.query(RouteQuery)
+            self.session.query(RouteQuery, UserAccountModel)
+            .join(UserAccountModel, RouteQuery.user_id == UserAccountModel.user_id)
             .order_by(RouteQuery.timestamp.desc())
             .all()
         )

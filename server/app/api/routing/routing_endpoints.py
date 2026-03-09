@@ -30,7 +30,6 @@ def create_routing_route_blueprint(route_yens_uc, log_route_query_uc, list_route
             chosen_route_rank = chosen["metadata"].get("rank", 1)
             chosen_route_path = chosen["path"]
 
-            # Safely extract user_id if authenticated
             user_id = data.get("user_id")
 
             log_route_query_uc.execute(
@@ -49,8 +48,24 @@ def create_routing_route_blueprint(route_yens_uc, log_route_query_uc, list_route
 
     @bp.route("/queries", methods=["GET"])
     def list_route_queries():
-        result = list_route_queries_uc.execute()
-        data = RouteQuerySchema(many=True).dump(result)
-        return ok(data=data)
+        try:
+            result = list_route_queries_uc.execute()
+            data = [
+                {
+                    "query_id": rq.query_id,
+                    "user_id": rq.user_id,
+                    "start": rq.start,
+                    "end": rq.end,
+                    "weights_json": rq.weights_json,
+                    "chosen_route_rank": rq.chosen_route_rank,
+                    "chosen_route_path": rq.chosen_route_path,
+                    "timestamp": rq.timestamp,
+                    "name": user.username if user else None,
+                }
+                for rq, user in result
+            ]
+            return ok(data=data)
+        except Exception as e:
+            raise(ValidationError(message=e))
 
     return bp

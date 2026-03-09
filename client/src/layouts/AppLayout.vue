@@ -14,7 +14,7 @@ const navItems = computed(() => {
         { label: 'Profile', path: '/profile' },
     ]
 
-    if (mainStore.userRole === 'administrators') {
+    if (mainStore.userRole === 'administrators' || mainStore.userRole === 'developers') {
         items.push({ label: 'Analytics', path: '/analytics/route-queries'})
     }
 
