@@ -2,10 +2,10 @@ from server.app.api.responses import ok
 from flask import Blueprint, request
 import osmnx as ox
 import requests
-from server.app.api.error_handlers import ValidationError
+from server.app.api.error_handlers import ValidationError, NotFoundError
 
 
-def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_uc, fetch_node_data, fetch_edge_data):
+def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_uc, fetch_node_data, fetch_edge_data, fetch_location_name):
     bp = Blueprint("graph", __name__, url_prefix="/api/graph")
 
     @bp.route("", methods=["GET"])
@@ -50,6 +50,13 @@ def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_u
             print("Error:", e)
             raise
 
+    @bp.route("/location/name", methods=["GET"])
+    def get_location_name():
+        node_id = request.args.get("node_id")
+        if node_id is None:
+            raise NotFoundError(message="Node ID is missing")
+        data = fetch_location_name.execute(node_id)
+        return ok(data=data)
         
     
     @bp.route("/locations", methods=["GET"])

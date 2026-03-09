@@ -15,6 +15,8 @@ class GraphDataRepository:
         edges_list = self.get_all_edges()
         locations_list = self.get_used_locations()
 
+        centre = self.get_graph_center()
+
         #edge_geometries = load_edge_geometries(geom_csv)
         nodes_geojson = build_nodes_geojson(nodes_list)
         edges_geojson = build_edges_geojson(edges_list)
@@ -24,13 +26,41 @@ class GraphDataRepository:
             "nodes": nodes_geojson,
             "edges": edges_geojson,
             "locations": location_geojson,
+            "center" : centre
         }
+    
+    def get_graph_center(self) -> tuple[float, float] | None:
+        """
+        Returns (longitude, latitude) of the graph center.
+        Returns None if there are no nodes.
+        """
+        nodes = self.get_all_nodes()
+        if not nodes:
+            return None
+
+        sum_lat = 0.0
+        sum_lon = 0.0
+        count = 0
+
+        for node in nodes:
+            if node.x_coordinate is not None and node.y_coordinate is not None:
+                sum_lat += node.x_coordinate
+                sum_lon += node.y_coordinate
+                count += 1
+
+        if count == 0:
+            return None
+
+        center_lat = sum_lat / count
+        center_lon = sum_lon / count
+        return (center_lon, center_lat) 
     
     def bulk_add(self, objects):
         self.session.bulk_save_objects(objects)
 
     def get_nodes_by_location(self, locations):
         node_ids = [location.node_id for location in locations]
+        print(node_ids)
         return self.session.query(NodesModel).filter(
             NodesModel.node_id.in_(node_ids)
         ).all()
@@ -46,10 +76,16 @@ class GraphDataRepository:
         return self.session.query(NodesModel).all()
     
     def get_all_locations(self) -> list:
-        return self.session.query(LocationModel).all()
+        stmt = select(LocationModel).where(LocationModel.name != 'NaN')
+        return self.session.execute(stmt).scalars().all()
+    
+    def get_location_name(self, node_id):
+        stmt = select(LocationModel.name).where(LocationModel.node_id == node_id)
+        print(node_id)
+        return self.session.execute(stmt).scalars().first()
     
     def get_used_locations(self) -> list:
-        stmt = select(LocationModel).where(LocationModel.in_use.is_(True))
+        stmt = select(LocationModel).where((LocationModel.in_use.is_(True)) & (LocationModel.name != 'NaN'))
         return self.session.execute(stmt).scalars().all()
 
     def get_node_by_id(self, node_id):

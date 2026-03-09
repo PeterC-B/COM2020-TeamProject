@@ -21,6 +21,7 @@ from server.app.repositories.routing_graph_repository import RoutingGraphReposit
 from server.app.repositories.user_repository import UserRepository
 from server.app.unit_of_work.sqlalchemy_uow import SqlAlchemyUnitOfWork
 from server.app.use_cases.graph.get_graph_data import GetGraphData
+from server.app.use_cases.graph.fetch_location_name import FetchLocationName
 from server.app.use_cases.graph.fetch_edge_data import FetchEdgeData
 from server.app.use_cases.graph.fetch_node_data import FetchNodeData
 from server.app.use_cases.graph.get_graph_data_for_coords import FetchDataForCoordinates
@@ -99,6 +100,7 @@ def create_app():
     forgot_password_uc = ForgotPassword(uow, user_repo)
     get_graph_data_uc = GetGraphData(graph_data_repo)
     fetch_edge_data_uc = FetchEdgeData(graph_data_repo)
+    fetch_location_name_uc = FetchLocationName(graph_data_repo)
     fetch_node_data_uc = FetchNodeData(graph_data_repo)
     get_graph_data_for_coords_uc = FetchDataForCoordinates(uow, graph_data_repo)
     get_health_attributes_uc = GetHealthAttributes()
@@ -116,7 +118,7 @@ def create_app():
 
     # Initialise the Routes
     app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc, forgot_password_uc))
-    app.register_blueprint(create_graph_route_blueprint(get_graph_data_uc, get_graph_data_for_coords_uc, fetch_node_data_uc, fetch_edge_data_uc))
+    app.register_blueprint(create_graph_route_blueprint(get_graph_data_uc, get_graph_data_for_coords_uc, fetch_node_data_uc, fetch_edge_data_uc, fetch_location_name_uc))
     app.register_blueprint(create_health_routes(get_health_attributes_uc, get_default_weights_uc, explain_edge_cost_uc))
     app.register_blueprint(create_routing_route_blueprint(route_yens_uc))
     app.register_blueprint(create_missions_blueprint(list_missions_uc, get_mission_uc, create_mission_uc, update_mission_uc, delete_mission_uc))

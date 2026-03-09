@@ -127,9 +127,10 @@ def build_locations_geojson(locations_list: list, nodes_list: list) -> Dict[str,
                 "type": "Feature",
                 "geometry": {"type": "Point", "coordinates": [float(node.x_coordinate), float(node.y_coordinate)]},
                 "properties": {
-                    "type": type,
-                    "name": location.information,
-                    "node_id": node.node_id
+                    "amenity_type": type,
+                    "name": location.name,
+                    "node_id": node.node_id,
+                    "type": location.information
                 }
             }
         )

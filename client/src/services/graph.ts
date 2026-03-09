@@ -1,5 +1,6 @@
 import { get, type ApiEnvelope } from '@/services/api'
 import type { FeatureCollection } from 'geojson'
+import type { coordinates } from '@/components/simple-map/geoJsonUtils'
 
 const GRAPH_ENDPOINT = '/graph'
 
@@ -8,15 +9,26 @@ export type GraphDataResponse = {
         nodes: FeatureCollection
         edges: FeatureCollection
         locations: FeatureCollection
+        center: coordinates
     }
 }
 
+export type LocationNameResponse = string
+
 export function fetchGraphData(params: Record<string, unknown> = {}) {
-    console.log("Fetching graph data")
     const response = get<ApiEnvelope<GraphDataResponse>>(GRAPH_ENDPOINT, params).then(
         ({ data }) => data.data,
     )
     return response
+}
+
+export async function fetchLocationName(node_id: number) {
+    const response = await get<ApiEnvelope<LocationNameResponse>>(
+        `/graph/location/name`,
+        { node_id }
+    )
+
+    return response.data.data
 }
 
 export async function fetchGraphByLocation(location: string) {
