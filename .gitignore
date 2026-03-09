@@ -27,11 +27,11 @@ __pycache__/
 htmlcov/
 
 # Virtual environments
-#.venv/
-#venv/
-#ENV/
-#env/
-#server/.venv/
+.venv/
+venv/
+ENV/
+env/
+server/.venv/
 
 # Packaging / build output
 build/
