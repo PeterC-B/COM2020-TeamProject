@@ -31,6 +31,7 @@ from app.use_cases.users.list_users import ListUsers
 from app.use_cases.users.login_user import LoginUser
 from app.use_cases.users.register_user import RegisterUser
 from app.use_cases.missions.update_mission import UpdateMission
+from app.models.change_logging import init_change_logging
 
 
 def create_app():
@@ -64,6 +65,7 @@ def create_app():
 
     # Register the models
     from app.models import (
+        database_change_log_model,
         edges_model,
         location_model,
         mission_progress_model,
@@ -71,6 +73,7 @@ def create_app():
         nodes_model,
         user_account_model,
     )
+    init_change_logging()
 
     # Initialise the services
     session = db.session
