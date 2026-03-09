@@ -5,12 +5,16 @@ import Disclaimer from '@/components/Disclaimer.vue'
 import SimpleMap from '@/components/SimpleMap.vue'
 import { fetchYensRoutes, type YensRoutesResponse } from '@/services/routing'
 import { fetchGraphByLocation, fetchGraphData } from '@/services/graph'
+import { assertFeatureCollection, type GeoJson, type coordinates } from '@/components/simple-map/geoJsonUtils'
+import { useMainStore } from '@/stores/main'
 
 type SelectionPayload = {
     start: [number, number] | null
     end: [number, number] | null
     startNodeId: number | null
     endNodeId: number | null
+    start_location: string | null
+    end_location: string | null
 }
 
 const selection = ref<SelectionPayload>({
@@ -18,13 +22,23 @@ const selection = ref<SelectionPayload>({
     end: null,
     startNodeId: null,
     endNodeId: null,
+    start_location: null,
+    end_location: null,
 })
+const mainStore = useMainStore()
+const user_ID = computed(() => (mainStore.user_id))
+
+const nodes = ref<GeoJson | null>(null)
+const edges = ref<GeoJson | null>(null)
+const locations = ref<GeoJson | null>(null)
+const map_center = ref<coordinates | null>(null)
+
+const routeColors = ['#2563eb', '#ef4444', '#16a34a']
 
 const loadingRoute = ref(false)
 const routeError = ref<string | null>(null)
 const routeData = ref<YensRoutesResponse | null>(null)
 const showDisclaimer = ref(false)
-const mapKey = ref(0)
 const chosen_location = ref('')
 const routeGeometries = computed(() => routeData.value?.routes.map((route) => route.geometry) ?? [])
 
@@ -64,11 +78,13 @@ function formatScore(value: number | null | undefined) {
 
 async function findLocation(){
     await fetchGraphByLocation(chosen_location.value)
-    await fetchGraphData()
+    const graphData = await fetchGraphData()
 
-    mapKey.value++
+    nodes.value = assertFeatureCollection(graphData.features?.nodes, 'nodes')
+    edges.value = assertFeatureCollection(graphData.features?.edges, 'edges')
+    locations.value = graphData.features?.locations
+    map_center.value = graphData.features?.center
 }
-
 
 async function requestRoute() {
     if (!selection.value.start || !selection.value.end) return
@@ -88,6 +104,7 @@ async function requestRoute() {
             end: toLatLon(selection.value.end),
             k: 3,
             weights: normalizedWeights,
+            user_id: user_ID.value ?? "undefined"
         })
     } catch (err) {
         routeData.value = null
@@ -97,8 +114,16 @@ async function requestRoute() {
     }
 }
 
-onMounted(() => {
+onMounted(async () => {
     showDisclaimer.value = true
+
+    try {
+        const graphData = await fetchGraphData()
+        locations.value = graphData.features?.locations
+        map_center.value = graphData.features?.center ?? null
+    } catch (err) {
+        console.error('Failed to load graph data on mount', err)
+    }
 })
 </script>
 
@@ -109,6 +134,25 @@ onMounted(() => {
                 <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Route Planner</h1>
                 <p class="text-slate-500 text-sm italic">Customise your journey preferences and find the best path.</p>
             </div>
+
+            <div>
+                <select
+                    name="locations"
+                    v-model="chosen_location"
+                    class="border rounded px-2 py-1"
+                >
+                    <option value="" disabled selected>Select a location</option>
+                    <option
+                    v-for="poi in locations?.features ?? []"
+                    :key="poi.properties?.node_id"
+                    :value="poi.properties?.name"
+                    :hidden="poi.properties?.name === 'NaN'"
+                    >
+                    {{ poi.properties?.name }}
+                    </option>
+                </select>
+            </div>
+
             <div>
                 <input v-model="chosen_location" type="text" placeholder="Enter a location">
                 <button type="button" @click="findLocation">Search</button>
@@ -128,7 +172,7 @@ onMounted(() => {
                             <div class="flex flex-col">
                                 <span class="text-[10px] font-bold uppercase text-slate-400">Start Point</span>
                                 <span class="text-sm font-medium text-slate-700">
-                                    {{ selection.start ? `${selection.start[0].toFixed(4)}, ${selection.start[1].toFixed(4)}` : 'Click map to set' }}
+                                    {{ selection.start_location ? `${selection.start_location}` : 'Click map to set' }}
                                 </span>
                             </div>
                         </div>
@@ -138,7 +182,7 @@ onMounted(() => {
                             <div class="flex flex-col">
                                 <span class="text-[10px] font-bold uppercase text-slate-400">Destination</span>
                                 <span class="text-sm font-medium text-slate-700">
-                                    {{ selection.end ? `${selection.end[0].toFixed(4)}, ${selection.end[1].toFixed(4)}` : 'Click map to set' }}
+                                    {{ selection.end_location ? `${selection.end_location}` : 'Click map to set' }}
                                 </span>
                             </div>
                         </div>
@@ -184,7 +228,7 @@ onMounted(() => {
 
             <div class="space-y-6 lg:col-span-8">
                 <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-sm ring-1 ring-slate-100">
-                    <SimpleMap :key="mapKey" :routes="routeGeometries" @selection-change="onSelectionChange" class="h-[700px] rounded-xl" />
+                    <SimpleMap :routes="routeGeometries" :nodes="nodes" :edges="edges" :center="map_center" :locations="locations" @selection-change="onSelectionChange" class="h-[700px] rounded-xl" />
                 </div>
 
                 <div v-if="routeData" class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
@@ -210,11 +254,19 @@ onMounted(() => {
                                 <tr
                                     v-for="(route, index) in routeData.routes"
                                     :key="index"
-                                    class="group transition-colors hover:bg-slate-50"
+                                    class="group transition-colors hover:bg-slate-50 relative"
                                 >
-                                    <td class="rounded-l-lg bg-slate-50 px-4 py-3 font-bold text-slate-700 group-hover:bg-indigo-50 group-hover:text-indigo-700">
+                                    <td
+                                        :class="[
+                                            'rounded-l-lg px-4 py-3 font-bold transition-all',
+                                            index === 0 ? 'route-blue' : '',
+                                            index === 1 ? 'route-red' : '',
+                                            index === 2 ? 'route-green' : '',
+                                        ]"
+                                    >
                                         #{{ index + 1 }}
                                     </td>
+
                                     <td class="px-2 py-3 font-medium">{{ formatScore(route.distance) }}</td>
                                     <td class="px-2 py-3 font-bold text-indigo-600">{{ formatScore(route.indicators?.weighted_score) }}</td>
                                     <td class="px-2 py-3 text-center text-slate-500">{{ formatScore(route.indicators?.lighting) }}</td>
@@ -245,3 +297,19 @@ onMounted(() => {
         </div>
     </section>
 </template>
+
+<style scoped>
+/* mapping table route options to map line colours */
+.route-blue {
+    background-color: rgba(37, 99, 235, 0.08);
+    color: #2563eb;
+}
+.route-red {
+    background-color: rgba(239, 68, 68, 0.08);
+    color: #ef4444;
+}
+.route-green {
+    background-color: rgba(22, 163, 74, 0.08);
+    color: #16a34a;
+}
+</style>

@@ -18,3 +18,9 @@ input[type='range']::-moz-range-thumb {
     border: 2px solid white;
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
+
+:root{
+    --route_1_coloUr: #2563eb;
+    --route_2_colour: #ef4444;
+    --route_3_colour: #16a34a;
+}

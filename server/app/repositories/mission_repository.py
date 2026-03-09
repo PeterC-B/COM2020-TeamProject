@@ -1,4 +1,5 @@
 from app.models.missions_model import MissionsModel
+from app.models.mission_progress_model import MissionProgressModel
 from app.repositories.db_error_mapper import map_db_errors
 from sqlalchemy import select
 
@@ -20,3 +21,7 @@ class MissionsRepository:
 
     def add(self, mission: MissionsModel):
         self.session.add(mission)
+
+    def delete(self, mission: MissionsModel):
+        self.session.delete(mission)
+        self.session.commit()

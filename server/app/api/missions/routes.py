@@ -8,6 +8,7 @@ def create_missions_blueprint(
     get_mission_uc,
     create_mission_uc,
     update_mission_uc,
+    delete_mission_uc,
 ):
     bp = Blueprint("missions", __name__, url_prefix="/api/missions")
 
@@ -37,5 +38,12 @@ def create_missions_blueprint(
         )
         data = MissionReadSchema().dump(mission)
         return ok(data=data)
+    
+    @bp.route("/<uuid:mission_id>", methods=["DELETE"])
+    def delete_mission(mission_id):
+        delete_mission_uc.execute(
+            mission_id
+        )
+        return {"message": "Mission deleted"}, 200
 
     return bp

@@ -23,4 +23,4 @@ class MissionsModel(db.Model):
     
     # Correct answer from possible_answers
     answer: Mapped[str] = mapped_column(String(), nullable=False)
-    tier: Mapped[MissionTier] = mapped_column(SQLEnum(MissionTier), nullable=False)
+    tier: Mapped[MissionTier] = mapped_column(SQLEnum(MissionTier), nullable=False, default=MissionTier.MEDIUM)

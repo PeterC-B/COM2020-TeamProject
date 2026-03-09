@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from app.domain.errors import AuthError, ValidationError
 from flask_jwt_extended import create_access_token
-
+from app.security.passwords import verify_password
 
 @dataclass(frozen=True)
 class LoginUserResult:
@@ -11,6 +11,7 @@ class LoginUserResult:
     username: str
     email: str
     password: str
+    user_id: str
 
 
 class LoginUser:
@@ -23,10 +24,10 @@ class LoginUser:
 
         if not username or not password:
             raise ValidationError(message="Username and password are required")
-        
+                
         user = self.user_repo.get_by_username(username)
 
-        if user is None or user.password_hash != f"hashed-{password}":
+        if user is None or not verify_password(password, user.password_hash):
             raise AuthError(message="Invalid username or password")
 
         access_token = create_access_token(identity=str(user.user_id))
@@ -35,5 +36,6 @@ class LoginUser:
             role=user.role.value,
             username=user.username,
             email=user.email,
-            password=user.password_hash
+            password=user.password_hash, # TODO: Take this out b4 deployment
+            user_id = user.user_id
         )

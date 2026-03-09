@@ -9,6 +9,8 @@ const routes: RouteRecordRaw[] = [
     { path: '/', component: () => import('@/views/HomeView.vue'), meta: { requiresAuth: true } },
     { path: '/map', component: () => import('@/views/MapView.vue'), meta: { requiresAuth: true } },
     { path: '/missions', component: () => import('@/views/MissionView.vue'), meta: { requiresAuth: true } },
+    { path: '/forgot-password', component: () => import('@/views/ForgotPasswordView.vue') },
+    { path: '/leaderboard', component: () => import('@/views/LeaderboardView.vue'), meta: { requiresAuth: true } },
     {
         path: '/profile',
         component: () => import('@/views/ProfileView.vue'),
@@ -20,6 +22,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/NotFoundView.vue'),
         meta: { requiresAuth: true },
     },
+    {
+        path: '/analytics/route-queries',
+        component: () => import('@/views/RouteQueriesView.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true }
+    }
+
 ]
 
 const router = createRouter({
@@ -35,12 +43,19 @@ router.beforeEach((to) => {
 
     const publicPages = ['/login', '/register']
 
+    // Redirect authenticated users away from login/register
     if (publicPages.includes(to.path) && mainStore.isAuthenticated) {
         return '/'
     }
 
-    if (!publicPages.includes(to.path) && to.meta.requiresAuth && !mainStore.isAuthenticated) {
+    // Require authentication
+    if (to.meta.requiresAuth && !mainStore.isAuthenticated) {
         return { path: '/login', query: { redirect: to.fullPath } }
+    }
+
+    // Require admin role
+    if (to.meta.requiresAdmin && (mainStore.userRole !== 'administrators' && mainStore.userRole !== 'developers')) {
+        return '/'
     }
 
     return true

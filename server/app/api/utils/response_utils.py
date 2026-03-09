@@ -5,6 +5,9 @@ Response utilities:
 """
 
 import networkx as nx
+import osmnx as ox
+from app.domain.indicators.attribute_extraction import attach_edge_indicators
+from scripts.visualisation.visualisation_utils import add_lighting_tag, add_surface_tag
 
 def compute_path_distance(graph: nx.MultiDiGraph, path):
     """Compute total distance along a path in a MultiDiGraph."""
@@ -18,11 +21,11 @@ def compute_path_distance(graph: nx.MultiDiGraph, path):
 
         # Use the first edge key (OSMnx graphs rarely have parallel edges)
         first_key = next(iter(edge_data))
-        total += edge_data[first_key].get("distance", 0.0)
+        total += edge_data[first_key].get("length", 0.0)
 
     return total
 
-def compute_indicator_summary(graph, path, weights):
+def compute_indicator_summary(graph:nx.MultiDiGraph, path, weights):
     """
     Compute average indicator values and weighted score for a route.
     """
@@ -70,16 +73,45 @@ def compute_indicator_summary(graph, path, weights):
 
 
 def build_geometry_from_graph(graph: nx.MultiDiGraph, path):
-    """Return list of (lat, lon) for each node in the path."""
+    """
+    Build a route geometry using edge geometries instead of node straight lines.
+    Returns list of (lat, lon) coordinates.
+    """
+
     geometry = []
 
-    for node in path:
-        data = graph.nodes[node]
-        lat = data.get("y")
-        lon = data.get("x")
+    for u, v in zip(path[:-1], path[1:]):
+        edge_data = graph.get_edge_data(u, v)
 
-        if lat is not None and lon is not None:
-            geometry.append((lat, lon))
+        if not edge_data:
+            continue
+
+        first_key = next(iter(edge_data))
+        data = edge_data[first_key]
+
+        if "geometry" in data:
+            line = data["geometry"]
+
+            xs, ys = line.xy
+
+            coords = list(zip(ys, xs))
+
+            if geometry and geometry[-1] == coords[0]:
+                geometry.extend(coords[1:])
+            else:
+                geometry.extend(coords)
+
+        else:
+            u_data = graph.nodes[u]
+            v_data = graph.nodes[v]
+
+            u_coord = (u_data["y"], u_data["x"])
+            v_coord = (v_data["y"], v_data["x"])
+
+            if not geometry:
+                geometry.append(u_coord)
+
+            geometry.append(v_coord)
 
     return geometry
 
@@ -97,16 +129,17 @@ def format_route_response(path, graph, geometry=None, metadata=None, weights=Non
     Returns:
         dict formatted for JSON response
     """
-
     total_distance = compute_path_distance(graph, path)
 
     if geometry is None:
         geometry = build_geometry_from_graph(graph, path)
-    
+
+    if "crs" not in graph.graph:
+        graph.graph["crs"] = "EPSG:4326"
+
     indicators = {}
     if weights is not None:
         indicators = compute_indicator_summary(graph, path, weights)
-
 
     return {
         "path": path,

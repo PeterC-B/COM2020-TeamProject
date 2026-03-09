@@ -1,11 +1,14 @@
 import maplibregl, { type Map } from 'maplibre-gl'
 import { ref } from 'vue'
+import { fetchLocationName, type LocationNameResponse } from '@/services/graph'
 
 type SelectionPayload = {
     start: [number, number] | null
     end: [number, number] | null
     startNodeId: number | null
     endNodeId: number | null
+    start_location: string | null
+    end_location: string | null
 }
 
 export function useMapSelection(emitSelectionChange: (payload: SelectionPayload) => void) {
@@ -19,6 +22,8 @@ export function useMapSelection(emitSelectionChange: (payload: SelectionPayload)
     const endPoint = ref<[number, number] | null>(null)
     const startNodeId = ref<number | null>(null)
     const endNodeId = ref<number | null>(null)
+    const start_location = ref<string | null>(null)
+    const end_location = ref<string | null>(null)
 
     function upsertMarker(marker: maplibregl.Marker | null, color: string, lngLat: [number, number]) {
         if (!map) return marker
@@ -34,9 +39,10 @@ export function useMapSelection(emitSelectionChange: (payload: SelectionPayload)
         return null
     }
 
-    function setStartPoint(lngLat: [number, number] | null, nodeId: number | null) {
+    function setStartPoint(lngLat: [number, number] | null, nodeId: number | null, location: string | null) {
         startPoint.value = lngLat
         startNodeId.value = nodeId
+        start_location.value = location
         if (lngLat) {
             startMarker = upsertMarker(startMarker, '#22c55e', lngLat)
         } else {
@@ -44,9 +50,10 @@ export function useMapSelection(emitSelectionChange: (payload: SelectionPayload)
         }
     }
 
-    function setEndPoint(lngLat: [number, number] | null, nodeId: number | null) {
+    function setEndPoint(lngLat: [number, number] | null, nodeId: number | null, location: string | null) {
         endPoint.value = lngLat
         endNodeId.value = nodeId
+        end_location.value = location
         if (lngLat) {
             endMarker = upsertMarker(endMarker, '#ef4444', lngLat)
         } else {
@@ -54,18 +61,21 @@ export function useMapSelection(emitSelectionChange: (payload: SelectionPayload)
         }
     }
 
-    function applyNodeSelection(nodeId: number | null, point: [number, number] | null) {
+    async function applyNodeSelection(nodeId: number | null, point: [number, number] | null) {
         if (nodeId === null || point === null) return
 
+        console.log(nodeId)
         selectedNodeId.value = nodeId
         selectedEdgeId.value = null
 
+        const location_name = await fetchLocationName(nodeId)
+
         // First click sets start, second sets destination; third click starts a new pair.
         if (startPoint.value === null || (startPoint.value !== null && endPoint.value !== null)) {
-            setStartPoint(point, nodeId)
-            setEndPoint(null, null)
+            setStartPoint(point, nodeId, location_name)
+            setEndPoint(null, null, null)
         } else {
-            setEndPoint(point, nodeId)
+            setEndPoint(point, nodeId, location_name)
         }
 
         emitSelectionChange({
@@ -73,6 +83,8 @@ export function useMapSelection(emitSelectionChange: (payload: SelectionPayload)
             end: endPoint.value,
             startNodeId: startNodeId.value,
             endNodeId: endNodeId.value,
+            start_location: start_location.value,
+            end_location: end_location.value
         })
     }
 

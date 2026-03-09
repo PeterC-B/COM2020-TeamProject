@@ -11,7 +11,8 @@
                     Welcome to Healthy Streets
                 </h1>
                 <p class="mt-6 text-lg leading-8 text-slate-300">
-                    Plan safer routes, play a game, and explore accessibility insights across your city.  </p>
+                    Plan safer routes, play a game, and explore accessibility insights across your city. 
+                </p>
                 <div class="mt-10 flex items-center gap-x-6">
                     <router-link
                         to="/map"

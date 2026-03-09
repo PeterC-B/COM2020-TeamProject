@@ -1,7 +1,7 @@
-import { get, post, put, type ApiEnvelope } from '@/services/api'
+import { get, post, put, deleteRequest, type ApiEnvelope } from '@/services/api'
 
 export interface Mission {
-    mission_id?: string       
+    mission_id: string       
     mission_name: string
     question: string
     possible_answers: string
@@ -21,13 +21,7 @@ export async function fetchMission(missionId: string): Promise<Mission> {
 
 export async function createMission(mission: Mission): Promise<Mission> {
     const { mission_id, ...payload } = mission
-
-    console.log("payload;", payload)
-
     const res = await post<ApiEnvelope<Mission>>(`/missions`, payload)
-
-    console.log('Create mission response:', res)
-
     return res.data.data
 }
 
@@ -38,6 +32,13 @@ export async function updateMission(
     const response = await put<ApiEnvelope<Mission>>(
         `/missions/${missionId}`,
         payload
+    )
+    return response.data.data
+}
+
+export async function deleteMission(missionId: string){
+    const response = await deleteRequest<ApiEnvelope<Mission>>(
+        `/missions/${missionId}`
     )
     return response.data.data
 }

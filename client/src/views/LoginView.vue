@@ -32,7 +32,7 @@ async function handleSubmit() {
         const login_info = await login(username.value.trim(), password.value)
         mainStore.setAccessToken(login_info.token)
         mainStore.setUserRole(login_info.user_details.role?.toLowerCase() as 'travellers' | 'administrators' | 'developers' || 'travellers')
-        mainStore.setUserDetails(login_info.user_details?.username ?? 'guest', login_info.user_details?.password ?? 'temp_pass', login_info.user_details?.email ?? 'no email found') 
+        mainStore.setUserDetails(login_info.user_details?.username ?? 'guest', login_info.user_details?.email ?? 'no email found', login_info.user_details?.user_id ?? 'no user found') 
 
         const redirectPath = typeof route.query.redirect === 'string' ? route.query.redirect : '/map'
         await router.push(redirectPath)
@@ -112,6 +112,13 @@ async function handleSubmit() {
                         Don't have an account? 
                         <router-link to="/register" class="font-bold text-indigo-600 hover:text-indigo-500 transition-colors">Register here</router-link>
                     </p>
+
+                    <p class="mt-2 text-sm text-slate-500">
+                        <router-link to="/forgot-password" class="font-bold text-indigo-600 hover:text-indigo-500 transition-colors">
+                            Forgot your password?
+                        </router-link>
+                    </p>
+                    
                     <p class="mt-4 text-[10px] text-slate-400 italic leading-tight">
                         Note: this is not real-time safety advice. 
                         Please refer to our disclaimer for more information.

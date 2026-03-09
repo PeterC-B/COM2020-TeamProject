@@ -1,9 +1,10 @@
-import pytest
+import app.domain.indicators.attribute_extraction as ae
 import geopandas as gpd
 import pandas as pd
 from shapely.geometry import Point, LineString
 from tests.utils.confusion import assert_confusion
 from tests.load_module import load_module
+import pytest
 
 import tests.utils.attribute_extraction_core as ae
 
