@@ -85,7 +85,11 @@ class GraphDataRepository:
         return self.session.execute(stmt).scalars().first()
     
     def get_used_locations(self) -> list:
-        stmt = select(LocationModel).where((LocationModel.in_use.is_(True)) & (LocationModel.name != 'NaN'))
+        stmt = (
+            select(LocationModel)
+            .join(NodesModel, LocationModel.node_id == NodesModel.node_id)
+            .where(LocationModel.name != 'NaN')
+        )
         return self.session.execute(stmt).scalars().all()
 
     def get_node_by_id(self, node_id):
