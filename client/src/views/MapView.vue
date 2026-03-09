@@ -253,13 +253,14 @@ onMounted(async () => {
                                     :key="index"
                                     class="group transition-colors hover:bg-slate-50 relative"
                                 >
-                                    <!-- Colored bar -->
-                                    <td class="relative rounded-l-lg p-0">
-                                    <div
-                                        class="absolute left-0 top-0 h-full w-1 rounded-l-lg"
-                                        :style="{ backgroundColor: routeColors[index] }"
-                                    ></div>
-                                    <div class="pl-3 py-3 font-bold text-slate-700 group-hover:text-indigo-700">
+                                    <td
+                                        :class="[
+                                            'rounded-l-lg px-4 py-3 font-bold transition-all',
+                                            index === 0 ? 'route-blue' : '',
+                                            index === 1 ? 'route-red' : '',
+                                            index === 2 ? 'route-green' : '',
+                                        ]"
+                                    >
                                         #{{ index + 1 }}
                                     </div>
                                     </td>
@@ -294,3 +295,19 @@ onMounted(async () => {
         </div>
     </section>
 </template>
+
+<style scoped>
+/* mapping table route options to map line colours */
+.route-blue {
+    background-color: rgba(37, 99, 235, 0.08);
+    color: #2563eb;
+}
+.route-red {
+    background-color: rgba(239, 68, 68, 0.08);
+    color: #ef4444;
+}
+.route-green {
+    background-color: rgba(22, 163, 74, 0.08);
+    color: #16a34a;
+}
+</style>
