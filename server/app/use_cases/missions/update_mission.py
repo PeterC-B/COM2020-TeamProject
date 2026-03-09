@@ -1,5 +1,5 @@
-from server.app.domain.errors import NotFoundError
-from server.app.models.missions_model import MissionsModel
+from app.domain.errors import NotFoundError
+from app.models.missions_model import MissionsModel
 
 
 class UpdateMission:

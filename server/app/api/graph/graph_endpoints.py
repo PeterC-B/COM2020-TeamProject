@@ -1,8 +1,8 @@
-from server.app.api.responses import ok
+from app.api.responses import ok
 from flask import Blueprint, request
 import osmnx as ox
 import requests
-from server.app.api.error_handlers import ValidationError, NotFoundError
+from app.api.error_handlers import ValidationError, NotFoundError
 
 
 def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_uc, fetch_node_data, fetch_edge_data, fetch_location_name):

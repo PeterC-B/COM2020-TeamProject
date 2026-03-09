@@ -4,7 +4,7 @@ Error Utilities:
     - Helper functions for common API error patterns
 """
 
-from server.app.api.responses import error
+from app.api.responses import error
 
 
 def error_response(message, status=400, details=None, code="ERROR"):

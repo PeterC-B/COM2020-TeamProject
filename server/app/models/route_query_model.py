@@ -1,10 +1,10 @@
 # ORM model representation of a user in the database
-from server.app.extensions import db
+from app.extensions import db
 from sqlalchemy import UUID, ForeignKey, Integer, JSON, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import uuid
-from server.app.models.user_account_model import UserAccountModel
-from server.app.models.nodes_model import NodesModel
+from app.models.user_account_model import UserAccountModel
+from app.models.nodes_model import NodesModel
 from datetime import datetime
 
 # TODO: Whenever changed, edit the report documentation

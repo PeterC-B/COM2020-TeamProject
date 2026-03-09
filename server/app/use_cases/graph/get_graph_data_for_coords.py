@@ -1,14 +1,14 @@
 import osmnx as ox
 import geopandas as gpd
-from server.app.domain.routing.graph_cache import save_cached_graph
-from server.app.domain.indicators.attribute_extraction import attach_edge_indicators, compute_amenity_proximity
-from server.scripts.visualisation.visualisation_utils import add_lighting_tag, add_surface_tag
-from server.app.domain.scoring.weight_utils import add_pub_distance, normalize_pub_distance
-from server.app.domain.errors import NotFoundError
-from server.app.models.nodes_model import NodesModel
-from server.app.models.edges_model import EdgesModel
-from server.app.models.location_model import LocationModel
-from server.app.models.enums.LOCATION_TYPE import LocationType
+from app.domain.routing.graph_cache import save_cached_graph
+from app.domain.indicators.attribute_extraction import attach_edge_indicators, compute_amenity_proximity
+from scripts.visualisation.visualisation_utils import add_lighting_tag, add_surface_tag
+from app.domain.scoring.weight_utils import add_pub_distance, normalize_pub_distance
+from app.domain.errors import NotFoundError
+from app.models.nodes_model import NodesModel
+from app.models.edges_model import EdgesModel
+from app.models.location_model import LocationModel
+from app.models.enums.LOCATION_TYPE import LocationType
 import numpy as np
 import pandas as pd
 

@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields
 from sqlalchemy import UUID
 from sqlalchemy import Enum
-from server.app.models.enums.ACCESS_TYPE import UserAccessType
+from app.models.enums.ACCESS_TYPE import UserAccessType
 
 class UserReadSchema(Schema):
     user_id = fields.UUID(required=True)

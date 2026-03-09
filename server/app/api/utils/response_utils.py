@@ -6,8 +6,8 @@ Response utilities:
 
 import networkx as nx
 import osmnx as ox
-from server.app.domain.indicators.attribute_extraction import attach_edge_indicators
-from server.scripts.visualisation.visualisation_utils import add_lighting_tag, add_surface_tag
+from app.domain.indicators.attribute_extraction import attach_edge_indicators
+from scripts.visualisation.visualisation_utils import add_lighting_tag, add_surface_tag
 
 def compute_path_distance(graph: nx.MultiDiGraph, path):
     """Compute total distance along a path in a MultiDiGraph."""

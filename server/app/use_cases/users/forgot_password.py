@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from server.app.domain.errors import ValidationError
-from server.app.security.passwords import hash_password
+from app.domain.errors import ValidationError
+from app.security.passwords import hash_password
 @dataclass(frozen=True)
 class ForgotPasswordResult:
     reset: bool

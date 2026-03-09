@@ -7,8 +7,8 @@ from typing import Dict, Iterable, List, Tuple
 import pandas as pd
 import geopandas as gpd
 from shapely import wkt
-from server.app.domain.scoring.weight_utils import calculate_weights
-from server.app.models.enums.LOCATION_TYPE import LocationType
+from app.domain.scoring.weight_utils import calculate_weights
+from app.models.enums.LOCATION_TYPE import LocationType
 
 Coord = List[float]
 EdgeKey = Tuple[int, int, int]
@@ -177,10 +177,10 @@ def main(argv: Iterable[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Convert CSV graph data to MapLibre-ready GeoJSON."
     )
-    parser.add_argument("--nodes", default="server/app/data/processed/nodes_table.csv", help="Path to nodes_table.csv")
-    parser.add_argument("--edges", default="server/app/data/processed/edges_table.csv", help="Path to edges_table.csv")
-    parser.add_argument("--geom", default="server/app/data/processed/edges_geometry.csv", help="Path to edges_geometry.csv")
-    parser.add_argument("--out", default="server/app/data/processed/maplibre", help="Output folder for GeoJSON files")
+    parser.add_argument("--nodes", default="app/data/processed/nodes_table.csv", help="Path to nodes_table.csv")
+    parser.add_argument("--edges", default="app/data/processed/edges_table.csv", help="Path to edges_table.csv")
+    parser.add_argument("--geom", default="app/data/processed/edges_geometry.csv", help="Path to edges_geometry.csv")
+    parser.add_argument("--out", default="app/data/processed/maplibre", help="Output folder for GeoJSON files")
     args = parser.parse_args(argv)
 
     nodes_path = Path(args.nodes)

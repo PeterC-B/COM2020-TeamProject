@@ -1,6 +1,6 @@
-from server.app.models.missions_model import MissionsModel
-from server.app.models.enums.MISSION_TIER import MissionTier
-from server.app.domain.errors import ValidationError
+from app.models.missions_model import MissionsModel
+from app.models.enums.MISSION_TIER import MissionTier
+from app.domain.errors import ValidationError
 
 
 class CreateMission:

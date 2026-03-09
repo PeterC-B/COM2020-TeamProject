@@ -21,12 +21,12 @@ import pickle
 
 import networkx as nx
 import osmnx as ox
-from server.app.domain.indicators.attribute_extraction import (
+from app.domain.indicators.attribute_extraction import (
     attach_edge_indicators, compute_amenity_proximity)
-from server.app.domain.indicators.normalisation import normalise_graph_attributes
+from app.domain.indicators.normalisation import normalise_graph_attributes
 
 # Output paths
-OUTPUT_DIR = "server/app/data/processed"
+OUTPUT_DIR = "app/data/processed"
 GRAPH_PKL = os.path.join(OUTPUT_DIR, "processed_graph.pkl")
 GRAPH_GRAPHML = os.path.join(OUTPUT_DIR, "processed_graph.graphml")
 NODES_CSV = os.path.join(OUTPUT_DIR, "nodes_table.csv")

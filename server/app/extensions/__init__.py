@@ -14,8 +14,8 @@ migrate = Migrate()
 jwt = JWTManager()
 ma = Marshmallow()
 
-from server.app.models.user_account_model import UserAccountModel
-from server.app.models.enums.ACCESS_TYPE import UserAccessType
+from app.models.user_account_model import UserAccountModel
+from app.models.enums.ACCESS_TYPE import UserAccessType
 
 @jwt.user_lookup_loader
 def load_user(jwt_header, jwt_data):

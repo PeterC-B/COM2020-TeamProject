@@ -14,7 +14,7 @@ import matplotlib.colors as mcolors
 
 
 # Output directory for all generated graphs
-GRAPH_DIR = "server/server/app/api/infrastructure/graphs"
+GRAPH_DIR = "server/app/api/infrastructure/graphs"
 
 def ensure_graph_dir():
     """Ensure the graph output directory exists."""

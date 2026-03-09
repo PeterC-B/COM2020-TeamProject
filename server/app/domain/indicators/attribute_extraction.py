@@ -15,8 +15,8 @@ Indicators extracted:
 import geopandas as gpd
 import networkx as nx
 import osmnx as ox
-from server.app.models.location_model import LocationModel
-from server.app.models.enums.LOCATION_TYPE import LocationType
+from app.models.location_model import LocationModel
+from app.models.enums.LOCATION_TYPE import LocationType
 
 AMENITY_TAGS = {
     "amenity":[
@@ -189,17 +189,17 @@ def compute_amenity_proximity(graph, center_coords, search_radius=500):
     return locations
 
 if __name__ == "__main__":
-    from server.scripts.visualisation.visualisation_utils import plot_blank_graph, add_lighting_tag, add_surface_tag
+    from scripts.visualisation.visualisation_utils import plot_blank_graph, add_lighting_tag, add_surface_tag
     graph = plot_blank_graph((51.460498, -2.585757), 450, "walk")
 
     graph = add_lighting_tag(graph, (51.460498, -2.585757), 450)
     graph = add_surface_tag(graph, (51.460498, -2.585757), 450)
     fig, ax = ox.plot_graph(graph, show=False, close=False, node_size=2)
-    #fig.savefig("server/server/app/domain/indicators/graph.png", dpi=300)
+    #fig.savefig("server/app/domain/indicators/graph.png", dpi=300)
     nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
-    edges_gdf.to_csv("server/app/domain/indicators/surface.csv")
+    edges_gdf.to_csv("app/domain/indicators/surface.csv")
     edges_gdf = attach_edge_indicators(edges_gdf)
-    from server.app.domain.scoring.weight_utils import calculate_weights
+    from app.domain.scoring.weight_utils import calculate_weights
     calculate_weights(edges_gdf, 0.3, 0.5, 0.9)
     edges_export = edges_gdf.copy().reset_index()
     edges_export = edges_export[[
@@ -210,4 +210,4 @@ if __name__ == "__main__":
         "pollution",
         "surface_quality",
     ]]
-    #edges_export.to_csv("server/server/app/domain/indicators/edges.csv")
+    #edges_export.to_csv("server/app/domain/indicators/edges.csv")

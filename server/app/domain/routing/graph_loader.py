@@ -18,10 +18,10 @@ import os
 import pickle
 import networkx as nx
 
-from server.app.domain.errors import InfrastructureError
-from server.app.domain.routing.graph_cache import load_cached_graph, save_cached_graph
-from server.app.domain.indicators.attribute_extraction import attach_edge_indicators
-from server.app.domain.indicators.normalisation import normalise_graph_attributes
+from app.domain.errors import InfrastructureError
+from app.domain.routing.graph_cache import load_cached_graph, save_cached_graph
+from app.domain.indicators.attribute_extraction import attach_edge_indicators
+from app.domain.indicators.normalisation import normalise_graph_attributes
 
 
 PROCESSED_GRAPH_PATH = "data/processed_graph.pkl"

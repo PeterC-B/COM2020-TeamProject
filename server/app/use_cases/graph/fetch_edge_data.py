@@ -1,4 +1,4 @@
-from server.app.domain.errors import NotFoundError
+from app.domain.errors import NotFoundError
 
 class FetchEdgeData:
     def __init__(self, graph_data_repo):

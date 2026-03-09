@@ -1,11 +1,11 @@
 import random
-from server.app import create_app
-from server.app.extensions import db
-from server.app.domain.routing.graph_loader import load_graph_from_disk
-from server.app.models.nodes_model import NodesModel
-from server.app.models.edges_model import EdgesModel
-from server.app.models.location_model import LocationModel
-from server.app.models.enums.LOCATION_TYPE import LocationType
+from app import create_app
+from app.extensions import db
+from app.domain.routing.graph_loader import load_graph_from_disk
+from app.models.nodes_model import NodesModel
+from app.models.edges_model import EdgesModel
+from app.models.location_model import LocationModel
+from app.models.enums.LOCATION_TYPE import LocationType
 
 app = create_app()
 app.app_context().push()

@@ -1,4 +1,4 @@
-from server.app.models.route_query_model import RouteQuery
+from app.models.route_query_model import RouteQuery
 
 class LogRouteQuery:
     def __init__(self, uow, repo):

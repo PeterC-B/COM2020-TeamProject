@@ -1,14 +1,14 @@
 from pathlib import Path
-from server.app.data.convert import build_edges_geojson, build_nodes_geojson, build_locations_geojson
-from server.app.models.nodes_model import NodesModel
-from server.app.models.edges_model import EdgesModel
-from server.app.models.location_model import LocationModel
+from app.data.convert import build_edges_geojson, build_nodes_geojson, build_locations_geojson
+from app.models.nodes_model import NodesModel
+from app.models.edges_model import EdgesModel
+from app.models.location_model import LocationModel
 from sqlalchemy import select
 
 class GraphDataRepository:
     def __init__(self, session, data_path: Path | None = None):
         self.session = session
-        self.data_path = data_path or Path("server/app/data/processed")
+        self.data_path = data_path or Path("app/data/processed")
 
     def get_graph_features(self):
         nodes_list = self.get_all_nodes()

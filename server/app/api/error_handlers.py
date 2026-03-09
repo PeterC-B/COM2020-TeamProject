@@ -1,5 +1,5 @@
-from server.app.api.responses import error
-from server.app.domain.errors import (AppError, AuthError, ConflictError,
+from app.api.responses import error
+from app.domain.errors import (AppError, AuthError, ConflictError,
                                DatabaseConnectionError,
                                DatabaseConflictError,
                                DatabaseTransactionError,

@@ -2,8 +2,8 @@
 import uuid
 from datetime import datetime
 
-from server.app.extensions import db
-from server.app.models.enums.ACCESS_TYPE import UserAccessType
+from app.extensions import db
+from app.models.enums.ACCESS_TYPE import UserAccessType
 from sqlalchemy import UUID, DateTime
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import String

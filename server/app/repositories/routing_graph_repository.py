@@ -1,8 +1,8 @@
-from server.app.domain.routing.graph_loader import build_routing_graph
-from server.app.data.convert import build_graph
-from server.app.models.nodes_model import NodesModel
-from server.app.models.edges_model import EdgesModel
-from server.app.domain.scoring.weight_utils import apply_weights
+from app.domain.routing.graph_loader import build_routing_graph
+from app.data.convert import build_graph
+from app.models.nodes_model import NodesModel
+from app.models.edges_model import EdgesModel
+from app.domain.scoring.weight_utils import apply_weights
 
 class RoutingGraphRepository:
     def __init__(self, session):

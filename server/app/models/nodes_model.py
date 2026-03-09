@@ -1,5 +1,5 @@
 # ORM model representation of a user in the database
-from server.app.extensions import db
+from app.extensions import db
 from sqlalchemy import BigInteger, String, Float
 from sqlalchemy.orm import Mapped, mapped_column
 

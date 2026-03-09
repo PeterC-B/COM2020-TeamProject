@@ -1,5 +1,5 @@
-from server.app.models.enums.MISSION_STATUS import MissionStatus
-from server.app.models.mission_progress_model import MissionProgressModel
+from app.models.enums.MISSION_STATUS import MissionStatus
+from app.models.mission_progress_model import MissionProgressModel
 from marshmallow import Schema, fields
 
 

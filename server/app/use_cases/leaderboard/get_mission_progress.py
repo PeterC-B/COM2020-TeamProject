@@ -1,4 +1,4 @@
-from server.app.domain.errors import NotFoundError
+from app.domain.errors import NotFoundError
 
 class GetMissionProgress:
     def __init__(self, leaderboard_repo):

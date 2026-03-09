@@ -16,9 +16,9 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from app import create_app
-from server.app.extensions import db
-from server.app.models.enums.ACCESS_TYPE import UserAccessType
-from server.app.models.user_account_model import UserAccountModel
+from app.extensions import db
+from app.models.enums.ACCESS_TYPE import UserAccessType
+from app.models.user_account_model import UserAccountModel
 
 
 def main():

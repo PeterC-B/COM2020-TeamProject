@@ -1,7 +1,7 @@
-from server.app.models.enums.MISSION_TIER import MissionTier
-from server.app.models.enums.MISSION_STATUS import MissionStatus
-from server.app.models.mission_progress_model import MissionProgressModel
-from server.app.domain.errors import ValidationError
+from app.models.enums.MISSION_TIER import MissionTier
+from app.models.enums.MISSION_STATUS import MissionStatus
+from app.models.mission_progress_model import MissionProgressModel
+from app.domain.errors import ValidationError
 import uuid
 
 

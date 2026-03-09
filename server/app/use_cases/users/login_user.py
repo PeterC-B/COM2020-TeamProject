@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
-from server.app.domain.errors import AuthError, ValidationError
+from app.domain.errors import AuthError, ValidationError
 from flask_jwt_extended import create_access_token
-from server.app.security.passwords import verify_password
+from app.security.passwords import verify_password
 
 @dataclass(frozen=True)
 class LoginUserResult:

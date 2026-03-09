@@ -1,5 +1,5 @@
-from server.app.models.route_query_model import RouteQuery
-from server.app.models.user_account_model import UserAccountModel
+from app.models.route_query_model import RouteQuery
+from app.models.user_account_model import UserAccountModel
 
 class RouteQueryRepository:
     def __init__(self, session):

@@ -4,7 +4,7 @@ import os
 
 from dotenv import load_dotenv
 
-from server.app.domain.errors import ValidationError
+from app.domain.errors import ValidationError
 
 # Load environment variables from a .env file into the system's environment variables
 load_dotenv(".env")

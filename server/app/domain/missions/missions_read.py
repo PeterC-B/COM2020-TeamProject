@@ -1,5 +1,5 @@
-from server.app.models.enums.MISSION_TIER import MissionTier
-from server.app.models.missions_model import MissionsModel
+from app.models.enums.MISSION_TIER import MissionTier
+from app.models.missions_model import MissionsModel
 from marshmallow import Schema, fields
 
 

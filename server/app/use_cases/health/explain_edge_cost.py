@@ -1,6 +1,6 @@
-from server.app.domain.errors import ValidationError
-from server.app.domain.scoring.cost_functions import explain_cost
-from server.app.domain.scoring.weight_utils import validate_weights
+from app.domain.errors import ValidationError
+from app.domain.scoring.cost_functions import explain_cost
+from app.domain.scoring.weight_utils import validate_weights
 
 
 class ExplainEdgeCost:

@@ -1,8 +1,8 @@
 import uuid
 
-from server.app.extensions import db
-from server.app.models.enums.LOCATION_TYPE import LocationType
-from server.app.models.nodes_model import NodesModel
+from app.extensions import db
+from app.models.enums.LOCATION_TYPE import LocationType
+from app.models.nodes_model import NodesModel
 from sqlalchemy import UUID
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import ForeignKey, String, Boolean
