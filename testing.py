@@ -55,8 +55,8 @@ def seed_test_user():
     db.session.commit()
 
     print("✅ Test user inserted:")
-    print("   username: testuser")
-    print("   password: password123")
+    print("   username: dev")
+    print("   password: dev123")
 
 
 def reset_db():

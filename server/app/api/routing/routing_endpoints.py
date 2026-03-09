@@ -31,7 +31,7 @@ def create_routing_route_blueprint(route_yens_uc, log_route_query_uc, list_route
             chosen_route_path = chosen["path"]
 
             # Safely extract user_id if authenticated
-            user_id = getattr(current_user, "user_id", None)
+            user_id = data.get("user_id")
 
             log_route_query_uc.execute(
                 user_id=user_id,

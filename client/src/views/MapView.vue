@@ -7,6 +7,7 @@ import { fetchYensRoutes, type YensRoutesResponse } from '@/services/routing'
 import { fetchGraphByLocation, fetchGraphData } from '@/services/graph'
 import { assertFeatureCollection, type GeoJson, type coordinates } from '@/components/simple-map/geoJsonUtils'
 import { Point } from 'maplibre-gl'
+import { useMainStore } from '@/stores/main'
 
 type SelectionPayload = {
     start: [number, number] | null
@@ -25,6 +26,8 @@ const selection = ref<SelectionPayload>({
     start_location: null,
     end_location: null,
 })
+const mainStore = useMainStore()
+const user_ID = computed(() => (mainStore.user_id))
 
 const nodes = ref<GeoJson | null>(null)
 const edges = ref<GeoJson | null>(null)
@@ -102,6 +105,7 @@ async function requestRoute() {
             end: toLatLon(selection.value.end),
             k: 3,
             weights: normalizedWeights,
+            user_id: user_ID.value ?? "undefined"
         })
     } catch (err) {
         routeData.value = null
