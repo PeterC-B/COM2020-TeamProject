@@ -262,7 +262,6 @@ onMounted(async () => {
                                         ]"
                                     >
                                         #{{ index + 1 }}
-                                    </div>
                                     </td>
 
                                     <td class="px-2 py-3 font-medium">{{ formatScore(route.distance) }}</td>
