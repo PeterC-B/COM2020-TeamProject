@@ -41,7 +41,6 @@ export async function login(username: string, password: string) {
     }
 
     return {token, user_details: response.data?.data}
-    return {token, user_details: response.data?.data}
 }
 
 export async function register(payload: RegisterPayload) {
