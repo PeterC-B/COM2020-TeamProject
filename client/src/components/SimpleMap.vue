@@ -163,7 +163,6 @@ onMounted(() => {
         zoom: 14,
     })
 
-
     setMap(map)
 
     map.addControl(new maplibregl.NavigationControl(), 'top-right')
@@ -269,15 +268,13 @@ onMounted(() => {
                     map.setRenderWorldCopies(false)
                 }
 
-                map.setLayoutProperty('edges-line', 'visibility', 'visible')
-                map.setLayoutProperty('edges-line-hit', 'visibility', 'visible')
-                map.setLayoutProperty('edges-line-highlight', 'visibility', 'visible')
+                //map.setLayoutProperty('edges-line', 'visibility', 'none')
+                //map.setLayoutProperty('edges-line-hit', 'visibility', 'none')
+                //map.setLayoutProperty('edges-line-highlight', 'visibility', 'none')
 
-                map.setLayoutProperty('nodes-circle', 'visibility', 'visible')
-                map.setLayoutProperty('nodes-circle-hit', 'visibility', 'visible')
-                map.setLayoutProperty('nodes-circle-highlight', 'visibility', 'visible')
-                
-                map.setCenter(map_center.value)
+                map.setLayoutProperty('nodes-circle', 'visibility', 'none')
+                map.setLayoutProperty('nodes-circle-hit', 'visibility', 'none')
+                map.setLayoutProperty('nodes-circle-highlight', 'visibility', 'none')
         })
     })
 })

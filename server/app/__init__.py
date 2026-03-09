@@ -5,45 +5,43 @@ from pathlib import Path
 from flask import Flask
 from flask_cors import CORS
 
-from app.api.error_handlers import register_error_handlers
-from app.api.graph.graph_endpoints import create_graph_route_blueprint
-from app.api.health.health_endpoints import create_health_routes
-from app.api.missions.routes import create_missions_blueprint
-from app.api.routing.routing_endpoints import create_routing_route_blueprint
-from app.api.users.routes import create_user_route_blueprint
-from app.api.leaderboard.routes import create_leaderboard_blueprint
-from app.config import Config
-from app.extensions import db, jwt, ma, migrate
-from app.repositories.graph_data_repository import GraphDataRepository
-from app.repositories.mission_repository import MissionsRepository
-from app.repositories.leaderboard_repository import LeaderboardRepository
-from app.repositories.routing_graph_repository import RoutingGraphRepository
-from app.repositories.user_repository import UserRepository
-from app.repositories.route_query_repository import RouteQueryRepository
-from app.unit_of_work.sqlalchemy_uow import SqlAlchemyUnitOfWork
-from app.use_cases.graph.get_graph_data import GetGraphData
-from app.use_cases.graph.fetch_location_name import FetchLocationName
-from app.use_cases.graph.fetch_edge_data import FetchEdgeData
-from app.use_cases.graph.fetch_node_data import FetchNodeData
-from app.use_cases.graph.get_graph_data_for_coords import FetchDataForCoordinates
-from app.use_cases.health.explain_edge_cost import ExplainEdgeCost
-from app.use_cases.health.get_attributes import GetHealthAttributes
-from app.use_cases.health.get_default_weights import GetDefaultWeights
-from app.use_cases.missions.create_mission import CreateMission
-from app.use_cases.missions.get_mission import GetMission
-from app.use_cases.missions.list_missions import ListMissions
-from app.use_cases.missions.delete_mission import DeleteMission
-from app.use_cases.leaderboard.save_mission_progress import SaveMissionProgress
-from app.use_cases.leaderboard.get_mission_progress import GetMissionProgress
-from app.use_cases.leaderboard.get_leaderboard import GetLeaderboard
-from app.use_cases.routing.route_yens import RouteYens
-from app.use_cases.users.list_users import ListUsers
-from app.use_cases.users.login_user import LoginUser
-from app.use_cases.users.register_user import RegisterUser
-from app.use_cases.users.forgot_password import ForgotPassword
-from app.use_cases.missions.update_mission import UpdateMission
-from app.use_cases.route_queries.log_route_query import LogRouteQuery
-from app.use_cases.route_queries.list_route_queries import ListRouteQueries
+from server.app.api.error_handlers import register_error_handlers
+from server.app.api.graph.graph_endpoints import create_graph_route_blueprint
+from server.app.api.health.health_endpoints import create_health_routes
+from server.app.api.missions.routes import create_missions_blueprint
+from server.app.api.routing.routing_endpoints import create_routing_route_blueprint
+from server.app.api.users.routes import create_user_route_blueprint
+from server.app.api.leaderboard.routes import create_leaderboard_blueprint
+from server.app.config import Config
+from server.app.extensions import db, jwt, ma, migrate
+from server.app.repositories.graph_data_repository import GraphDataRepository
+from server.app.repositories.mission_repository import MissionsRepository
+from server.app.repositories.routing_graph_repository import RoutingGraphRepository
+from server.app.repositories.leaderboard_repository import LeaderboardRepository
+from server.app.repositories.route_query_repository import RouteQueryRepository
+from server.app.repositories.user_repository import UserRepository
+from server.app.use_cases.route_queries.list_route_queries import ListRouteQueries
+from server.app.use_cases.route_queries.log_route_query import LogRouteQuery
+from server.app.use_cases.users.forgot_password import ForgotPassword
+from server.app.use_cases.missions.delete_mission import DeleteMission
+from server.app.use_cases.leaderboard.get_leaderboard import GetLeaderboard
+from server.app.use_cases.leaderboard.save_mission_progress import SaveMissionProgress
+from server.app.use_cases.leaderboard.get_mission_progress import GetMissionProgress
+from server.app.use_cases.graph.get_graph_data import GetGraphData
+from server.app.use_cases.health.explain_edge_cost import ExplainEdgeCost
+from server.app.use_cases.health.get_attributes import GetHealthAttributes
+from server.app.use_cases.health.get_default_weights import GetDefaultWeights
+from server.app.use_cases.missions.create_mission import CreateMission
+from server.app.use_cases.missions.get_mission import GetMission
+from server.app.use_cases.missions.list_missions import ListMissions
+from server.app.use_cases.routing.route_yens import RouteYens
+from server.app.use_cases.users.list_users import ListUsers
+from server.app.use_cases.users.login_user import LoginUser
+from server.app.use_cases.users.register_user import RegisterUser
+from server.app.use_cases.missions.update_mission import UpdateMission
+from app.models.change_logging import init_change_logging
+from server.app.unit_of_work.sqlalchemy_uow import SqlAlchemyUnitOfWork
+
 
 def create_app():
     # Application instance
@@ -75,7 +73,7 @@ def create_app():
     ma.init_app(app)
 
     # Register the models
-    from app.models import (
+    from server.app.models import (
         edges_model,
         location_model,
         mission_progress_model,
@@ -84,6 +82,7 @@ def create_app():
         user_account_model,
         route_query_model
     )
+    init_change_logging()
 
     # Initialise the services
     session = db.session
@@ -104,10 +103,6 @@ def create_app():
     login_user_uc = LoginUser(user_repo)
     forgot_password_uc = ForgotPassword(uow, user_repo)
     get_graph_data_uc = GetGraphData(graph_data_repo)
-    fetch_edge_data_uc = FetchEdgeData(graph_data_repo)
-    fetch_location_name_uc = FetchLocationName(graph_data_repo)
-    fetch_node_data_uc = FetchNodeData(graph_data_repo)
-    get_graph_data_for_coords_uc = FetchDataForCoordinates(uow, graph_data_repo)
     get_health_attributes_uc = GetHealthAttributes()
     get_default_weights_uc = GetDefaultWeights()
     explain_edge_cost_uc = ExplainEdgeCost()
@@ -125,7 +120,7 @@ def create_app():
 
     # Initialise the Routes
     app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc, forgot_password_uc))
-    app.register_blueprint(create_graph_route_blueprint(get_graph_data_uc, get_graph_data_for_coords_uc, fetch_node_data_uc, fetch_edge_data_uc, fetch_location_name_uc))
+    app.register_blueprint(create_graph_route_blueprint(get_graph_data_uc))
     app.register_blueprint(create_health_routes(get_health_attributes_uc, get_default_weights_uc, explain_edge_cost_uc))
     app.register_blueprint(create_missions_blueprint(list_missions_uc, get_mission_uc, create_mission_uc, update_mission_uc, delete_mission_uc))
     app.register_blueprint(create_leaderboard_blueprint(get_leaderboard_uc, get_mission_progress_uc, save_mission_progress_uc))

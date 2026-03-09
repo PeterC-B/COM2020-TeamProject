@@ -6,7 +6,6 @@ import SimpleMap from '@/components/SimpleMap.vue'
 import { fetchYensRoutes, type YensRoutesResponse } from '@/services/routing'
 import { fetchGraphByLocation, fetchGraphData } from '@/services/graph'
 import { assertFeatureCollection, type GeoJson, type coordinates } from '@/components/simple-map/geoJsonUtils'
-import { Point } from 'maplibre-gl'
 import { useMainStore } from '@/stores/main'
 
 type SelectionPayload = {

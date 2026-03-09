@@ -1,5 +1,6 @@
 """Routing API endpoint for Yen's algorithm."""
 
+from app.api.responses import ok
 from flask import Blueprint, request
 from app.schemas.route_query_schema import RouteQuerySchema
 from app.extensions import login_required, admin_required

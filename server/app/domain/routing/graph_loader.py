@@ -24,7 +24,7 @@ from app.domain.indicators.attribute_extraction import attach_edge_indicators
 from app.domain.indicators.normalisation import normalise_graph_attributes
 
 
-PROCESSED_GRAPH_PATH = "data/processed_graph.pkl"
+PROCESSED_GRAPH_PATH = "app/data/processed/processed_graph.pkl"
 
 
 def load_graph_from_disk() -> nx.MultiDiGraph:
