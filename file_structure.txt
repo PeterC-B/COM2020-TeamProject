@@ -1,15 +1,19 @@
 Folder PATH listing
 Volume serial number is 2E35-658B
 C:.
+|   .env
 |   .gitignore
 |   application.py
 |   dev_start.py
 |   Docker+DB.md
+|   edge.csv
+|   edges.csv
 |   f
 |   File tree.md
 |   file_structure.txt
 |   index.css
 |   LICENSE
+|   nearest.csv
 |   package-lock.json
 |   Procfile
 |   pytest.ini
@@ -7361,73 +7365,12 @@ C:.
 |   |   |   +---bin
 |   |   |   |       editorconfig
 |   |   |   |       
-|   |   |   +---lib
-|   |   |   |       cli.d.ts
-|   |   |   |       cli.js
-|   |   |   |       index.d.ts
-|   |   |   |       index.js
-|   |   |   |       
-|   |   |   \---node_modules
-|   |   |       \---minimatch
-|   |   |           |   LICENSE
-|   |   |           |   package.json
-|   |   |           |   README.md
-|   |   |           |   
-|   |   |           \---dist
-|   |   |               +---cjs
-|   |   |               |       assert-valid-pattern.d.ts
-|   |   |               |       assert-valid-pattern.d.ts.map
-|   |   |               |       assert-valid-pattern.js
-|   |   |               |       assert-valid-pattern.js.map
-|   |   |               |       ast.d.ts
-|   |   |               |       ast.d.ts.map
-|   |   |               |       ast.js
-|   |   |               |       ast.js.map
-|   |   |               |       brace-expressions.d.ts
-|   |   |               |       brace-expressions.d.ts.map
-|   |   |               |       brace-expressions.js
-|   |   |               |       brace-expressions.js.map
-|   |   |               |       escape.d.ts
-|   |   |               |       escape.d.ts.map
-|   |   |               |       escape.js
-|   |   |               |       escape.js.map
-|   |   |               |       index.d.ts
-|   |   |               |       index.d.ts.map
-|   |   |               |       index.js
-|   |   |               |       index.js.map
-|   |   |               |       package.json
-|   |   |               |       unescape.d.ts
-|   |   |               |       unescape.d.ts.map
-|   |   |               |       unescape.js
-|   |   |               |       unescape.js.map
-|   |   |               |       
-|   |   |               \---mjs
-|   |   |                       assert-valid-pattern.d.ts
-|   |   |                       assert-valid-pattern.d.ts.map
-|   |   |                       assert-valid-pattern.js
-|   |   |                       assert-valid-pattern.js.map
-|   |   |                       ast.d.ts
-|   |   |                       ast.d.ts.map
-|   |   |                       ast.js
-|   |   |                       ast.js.map
-|   |   |                       brace-expressions.d.ts
-|   |   |                       brace-expressions.d.ts.map
-|   |   |                       brace-expressions.js
-|   |   |                       brace-expressions.js.map
-|   |   |                       escape.d.ts
-|   |   |                       escape.d.ts.map
-|   |   |                       escape.js
-|   |   |                       escape.js.map
-|   |   |                       index.d.ts
-|   |   |                       index.d.ts.map
-|   |   |                       index.js
-|   |   |                       index.js.map
-|   |   |                       package.json
-|   |   |                       unescape.d.ts
-|   |   |                       unescape.d.ts.map
-|   |   |                       unescape.js
-|   |   |                       unescape.js.map
-|   |   |                       
+|   |   |   \---lib
+|   |   |           cli.d.ts
+|   |   |           cli.js
+|   |   |           index.d.ts
+|   |   |           index.js
+|   |   |           
 |   |   +---electron-to-chromium
 |   |   |       chromium-versions.js
 |   |   |       chromium-versions.json
@@ -14767,6 +14710,7 @@ C:.
 |       |       api.ts
 |       |       auth.ts
 |       |       graph.ts
+|       |       leaderboard.ts
 |       |       missions.ts
 |       |       routing.ts
 |       |       
@@ -14777,13 +14721,20 @@ C:.
 |       \---views
 |               ForgotPasswordView.vue
 |               HomeView.vue
+|               leaderboard.vue
+|               LeaderboardView.vue
 |               LoginView.vue
 |               MapView.vue
 |               MissionView.vue
 |               NotFoundView.vue
 |               ProfileView.vue
 |               RegisterView.vue
+|               RouteQueriesView.vue
 |               
++---data
+|       processed_graph.pkl
+|       routing_graph_cache.pkl
+|       
 +---filetrees
 |       Client File Tree.md
 |       Server File Tree.md
@@ -14849,6 +14800,12 @@ C:.
 |   |   |   |               filled_graph.png
 |   |   |   |               shortestPathGraph.png
 |   |   |   |               
+|   |   |   +---leaderboard
+|   |   |   |   |   routes.py
+|   |   |   |   |   
+|   |   |   |   \---__pycache__
+|   |   |   |           routes.cpython-314.pyc
+|   |   |   |           
 |   |   |   +---missions
 |   |   |   |   |   routes.py
 |   |   |   |   |   
@@ -14895,8 +14852,6 @@ C:.
 |   |   |   |   |   edges_table.csv
 |   |   |   |   |   nodes_table.csv
 |   |   |   |   |   processed_graph.graphml
-|   |   |   |   |   processed_graph.pkl
-|   |   |   |   |   routing_graph_cache.pkl
 |   |   |   |   |   
 |   |   |   |   \---maplibre
 |   |   |   |           edges.geojson
@@ -14934,9 +14889,11 @@ C:.
 |   |   |   |           
 |   |   |   +---missions
 |   |   |   |   |   missions_read.py
+|   |   |   |   |   mission_progress_read.py
 |   |   |   |   |   
 |   |   |   |   \---__pycache__
 |   |   |   |           missions_read.cpython-314.pyc
+|   |   |   |           mission_progress_read.cpython-314.pyc
 |   |   |   |           
 |   |   |   +---routing
 |   |   |   |   |   geometry_utils.py
@@ -15004,6 +14961,7 @@ C:.
 |   |   |   |   missions_model.py
 |   |   |   |   mission_progress_model.py
 |   |   |   |   nodes_model.py
+|   |   |   |   route_query_model.py
 |   |   |   |   user_account_model.py
 |   |   |   |   __init__.py
 |   |   |   |   
@@ -15028,6 +14986,7 @@ C:.
 |   |   |           missions_model.cpython-314.pyc
 |   |   |           mission_progress_model.cpython-314.pyc
 |   |   |           nodes_model.cpython-314.pyc
+|   |   |           route_query_model.cpython-314.pyc
 |   |   |           user_account_model.cpython-314.pyc
 |   |   |           __init__.cpython-314.pyc
 |   |   |           
@@ -15035,7 +14994,9 @@ C:.
 |   |   |   |   db_error_mapper.py
 |   |   |   |   file_reader.py
 |   |   |   |   graph_data_repository.py
+|   |   |   |   leaderboard_repository.py
 |   |   |   |   mission_repository.py
+|   |   |   |   route_query_repository.py
 |   |   |   |   routing_graph_repository.py
 |   |   |   |   user_repository.py
 |   |   |   |   __init__.py
@@ -15043,21 +15004,34 @@ C:.
 |   |   |   \---__pycache__
 |   |   |           db_error_mapper.cpython-314.pyc
 |   |   |           graph_data_repository.cpython-314.pyc
+|   |   |           leaderboard_repository.cpython-314.pyc
 |   |   |           mission_repository.cpython-314.pyc
+|   |   |           route_query_repository.cpython-314.pyc
 |   |   |           routing_graph_repository.cpython-314.pyc
 |   |   |           user_repository.cpython-314.pyc
 |   |   |           __init__.cpython-314.pyc
 |   |   |           
 |   |   +---schemas
-|   |   |   \---user
-|   |   |       |   user_read.py
-|   |   |       |   user_register.py
-|   |   |       |   
-|   |   |       \---__pycache__
-|   |   |               user_read.cpython-312.pyc
-|   |   |               user_read.cpython-314.pyc
-|   |   |               user_register.cpython-314.pyc
-|   |   |               
+|   |   |   |   route_query_schema.py
+|   |   |   |   
+|   |   |   +---user
+|   |   |   |   |   user_read.py
+|   |   |   |   |   user_register.py
+|   |   |   |   |   
+|   |   |   |   \---__pycache__
+|   |   |   |           user_read.cpython-312.pyc
+|   |   |   |           user_read.cpython-314.pyc
+|   |   |   |           user_register.cpython-314.pyc
+|   |   |   |           
+|   |   |   \---__pycache__
+|   |   |           route_query_schema.cpython-314.pyc
+|   |   |           
+|   |   +---security
+|   |   |   |   passwords.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           passwords.cpython-314.pyc
+|   |   |           
 |   |   +---tests
 |   |   |   |   conftest.py
 |   |   |   |   
@@ -15076,11 +15050,15 @@ C:.
 |   |   |   |   __init__.py
 |   |   |   |   
 |   |   |   +---graph
+|   |   |   |   |   fetch_edge_data.py
+|   |   |   |   |   fetch_node_data.py
 |   |   |   |   |   get_graph_data.py
 |   |   |   |   |   get_graph_data_for_coords.py
 |   |   |   |   |   __init__.py
 |   |   |   |   |   
 |   |   |   |   \---__pycache__
+|   |   |   |           fetch_edge_data.cpython-314.pyc
+|   |   |   |           fetch_node_data.cpython-314.pyc
 |   |   |   |           get_graph_data.cpython-314.pyc
 |   |   |   |           get_graph_data_for_coords.cpython-314.pyc
 |   |   |   |           __init__.cpython-314.pyc
@@ -15097,12 +15075,21 @@ C:.
 |   |   |   |           get_default_weights.cpython-314.pyc
 |   |   |   |           __init__.cpython-314.pyc
 |   |   |   |           
+|   |   |   +---leaderboard
+|   |   |   |   |   get_leaderboard.py
+|   |   |   |   |   get_mission_progress.py
+|   |   |   |   |   save_mission_progress.py
+|   |   |   |   |   
+|   |   |   |   \---__pycache__
+|   |   |   |           get_leaderboard.cpython-314.pyc
+|   |   |   |           get_mission_progress.cpython-314.pyc
+|   |   |   |           save_mission_progress.cpython-314.pyc
+|   |   |   |           
 |   |   |   +---missions
 |   |   |   |   |   create_mission.py
 |   |   |   |   |   delete_mission.py
 |   |   |   |   |   get_mission.py
 |   |   |   |   |   list_missions.py
-|   |   |   |   |   save_mission_progress.py
 |   |   |   |   |   update_mission.py
 |   |   |   |   |   
 |   |   |   |   \---__pycache__
@@ -15112,6 +15099,14 @@ C:.
 |   |   |   |           list_missions.cpython-314.pyc
 |   |   |   |           save_mission_progress.cpython-314.pyc
 |   |   |   |           update_mission.cpython-314.pyc
+|   |   |   |           
+|   |   |   +---route_queries
+|   |   |   |   |   list_route_queries.py
+|   |   |   |   |   log_route_query.py
+|   |   |   |   |   
+|   |   |   |   \---__pycache__
+|   |   |   |           list_route_queries.cpython-314.pyc
+|   |   |   |           log_route_query.cpython-314.pyc
 |   |   |   |           
 |   |   |   +---routing
 |   |   |   |   |   route_yens.py
@@ -15148,6 +15143,8 @@ C:.
 |   |           
 |   +---cache
 |   +---scripts
+|   |   |   check_locations.py
+|   |   |   seed_route_queries.py
 |   |   |   setup_fresh_db.py
 |   |   |   
 |   |   +---preprocessing
@@ -15157,16 +15154,20 @@ C:.
 |   |   |           graph_preprocessor.cpython-312.pyc
 |   |   |           graph_preprocessor.cpython-314.pyc
 |   |   |           
-|   |   \---visualisation
-|   |       |   test_plot.py
-|   |       |   visualisation_utils.py
-|   |       |   
-|   |       \---__pycache__
-|   |               test_plot.cpython-314-pytest-9.0.2.pyc
-|   |               test_plot.cpython-314.pyc
-|   |               visualisation_utils.cpython-312.pyc
-|   |               visualisation_utils.cpython-314.pyc
-|   |               
+|   |   +---visualisation
+|   |   |   |   test_plot.py
+|   |   |   |   visualisation_utils.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           test_plot.cpython-314-pytest-9.0.2.pyc
+|   |   |           test_plot.cpython-314.pyc
+|   |   |           visualisation_utils.cpython-312.pyc
+|   |   |           visualisation_utils.cpython-314.pyc
+|   |   |           
+|   |   \---__pycache__
+|   |           check_locations.cpython-314.pyc
+|   |           seed_route_queries.cpython-314.pyc
+|   |           
 |   \---__pycache__
 |           run.cpython-314.pyc
 |           __init__.cpython-312.pyc

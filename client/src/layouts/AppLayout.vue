@@ -1,16 +1,24 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import { computed } from 'vue'
+import { useMainStore } from '@/stores/main'
 
+const mainStore = useMainStore()
 
 const navItems = computed(() => {
-    return [
+    const items = [
         { label: 'Home', path: '/' },
         { label: 'Map', path: '/map' },
         { label: 'Missions', path: '/missions' },
         { label: 'Leaderboard', path: '/leaderboard' },
         { label: 'Profile', path: '/profile' },
     ]
+
+    if (mainStore.userRole === 'administrators') {
+        items.push({ label: 'Analytics', path: '/analytics/route-queries'})
+    }
+
+    return items
 })
 </script>
 
