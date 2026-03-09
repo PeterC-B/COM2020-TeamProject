@@ -167,6 +167,15 @@ def calculate_weight(edge_data : gpd.GeoDataFrame):
 
     return length * (greenery_score + safety_score + speed_score)
 
+def apply_weights(G, safety_priority=0.5, speed_priority=0.5, greenery_priority=0.5):
+    for u, v, k, data in G.edges(keys=True, data=True):
+
+        safety_score = (data.get("access_score", 0) or 0) * safety_priority
+        speed_score = (1 / (data.get("travel_time", 1))) * speed_priority
+        greenery_score = (1 - data.get("greenery", 0.5)) * data.get("pollution") * (1-greenery_priority)
+
+        data["weight"] = (safety_score + speed_score * greenery_score) * data.get("length")
+
 def calculate_weights(edges_gdf : gpd.GeoDataFrame, centre : tuple[float, float], safety_priority : float = 0.5, speed_priority : float = 0.5, greenery_priority : float = 0.5) -> gpd.GeoDataFrame:
     edges_gdf_copy = edges_gdf.copy()
 

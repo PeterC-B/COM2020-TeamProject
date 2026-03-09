@@ -52,8 +52,6 @@ export function fetchYensRoutes({ start, end, k, weights }: YensRouteRequest) {
     }).then(
         ({ data }) => data.data,
     )
-
     console.log(response)
-
     return response
 }

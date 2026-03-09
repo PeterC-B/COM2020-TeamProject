@@ -1,4 +1,5 @@
 export type GeoJson = GeoJSON.FeatureCollection
+export type coordinates = [number, number]
 
 export function parseFeatureId(value: unknown): number | null {
     if (typeof value === 'number') return Number.isFinite(value) ? value : null
