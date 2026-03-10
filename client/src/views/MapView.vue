@@ -3,7 +3,7 @@ import '@/assets/main.css'
 import Disclaimer from '@/components/Disclaimer.vue'
 import { type GeoJson, type coordinates } from '@/components/simple-map/geoJsonUtils'
 import SimpleMap from '@/components/SimpleMap.vue'
-import { fetchGraphData, fetchLikeLocations } from '@/services/graph'
+import { fetchGraphByCoordinates, fetchGraphData, fetchLikeLocations } from '@/services/graph'
 import { fetchYensRoutes, type YensRoutesResponse } from '@/services/routing'
 import { useMainStore } from '@/stores/main'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -44,6 +44,8 @@ const locationSuggestions = ref<LocationSuggestion[]>([])
 const showSuggestions = ref(false)
 const loadingSuggestions = ref(false)
 const suppressSuggestionFetch = ref(false)
+const selectingArea = ref(false)
+const selectAreaError = ref<string | null>(null)
 const routeGeometries = computed(() => routeData.value?.routes.map((route) => route.geometry) ?? [])
 
 const weightFields = [
@@ -78,6 +80,12 @@ function toLatLon(value: [number, number]): [number, number] {
 function formatScore(value: number | null | undefined) {
     if (value === null || value === undefined || Number.isNaN(value)) return 'N/A'
     return value.toFixed(2)
+}
+
+// Shows the map center just for debugging purposes
+function formatCoordinate(value: number | null | undefined) {
+    if (value === null || value === undefined || Number.isNaN(value)) return 'N/A'
+    return value.toFixed(6)
 }
 
 async function findLocation() {
@@ -128,6 +136,35 @@ function selectLocationSuggestion(suggestion: LocationSuggestion) {
     locationSearchError.value = null
     // SimpleMap expects [lat, lon] on the `center` prop and converts to [lon, lat] internally.
     mapCenter.value = [lat, lon]
+}
+
+function onMapCenterChange(value: [number, number]) {
+    mapCenter.value = value
+}
+
+async function selectCurrentArea() {
+    const center = mapCenter.value
+    if (!center) {
+        selectAreaError.value = 'Move the map first to choose an area'
+        return
+    }
+
+    selectAreaError.value = null
+    selectingArea.value = true
+    try {
+        const [lat, lon] = center
+        const graphData = await fetchGraphByCoordinates(lat, lon)
+        console.log('Graph data selected for coordinates: ', graphData)
+        // const graphData = await fetchGraphData()
+        // nodes.value = assertFeatureCollection(graphData.features?.nodes, 'nodes')
+        // edges.value = assertFeatureCollection(graphData.features?.edges, 'edges')
+        // locations.value = assertFeatureCollection(graphData.features?.locations, 'locations')
+        // mapCenter.value = [lat, lon]
+    } catch (err) {
+        selectAreaError.value = err instanceof Error ? err.message : 'Failed to select current area'
+    } finally {
+        selectingArea.value = false
+    }
 }
 
 watch(
@@ -207,23 +244,56 @@ onMounted(async () => {
                 <p class="text-slate-500 text-sm italic">
                     Customise your journey preferences and find the best path.
                 </p>
+                <p class="mt-2 text-xs text-slate-600">
+                    Map center:
+                    <span class="font-semibold">
+                        {{ formatCoordinate(mapCenter?.[0] ?? null) }},
+                        {{ formatCoordinate(mapCenter?.[1] ?? null) }}
+                    </span>
+                </p>
             </div>
 
-            <div class="relative">
-                <input v-model="locationQuery" type="text" placeholder="Enter a location" />
-                <button type="button" @click="findLocation">Search</button>
+            <div class="relative w-full max-w-xl">
+                <div
+                    class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2 shadow-sm"
+                >
+                    <input
+                        v-model="locationQuery"
+                        type="text"
+                        placeholder="Search for a location"
+                        class="min-w-0 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20"
+                    />
+                    <button
+                        type="button"
+                        class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 active:bg-indigo-700"
+                        @click="findLocation"
+                    >
+                        Search
+                    </button>
+                    <button
+                        type="button"
+                        class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                        :disabled="selectingArea"
+                        @click="selectCurrentArea"
+                    >
+                        {{ selectingArea ? 'Selecting...' : 'Select Area' }}
+                    </button>
+                </div>
                 <p v-if="locationSearchError" class="mt-2 text-xs text-rose-600">
                     {{ locationSearchError }}
                 </p>
+                <p v-if="selectAreaError" class="mt-2 text-xs text-rose-600">
+                    {{ selectAreaError }}
+                </p>
                 <div
                     v-if="showSuggestions"
-                    class="absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded-md border border-slate-200 bg-white shadow-lg"
+                    class="absolute z-20 mt-2 max-h-56 w-full overflow-auto rounded-xl border border-slate-200 bg-white shadow-lg"
                 >
                     <button
                         v-for="suggestion in locationSuggestions"
                         :key="suggestion.display_name"
                         type="button"
-                        class="block w-full border-b border-slate-100 px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
+                        class="block w-full border-b border-slate-100 px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50"
                         @click="selectLocationSuggestion(suggestion)"
                     >
                         {{ suggestion.display_name }}
@@ -359,6 +429,7 @@ onMounted(async () => {
                         :center="mapCenter"
                         :locations="locations"
                         @selection-change="onSelectionChange"
+                        @center-change="onMapCenterChange"
                         class="h-[700px] rounded-xl"
                     />
                 </div>

@@ -1,4 +1,3 @@
-import osmnx as ox
 import requests
 from app.api.error_handlers import NotFoundError, ValidationError
 from app.api.responses import ok
@@ -29,20 +28,22 @@ def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_u
     @bp.route("/coordinates", methods=["GET"])
     def get_graph_data_by_coords():
         try:
-            location = request.args.get("location")
+            lat_arg = request.args.get("lat")
+            lon_arg = request.args.get("lon")
 
-            if location is None:
-                return ValidationError(message="Unable to fetch location")
+            print("Received parameters - coords:", lat_arg, "lon:", lon_arg)
 
-            lat, lon = ox.geocode(location)
-
-            if lat is None or lon is None:
-                return ValidationError(message="Unable to fetch location")
+            if lat_arg is not None and lon_arg is not None:
+                lat, lon = lat_arg, lon_arg
+            else:
+                return ValidationError(message="Provide either location or lat/lon")
 
             try:
                 coords = (float(lat), float(lon))
             except ValueError:
                 return {"error": "lat and lon are invalid"}, 400
+
+            return ok(data={"message": "Received coordinates", "lat": lat, "lon": lon})
             
             data = get_graph_data_from_coords_uc.execute(coords)
             return ok(data=data)

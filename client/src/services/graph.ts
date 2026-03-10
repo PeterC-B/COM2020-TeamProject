@@ -1,6 +1,6 @@
+import type { coordinates } from '@/components/simple-map/geoJsonUtils'
 import { get, type ApiEnvelope } from '@/services/api'
 import type { FeatureCollection } from 'geojson'
-import type { coordinates } from '@/components/simple-map/geoJsonUtils'
 
 const GRAPH_ENDPOINT = '/graph'
 
@@ -23,35 +23,33 @@ export function fetchGraphData(params: Record<string, unknown> = {}) {
 }
 
 export async function fetchLocationName(node_id: number) {
-    const response = await get<ApiEnvelope<LocationNameResponse>>(
-        `/graph/location/name`,
-        { node_id }
-    )
+    const response = await get<ApiEnvelope<LocationNameResponse>>(`/graph/location/name`, {
+        node_id,
+    })
 
     return response.data.data
 }
 
-export async function fetchGraphByLocation(location: string) {
-    console.log("Fetching location")
-    const response = await fetch(
-        `/api${GRAPH_ENDPOINT}/coordinates?location=${location}`
-    )
+export async function fetchGraphByCoordinates(lat: number, lon: number) {
+    const params = new URLSearchParams({
+        lat: String(lat),
+        lon: String(lon),
+    })
+    const response = await fetch(`/api${GRAPH_ENDPOINT}/coordinates?${params.toString()}`)
 
     if (!response.ok) {
-        throw new Error(`Failed to fetch graph data`)
-    }   
+        throw new Error('Failed to fetch graph data')
+    }
 
     return response.json()
 }
 
-export async function fetchLikeLocations(start: string){
-    const response = await fetch(
-        `/api${GRAPH_ENDPOINT}/locations?like_string=${start}`
-    )
+export async function fetchLikeLocations(start: string) {
+    const response = await fetch(`/api${GRAPH_ENDPOINT}/locations?like_string=${start}`)
 
     if (!response.ok) {
         throw new Error(`Failed to fetch graph data`)
-    }   
+    }
 
     return response.json()
 }

@@ -40,6 +40,10 @@ const emit = defineEmits<{
             end_location: string | null
         },
     ): void
+    (
+        event: 'center-change',
+        payload: [number, number],
+    ): void
 }>()
 
 const mapEl = ref<HTMLDivElement | null>(null)
@@ -102,6 +106,12 @@ function buildRouteFeatureCollection(routes: Array<Array<[number, number]>>): Ge
             ]
         }),
     }
+}
+
+function emitMapCenter() {
+    if (!map) return
+    const center = map.getCenter()
+    emit('center-change', [center.lat, center.lng])
 }
 
 
@@ -217,6 +227,11 @@ onMounted(() => {
                     ['literal', locationNodeIds],
                 ])
                 renderRoutes(props.routes)
+                emitMapCenter()
+
+                map.on('moveend', () => {
+                    emitMapCenter()
+                })
 
                 map.on('click', (event) => {
                     if (!map) return
