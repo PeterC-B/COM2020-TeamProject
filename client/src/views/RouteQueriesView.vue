@@ -22,36 +22,51 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="p-6">
-        <h1 class="text-2xl font-bold mb-4">Route Query Analytics</h1>
+    <div class="mx-auto max-w-7xl p-6 antialiased">
+        <h1 class="text-3xl font-bold text-slate-900 mb-8">Route Query Analytics</h1>
 
-        <div v-if="loading">Loading...</div>
-        <div v-else-if="error">{{ error }}</div>
+        <div v-if="loading" class="p-12 text-center rounded-2xl border border-slate-200 bg-white text-slate-500 font-bold">
+            Loading...
+        </div>
 
-        <table v-else class="min-w-full border-collapse border border-gray-300">
-            <thead>
-                <tr class="bg-gray-100">
-                    <th class="border p-2">Start</th>
-                    <th class="border p-2">End</th>
-                    <th class="border p-2">Weights</th>
-                    <th class="border p-2">Rank</th>
-                    <th class="border p-2">Path</th>
-                    <th class="border p-2">Timestamp</th>
-                    <th class="border p-2">User</th>
-                </tr>
-            </thead>
+        <div v-else-if="error" class="p-4 rounded-xl border border-red-200 bg-red-50 text-red-600 font-bold">
+            {{ error }}
+        </div>
 
-            <tbody>
-                <tr v-for="q in queries" :key="q.query_id">
-                    <td class="border p-2">{{ q.start }}</td>
-                    <td class="border p-2">{{ q.end }}</td>
-                    <td class="border p-2">{{ q.weights_json }}</td>
-                    <td class="border p-2">{{ q.chosen_route_rank }}</td>
-                    <td class="border p-2">{{ q.chosen_route_path }}</td>
-                    <td class="border p-2">{{ q.timestamp }}</td>
-                    <td class="border p-2">{{ q.name ?? 'Anonymous' }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div v-else class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-separate border-spacing-0">
+                    <thead>
+                        <tr class="bg-slate-50">
+                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">User</th>
+                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Start</th>
+                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">End</th>
+                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Weights</th>
+                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Rank</th>
+                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Path</th>
+                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Timestamp</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-slate-100">
+                        <tr v-for="q in queries" :key="q.query_id" class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 text-sm font-bold text-slate-900">{{ q.name ?? 'Anonymous' }}</td>
+                            <td class="p-4 text-sm text-slate-600">{{ q.start }}</td>
+                            <td class="p-4 text-sm text-slate-600">{{ q.end }}</td>
+                            <td class="p-4">
+                                <code class="text-[10px] font-mono text-slate-400 truncate block max-w-[150px]">{{ q.weights_json }}</code>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md text-xs font-bold">#{{ q.chosen_route_rank }}</span>
+                            </td>
+                            <td class="p-4">
+                                <p class="text-[10px] text-slate-400 truncate max-w-[100px]">{{ q.chosen_route_path }}</p>
+                            </td>
+                            <td class="p-4 text-xs font-semibold text-slate-500">{{ q.timestamp }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </template>
