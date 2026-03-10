@@ -390,5 +390,5 @@ watch(
 </script>
 
 <template>
-    <div ref="mapEl" class="h-[calc(100vh-48px)] w-full" />
+    <div ref="mapEl" class="h-[calc(100vh-48px)] w-full"></div>
 </template>

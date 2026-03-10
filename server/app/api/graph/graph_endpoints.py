@@ -2,10 +2,10 @@ from app.api.responses import ok
 from flask import Blueprint, request
 import osmnx as ox
 import requests
-from app.api.error_handlers import ValidationError, NotFoundError
+from app.api.error_handlers import ValidationError, NotFoundError, DataError
 
 
-def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_uc, fetch_node_data, fetch_edge_data, fetch_location_name):
+def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_uc, fetch_node_data, fetch_edge_data, fetch_location_name, fetch_node_context_uc):
     bp = Blueprint("graph", __name__, url_prefix="/api/graph")
 
     @bp.route("", methods=["GET"])
@@ -95,5 +95,19 @@ def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_u
         ]
 
         return ok(data=suggestions)
+
+
+    @bp.route("/node", methods=["GET"])
+    def fetch_node_context():
+        node_id = request.args.get("node_id")
+
+        if node_id is None:
+            return DataError(statement="Node ID is required.")
+        
+        data = fetch_node_context_uc.execute(node_id)
+        return ok(data=data)
+
+        
+
     
     return bp

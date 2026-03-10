@@ -13,6 +13,12 @@ export type GraphDataResponse = {
     }
 }
 
+export type NodeContextResponse = {
+    name: string
+    type: string
+    opening_hours: string
+}
+
 export type LocationNameResponse = string
 
 export function fetchGraphData(params: Record<string, unknown> = {}) {
@@ -54,4 +60,12 @@ export async function fetchLikeLocations(start: string){
     }   
 
     return response.json()
+}
+
+export async function fetchNodeContext(node_id: number){
+    const response = await get<ApiEnvelope<NodeContextResponse>>(
+        `/graph/node?node_id=${node_id}`
+    )
+
+    return response.data.data
 }

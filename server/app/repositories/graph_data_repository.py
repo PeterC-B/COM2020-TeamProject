@@ -95,6 +95,14 @@ class GraphDataRepository:
     def get_node_by_id(self, node_id):
         stmt = select(NodesModel).where(NodesModel.node_id == node_id)
         return self.session.execute(stmt).scalars().first()
+    
+    def get_node_context(self, node_id):
+        stmt = (
+            select(NodesModel)
+            .join(LocationModel, NodesModel.node_id == LocationModel.node_id)
+            .where(NodesModel.node_id == node_id)
+        )
+        return self.session.execute(stmt).scalars().first()
 
     def clear_tables(self):
         self.session.query(LocationModel).delete()
