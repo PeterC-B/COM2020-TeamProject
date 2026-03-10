@@ -1,8 +1,8 @@
-from app.api.responses import ok
-from flask import Blueprint, request
 import osmnx as ox
 import requests
-from app.api.error_handlers import ValidationError, NotFoundError
+from app.api.error_handlers import NotFoundError, ValidationError
+from app.api.responses import ok
+from flask import Blueprint, request
 
 
 def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_uc, fetch_node_data, fetch_edge_data, fetch_location_name):
@@ -59,12 +59,13 @@ def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_u
         return ok(data=data)
         
     
+    # Route to return the top 5 location suggestions based on a like string query
     @bp.route("/locations", methods=["GET"])
     def get_like_locations():
         query = request.args.get("like_string")
 
         if not query:
-            return
+            return ValidationError(message="like_string query parameter is required")
         
         response = requests.get(
             "https://nominatim.openstreetmap.org/search",
