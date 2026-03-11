@@ -40,6 +40,9 @@ const emit = defineEmits<{
             end_location: string | null
         },
     ): void
+
+    (event: 'show-context', node: any): void
+    (event: 'hide-context'): void
 }>()
 
 const mapEl = ref<HTMLDivElement | null>(null)
@@ -48,7 +51,6 @@ let map: Map | null = null
 const nodes = ref<GeoJson | null>(null)
 const edges = ref<GeoJson | null>(null)
 const map_center = ref<LngLatLike | null>(null)
-const locations = ref<GeoJson | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
 const {
@@ -177,16 +179,11 @@ onMounted(() => {
                 if (!map) return
                 const nodeCollection = assertFeatureCollection(graphData.features?.nodes, 'nodes')
                 const edgeCollection = assertFeatureCollection(graphData.features?.edges, 'edges')
-                const locationCollection = assertFeatureCollection(graphData.features?.locations, 'locations')
                 nodes.value = nodeCollection
                 edges.value = edgeCollection
-                locations.value = locationCollection
                 map_center.value = toMapCoordinates(graphData.features?.center)
-                console.log(locationCollection)
 
-                const locationNodeIds = locationCollection.features
-                    .map((f) => f.properties?.node_id)
-                    .filter((id) => id !== undefined)
+                console.log(nodeCollection)
 
                 map.addSource('edges', {
                     type: 'geojson',
@@ -205,17 +202,6 @@ onMounted(() => {
                 map.addLayer(NODE_HIT_LAYER)
                 map.addLayer(NODE_HIGHLIGHT_LAYER)
 
-                map.setFilter('nodes-circle', [
-                    'in',
-                    ['get', 'node_id'],
-                    ['literal', locationNodeIds],
-                ])
-
-                map.setFilter('nodes-circle-hit', [
-                    'in',
-                    ['get', 'node_id'],
-                    ['literal', locationNodeIds],
-                ])
                 renderRoutes(props.routes)
 
                 map.on('click', (event) => {
@@ -251,6 +237,22 @@ onMounted(() => {
                     map.getCanvas().style.cursor = features.length ? 'pointer' : ''
                 })
 
+                map.on('mousemove', 'nodes-circle', (e) => {
+                    const feature = e.features?.[0]
+                    if (!feature || feature.geometry.type !== 'Point') return
+
+                    emit('show-context', feature)
+                })
+
+                map.on('click', (e) => {
+                    const features = map?.queryRenderedFeatures(e.point, {
+                        layers: selectableLayerIds,
+                    })
+                    if (!features?.length) {
+                        emit('hide-context')
+                    }
+                })
+
                 const bounds = new maplibregl.LngLatBounds()
                 const nodeFeatures = nodes.value.features
                 for (const feature of nodeFeatures) {
@@ -264,7 +266,6 @@ onMounted(() => {
                 }
                 if (!bounds.isEmpty()) {
                     map.fitBounds(bounds, { padding: 40, maxZoom: 20 })
-                    // Keep camera constrained to the dataset extent.
                     map.setRenderWorldCopies(false)
                 }
 
@@ -272,9 +273,9 @@ onMounted(() => {
                 //map.setLayoutProperty('edges-line-hit', 'visibility', 'none')
                 //map.setLayoutProperty('edges-line-highlight', 'visibility', 'none')
 
-                map.setLayoutProperty('nodes-circle', 'visibility', 'none')
-                map.setLayoutProperty('nodes-circle-hit', 'visibility', 'none')
-                map.setLayoutProperty('nodes-circle-highlight', 'visibility', 'none')
+                //map.setLayoutProperty('nodes-circle', 'visibility', 'none')
+                //map.setLayoutProperty('nodes-circle-hit', 'visibility', 'none')
+                //map.setLayoutProperty('nodes-circle-highlight', 'visibility', 'none')
         })
     })
 })
@@ -390,5 +391,5 @@ watch(
 </script>
 
 <template>
-    <div ref="mapEl" class="h-[calc(100vh-48px)] w-full"></div>
+    <div ref="mapEl" class="h-[calc(100vh-48px)] w-full">git</div>
 </template>

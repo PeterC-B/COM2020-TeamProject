@@ -7,6 +7,7 @@ import { fetchYensRoutes, type YensRoutesResponse } from '@/services/routing'
 import { fetchGraphByLocation, fetchGraphData } from '@/services/graph'
 import { assertFeatureCollection, type GeoJson, type coordinates } from '@/components/simple-map/geoJsonUtils'
 import { useMainStore } from '@/stores/main'
+import ContextBox from '@/components/ContextBox.vue'
 
 type SelectionPayload = {
     start: [number, number] | null
@@ -25,6 +26,53 @@ const selection = ref<SelectionPayload>({
     start_location: null,
     end_location: null,
 })
+
+const showContext = ref(false);
+const contextNode = ref<any | null>(null);
+let contextTimer: number | null = null;
+let isHovering = false;
+const hoveredNodeId = ref<number | null>(null);
+
+function onShowContext(node: any) {
+    isHovering = true
+
+    const nodeId = node.node_id
+
+    if (showContext.value && hoveredNodeId.value !== nodeId) {
+        hoveredNodeId.value = nodeId
+        contextNode.value = node
+        return
+    }
+
+    if (hoveredNodeId.value === nodeId) return
+
+    hoveredNodeId.value = nodeId
+
+    if (contextTimer) {
+        clearTimeout(contextTimer)
+    }
+
+    contextTimer = window.setTimeout(() => {
+        if (!isHovering) return
+
+        contextNode.value = node
+        showContext.value = true
+    }, 1000)
+}
+
+function onHideContext() {
+    isHovering = false
+
+    if (contextTimer) {
+        clearTimeout(contextTimer)
+        contextTimer = null
+    }
+
+    hoveredNodeId.value = null
+    showContext.value = false
+    contextNode.value = null
+}
+
 const mainStore = useMainStore()
 const user_ID = computed(() => (mainStore.user_id))
 
@@ -32,8 +80,6 @@ const nodes = ref<GeoJson | null>(null)
 const edges = ref<GeoJson | null>(null)
 const locations = ref<GeoJson | null>(null)
 const map_center = ref<coordinates | null>(null)
-
-const routeColors = ['#2563eb', '#ef4444', '#16a34a']
 
 const loadingRoute = ref(false)
 const routeError = ref<string | null>(null)
@@ -228,8 +274,24 @@ onMounted(async () => {
 
             <div class="space-y-6 lg:col-span-8">
                 <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-sm ring-1 ring-slate-100">
-                    <SimpleMap :routes="routeGeometries" :nodes="nodes" :edges="edges" :center="map_center" :locations="locations" @selection-change="onSelectionChange" class="h-[700px] rounded-xl" />
+                    <SimpleMap 
+                        :routes="routeGeometries" 
+                        :nodes="nodes" 
+                        :edges="edges" 
+                        :center="map_center" 
+                        :locations="locations" 
+                        @selection-change="onSelectionChange"
+                        @show-context="onShowContext"
+                        @hide-context="onHideContext"
+                        class="h-[700px] rounded-xl" 
+                    />
                 </div>
+
+                <ContextBox
+                    :open="showContext"
+                    :node="contextNode"
+                    @close="onHideContext"
+                />
 
                 <div v-if="routeData" class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                     <div class="border-b border-slate-100 bg-slate-50/50 px-6 py-4">
