@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import '@/assets/main.css'
 import Disclaimer from '@/components/Disclaimer.vue'
-import { type GeoJson, type coordinates } from '@/components/simple-map/geoJsonUtils'
+import {
+    assertFeatureCollection,
+    type GeoJson,
+    type coordinates,
+} from '@/components/simple-map/geoJsonUtils'
 import SimpleMap from '@/components/SimpleMap.vue'
 import { fetchGraphByCoordinates, fetchGraphData, fetchLikeLocations } from '@/services/graph'
 import { fetchYensRoutes, type YensRoutesResponse } from '@/services/routing'
@@ -154,12 +158,10 @@ async function selectCurrentArea() {
     try {
         const [lat, lon] = center
         const graphData = await fetchGraphByCoordinates(lat, lon)
-        console.log('Graph data selected for coordinates: ', graphData)
-        // const graphData = await fetchGraphData()
-        // nodes.value = assertFeatureCollection(graphData.features?.nodes, 'nodes')
-        // edges.value = assertFeatureCollection(graphData.features?.edges, 'edges')
-        // locations.value = assertFeatureCollection(graphData.features?.locations, 'locations')
-        // mapCenter.value = [lat, lon]
+        nodes.value = assertFeatureCollection(graphData.features?.nodes, 'nodes')
+        edges.value = assertFeatureCollection(graphData.features?.edges, 'edges')
+        locations.value = assertFeatureCollection(graphData.features?.locations, 'locations')
+        mapCenter.value = graphData.features?.center ?? [lat, lon]
     } catch (err) {
         selectAreaError.value = err instanceof Error ? err.message : 'Failed to select current area'
     } finally {

@@ -119,8 +119,13 @@ def build_edges_geojson(
     return {"type": "FeatureCollection", "features": features}
 
 def build_locations_geojson(locations_list: list, nodes_list: list) -> Dict[str, object]:
+    node_by_id = {int(node.node_id): node for node in nodes_list}
     features = []
-    for location, node in zip(locations_list, nodes_list):
+    for location in locations_list:
+        node_id = int(location.node_id)
+        node = node_by_id.get(node_id)
+        if node is None:
+            continue
         type = type_map.get(location.type, "Amenity")
         features.append(
             {
@@ -129,7 +134,7 @@ def build_locations_geojson(locations_list: list, nodes_list: list) -> Dict[str,
                 "properties": {
                     "amenity_type": type,
                     "name": location.name,
-                    "node_id": node.node_id,
+                    "node_id": node_id,
                     "type": location.information
                 }
             }

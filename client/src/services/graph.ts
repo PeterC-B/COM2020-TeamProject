@@ -38,10 +38,21 @@ export async function fetchGraphByCoordinates(lat: number, lon: number) {
     const response = await fetch(`/api${GRAPH_ENDPOINT}/coordinates?${params.toString()}`)
 
     if (!response.ok) {
-        throw new Error('Failed to fetch graph data')
+        let message = 'Failed to fetch graph data'
+        try {
+            const errorPayload = (await response.json()) as {
+                error?: { message?: string }
+                message?: string
+            }
+            message = errorPayload?.error?.message || errorPayload?.message || message
+        } catch {
+            // Ignore JSON parse errors and keep default message.
+        }
+        throw new Error(message)
     }
 
-    return response.json()
+    const payload = (await response.json()) as ApiEnvelope<GraphDataResponse>
+    return payload.data
 }
 
 export async function fetchLikeLocations(start: string) {

@@ -43,7 +43,7 @@ def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_u
             except ValueError:
                 return {"error": "lat and lon are invalid"}, 400
 
-            return ok(data={"message": "Received coordinates", "lat": lat, "lon": lon})
+            # return ok(data={"message": "Received coordinates", "lat": lat, "lon": lon})
             
             data = get_graph_data_from_coords_uc.execute(coords)
             return ok(data=data)
@@ -53,9 +53,13 @@ def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_u
 
     @bp.route("/location/name", methods=["GET"])
     def get_location_name():
-        node_id = request.args.get("node_id")
-        if node_id is None:
+        node_id_arg = request.args.get("node_id")
+        if node_id_arg is None:
             raise NotFoundError(message="Node ID is missing")
+        try:
+            node_id = int(node_id_arg)
+        except (TypeError, ValueError):
+            raise ValidationError(message="node_id must be an integer")
         data = fetch_location_name.execute(node_id)
         return ok(data=data)
         
