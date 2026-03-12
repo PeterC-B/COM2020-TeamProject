@@ -21,6 +21,13 @@ type SelectionPayload = {
     end_location: string | null
 }
 
+type PresetLocation = {
+    code: string
+    name: string
+    lat: number
+    lon: number
+}
+
 const selection = ref<SelectionPayload>({
     start: null,
     end: null,
@@ -67,6 +74,20 @@ const weights = ref({
     surface_quality: 5,
     amenity_proximity: 5,
 })
+
+const presetLocations: PresetLocation[] = [
+    { code: 'bristol', name: 'Bristol', lat: 51.4545, lon: -2.5879 },
+    { code: 'liverpool', name: 'Liverpool', lat: 53.4084, lon: -2.9916 },
+    { code: 'exeter', name: 'Exeter', lat: 50.7184, lon: -3.5339 },
+    { code: 'basingstoke', name: 'Basingstoke', lat: 51.2665, lon: -1.0924 },
+    { code: 'manchester', name: 'Manchester', lat: 53.4808, lon: -2.2426 },
+    { code: 'birmingham', name: 'Birmingham', lat: 52.4862, lon: -1.8904 },
+    { code: 'leeds', name: 'Leeds', lat: 53.8008, lon: -1.5491 },
+    { code: 'nottingham', name: 'Nottingham', lat: 52.9548, lon: -1.1581 },
+    { code: 'cardiff', name: 'Cardiff', lat: 51.4816, lon: -3.1791 },
+    { code: 'southampton', name: 'Southampton', lat: 50.9097, lon: -1.4044 },
+]
+const activePresetCode = ref<string | null>(null)
 
 const canRequestRoute = computed(() =>
     Boolean(selection.value.start && selection.value.end && !loadingRoute.value),
@@ -144,6 +165,16 @@ function selectLocationSuggestion(suggestion: LocationSuggestion) {
 
 function onMapCenterChange(value: [number, number]) {
     mapCenter.value = value
+}
+
+function selectPresetLocation(preset: PresetLocation) {
+    suppressSuggestionFetch.value = true
+    locationQuery.value = preset.name
+    showSuggestions.value = false
+    locationSearchError.value = null
+    selectAreaError.value = null
+    activePresetCode.value = preset.code
+    mapCenter.value = [preset.lat, preset.lon]
 }
 
 async function selectCurrentArea() {
@@ -421,6 +452,30 @@ onMounted(async () => {
             </aside>
 
             <div class="space-y-6 lg:col-span-8">
+                <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <div class="mb-3 flex items-center justify-between">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400">
+                            Preset Areas
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+                        <button
+                            v-for="preset in presetLocations"
+                            :key="preset.code"
+                            type="button"
+                            :class="[
+                                'rounded-lg border px-2 py-2 text-xs font-semibold transition',
+                                activePresetCode === preset.code
+                                    ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                                    : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:bg-slate-100',
+                            ]"
+                            @click="selectPresetLocation(preset)"
+                        >
+                            {{ preset.name }}
+                        </button>
+                    </div>
+                </div>
+
                 <div
                     class="overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-sm ring-1 ring-slate-100"
                 >
