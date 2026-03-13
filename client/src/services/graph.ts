@@ -1,6 +1,6 @@
-import { get, type ApiEnvelope } from '@/services/api'
-import type { FeatureCollection } from 'geojson'
 import type { coordinates } from '@/components/simple-map/geoJsonUtils'
+import { get, post, type ApiEnvelope } from '@/services/api'
+import type { FeatureCollection } from 'geojson'
 
 const GRAPH_ENDPOINT = '/graph'
 
@@ -15,6 +15,16 @@ export type GraphDataResponse = {
 
 export type LocationNameResponse = string
 
+export type GraphPreset = {
+    code: string
+    name: string
+    lat: number
+    lon: number
+    is_active: boolean
+    has_snapshot?: boolean
+    snapshot?: GraphDataResponse | null
+}
+
 export function fetchGraphData(params: Record<string, unknown> = {}) {
     const response = get<ApiEnvelope<GraphDataResponse>>(GRAPH_ENDPOINT, params).then(
         ({ data }) => data.data,
@@ -22,36 +32,61 @@ export function fetchGraphData(params: Record<string, unknown> = {}) {
     return response
 }
 
-export async function fetchLocationName(node_id: number) {
-    const response = await get<ApiEnvelope<LocationNameResponse>>(
-        `/graph/location/name`,
-        { node_id }
+export function fetchGraphPresets() {
+    return get<ApiEnvelope<GraphPreset[]>>(`${GRAPH_ENDPOINT}/presets`).then(({ data }) => data.data)
+}
+
+export function fetchGraphPresetSnapshot(presetCode: string) {
+    return get<ApiEnvelope<GraphDataResponse>>(`${GRAPH_ENDPOINT}/presets/${presetCode}/snapshot`).then(
+        ({ data }) => data.data,
     )
+}
+
+export function activateGraphPreset(presetCode: string) {
+    return post<ApiEnvelope<GraphDataResponse>>(`${GRAPH_ENDPOINT}/presets/${presetCode}/activate`, {}).then(
+        ({ data }) => data.data,
+    )
+}
+
+export async function fetchLocationName(node_id: number) {
+    const response = await get<ApiEnvelope<LocationNameResponse>>(`/graph/location/name`, {
+        node_id,
+    })
 
     return response.data.data
 }
 
-export async function fetchGraphByLocation(location: string) {
-    console.log("Fetching location")
-    const response = await fetch(
-        `/api${GRAPH_ENDPOINT}/coordinates?location=${location}`
-    )
+export async function fetchGraphByCoordinates(lat: number, lon: number) {
+    const params = new URLSearchParams({
+        lat: String(lat),
+        lon: String(lon),
+    })
+    const response = await fetch(`/api${GRAPH_ENDPOINT}/coordinates?${params.toString()}`)
 
     if (!response.ok) {
-        throw new Error(`Failed to fetch graph data`)
-    }   
+        let message = 'Failed to fetch graph data'
+        try {
+            const errorPayload = (await response.json()) as {
+                error?: { message?: string }
+                message?: string
+            }
+            message = errorPayload?.error?.message || errorPayload?.message || message
+        } catch {
+            // Ignore JSON parse errors and keep default message.
+        }
+        throw new Error(message)
+    }
 
-    return response.json()
+    const payload = (await response.json()) as ApiEnvelope<GraphDataResponse>
+    return payload.data
 }
 
-export async function fetchLikeLocations(start: string){
-    const response = await fetch(
-        `/api${GRAPH_ENDPOINT}/locations?like_string=${start}`
-    )
+export async function fetchLikeLocations(start: string) {
+    const response = await fetch(`/api${GRAPH_ENDPOINT}/locations?like_string=${start}`)
 
     if (!response.ok) {
         throw new Error(`Failed to fetch graph data`)
-    }   
+    }
 
     return response.json()
 }

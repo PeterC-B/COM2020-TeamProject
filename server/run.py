@@ -1,7 +1,8 @@
 from dotenv import load_dotenv
+
 load_dotenv()
 from os import getenv
-from pathlib import Path
+
 from app import create_app
 
 app = create_app()
@@ -37,4 +38,4 @@ if __name__ == '__main__':
     print(f"Port: {backend_port}")
     print(f"Debug mode: {debug_mode}")
 
-    app.run(host=host_address, port=backend_port, debug=debug_mode, use_reloader=False)
+    app.run(host=host_address, port=backend_port, debug=debug_mode)
