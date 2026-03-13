@@ -52,11 +52,18 @@ def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_u
 
     @bp.route("/location/name", methods=["GET"])
     def get_location_name():
-        node_id = request.args.get("node_id")
-        if node_id is None:
-            raise NotFoundError(message="Node ID is missing")
-        data = fetch_location_name.execute(node_id)
-        return ok(data=data)
+        try:
+            node_id = request.args.get("node_id")
+            if node_id is None:
+                raise NotFoundError(message="Node ID is missing")
+            data = fetch_location_name.execute(node_id)
+            return ok(data={
+                "name": data.name,
+                "information": data.information,
+            })
+        except Exception as e:
+            print("Error", e)
+            raise NotFoundError(message=e)
         
     
     @bp.route("/locations", methods=["GET"])

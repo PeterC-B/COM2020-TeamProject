@@ -84,8 +84,7 @@ class GraphDataRepository:
         return self.session.execute(stmt).scalars().all()
     
     def get_location_name(self, node_id):
-        stmt = select(LocationModel.name).where(LocationModel.node_id == node_id)
-        print(node_id)
+        stmt = select(LocationModel).where(LocationModel.node_id == node_id)
         return self.session.execute(stmt).scalars().first()
     
     def get_used_locations(self) -> list:

@@ -39,7 +39,7 @@ function capital_case(word: string): string{
 </script>
 
 <template>
-    <div v-if="open && payload" class = "relative w-72 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl antialiased animate-in fade-in zoom-in duration-200">
+    <div v-if="open && payload" class="relative w-72 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl antialiased animate-in fade-in zoom-in duration-200">
 
         <header class="flex items-center justify-between border-b border-slate-100 bg-slate-50/80 px-4 py-2 backdrop-blur-sm">
             <div class="flex items-center gap-2">
@@ -58,7 +58,7 @@ function capital_case(word: string): string{
         </header>
 
         <!-- NODE -->
-        <div v-if="payload.kind === 'node'">
+        <div v-if="payload.kind === 'node'" class="p-5">
             <h3 class="text-lg font-bold text-slate-900 leading -tight">{{ payload.name }}</h3>
             <p class="text-sm leading-relaxed text-slate-600">Type: {{ payload.nodeType }}</p>
             <p v-if="payload.extra" class="text-sm leading-relaxed text-slate-600">Extra: {{ payload.extra }}</p>
@@ -66,7 +66,7 @@ function capital_case(word: string): string{
         </div>
 
         <!-- EDGE -->
-        <div v-else>
+        <div v-else class="p-5">
             <p class="text-sm leading-relaxed text-slate-600">Access Score: {{ payload.access_score }}</p>
             <p class="text-sm leading-relaxed text-slate-600">Greenery: {{ payload.greenery }}</p>
             <p class="text-sm leading-relaxed text-slate-600">Lighting: {{ payload.lighting }}</p>
