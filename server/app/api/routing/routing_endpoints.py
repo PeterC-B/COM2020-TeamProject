@@ -50,23 +50,48 @@ def create_routing_route_blueprint(route_yens_uc, log_route_query_uc, list_route
     @bp.route("/queries", methods=["GET"])
     def list_route_queries():
         try:
-            result = list_route_queries_uc.execute()
-            data = [
-                {
-                    "query_id": rq.query_id,
-                    "user_id": rq.user_id,
-                    "start": rq.start,
-                    "end": rq.end,
-                    "weights_json": rq.weights_json,
-                    "chosen_route_rank": rq.chosen_route_rank,
-                    "chosen_route_path": rq.chosen_route_path,
-                    "timestamp": rq.timestamp,
-                    "name": user.username if user else None,
-                }
-                for rq, user in result
-            ]
-            return ok(data=data)
+            # Fetch all (RouteQuery, UserAccountModel) pairs
+            rows = list_route_queries_uc.execute()
+
+            # Aggregate by (start, end)
+            popularity_map = {}
+
+            for rq, user in rows:
+                key = (rq.start, rq.end)
+
+                if key not in popularity_map:
+                    popularity_map[key] = {
+                        "start": rq.start,
+                        "end": rq.end,
+                        "popularity": 0,
+                        "most_recent": rq.timestamp,
+                        "unique_users": set(),
+                    }
+
+                popularity_map[key]["popularity"] += 1
+                popularity_map[key]["unique_users"].add(rq.user_id)
+
+                # Update most recent timestamp
+                if rq.timestamp > popularity_map[key]["most_recent"]:
+                    popularity_map[key]["most_recent"] = rq.timestamp
+
+            # Flatten aggregated data
+            aggregated = []
+            for key, data in popularity_map.items():
+                aggregated.append({
+                    "start": data["start"],
+                    "end": data["end"],
+                    "popularity": data["popularity"],
+                    "most_recent": data["most_recent"],
+                    "unique_users": len(data["unique_users"]),
+                })
+
+            # Sort by popularity descending
+            aggregated.sort(key=lambda x: x["popularity"], reverse=True)
+
+            return ok(data=aggregated)
+
         except Exception as e:
-            raise(ValidationError(message=e))
+            raise ValidationError(message=e)
 
     return bp
