@@ -7,6 +7,7 @@ class FetchLocationName:
     def execute(self, node_id):
         try:
             name = self.graph_data_repo.get_location_name(node_id)
+            print(name)
             if not name:
                 raise NotFoundError(message="Name not found")
             return name

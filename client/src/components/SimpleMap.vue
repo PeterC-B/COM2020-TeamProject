@@ -247,7 +247,6 @@ onMounted(() => {
 
                 map.on('mouseleave', 'nodes-circle', () => {
                     hoveringNode = false
-                    emit('hide-context')
                 })
 
                 map.on('mousemove', 'edges-line-hit', (e) => {
@@ -258,6 +257,7 @@ onMounted(() => {
 
                     emit('show-context', feature)
                 })
+
 
                 map.on('click', (e) => {
                     const features = map?.queryRenderedFeatures(e.point, {

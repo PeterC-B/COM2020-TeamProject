@@ -19,7 +19,10 @@ export type NodeContextResponse = {
     opening_hours: string
 }
 
-export type LocationNameResponse = string
+export type LocationNameResponse = {
+    name: string
+    information: string
+}
 
 export function fetchGraphData(params: Record<string, unknown> = {}) {
     const response = get<ApiEnvelope<GraphDataResponse>>(GRAPH_ENDPOINT, params).then(

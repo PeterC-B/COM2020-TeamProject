@@ -325,6 +325,13 @@ onMounted(async () => {
 
                     <p v-if="routeError" class="mt-3 text-center text-xs font-medium text-rose-600">{{ routeError }}</p>
                 </div>
+
+                <ContextBox
+                    class="absolute top-2 left-1 z-50 pointer-events-auto"
+                    :open="showContext"
+                    :payload="contextPayload"
+                    @close="onHideContext"
+                />
             </aside>
 
             <div class="space-y-6 lg:col-span-8">
@@ -340,13 +347,8 @@ onMounted(async () => {
                         @hide-context="onHideContext"
                         class="h-[700px] rounded-xl" 
                     />
-                </div>
 
-                <ContextBox
-                    :open="showContext"
-                    :payload="contextPayload"
-                    @close="onHideContext"
-                />
+                </div>
 
                 <div v-if="routeData" class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                     <div class="border-b border-slate-100 bg-slate-50/50 px-6 py-4">
