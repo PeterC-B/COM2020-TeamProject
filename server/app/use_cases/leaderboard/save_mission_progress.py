@@ -10,7 +10,6 @@ class SaveMissionProgress:
         self.uow = uow
         self.leaderboard_repo = leaderboard_repo
 
-
     def execute(self, payload):
         try:
             user_id = uuid.UUID(payload.get("user_id"))
@@ -20,6 +19,7 @@ class SaveMissionProgress:
         
         status = payload.get('status')
         score = payload.get('score')
+        selected_answer = payload.get('selected_answer')  # NEW
 
         missing = [
             field for field, value in {
@@ -49,9 +49,11 @@ class SaveMissionProgress:
                 user_id=user_id,
                 mission_id=mission_id,
                 status=status_value,
-                score=score
+                score=score,
+                selected_answer=selected_answer  # NEW
             )
 
             self.leaderboard_repo.add(progress)
             self.uow.commit()
+
         return progress

@@ -60,24 +60,33 @@ onMounted(async () => {
                 <table class="w-full text-left border-separate border-spacing-0">
                     <thead>
                         <tr class="bg-slate-50">
+                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">User</th>
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Start</th>
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">End</th>
+                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Weights</th>
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Popularity</th>
-                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Most Recent</th>
-                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Unique Users</th>
+                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Path</th>
+                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Timestamp</th>
                         </tr>
                     </thead>
 
                     <tbody class="divide-y divide-slate-100">
-                        <tr v-for="q in queries" :key="q.start + q.end" class="hover:bg-slate-50 transition-colors">
-                            <td class="p-4 text-sm text-slate-600">{{ q.start }}</td>
-                            <td class="p-4 text-sm text-slate-600">{{ q.end }}</td>
-                            <td class="p-4 text-sm font-bold text-slate-900">{{ q.popularity }}</td>
-                            <td class="p-4 text-xs font-semibold text-slate-500">{{ q.most_recent }}</td>
-                            <td class="p-4 text-sm text-slate-600">{{ q.unique_users }}</td>
+                        <tr v-for="q in queries" :key="q.query_id" class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 text-sm font-bold text-slate-900">{{ capital_case(q.name) ?? 'Anonymous' }}</td>
+                            <td class="p-4 text-sm text-slate-600 max-w-[150px]">{{ q.start }}</td>
+                            <td class="p-4 text-sm text-slate-600 max-w-[150px]">{{ q.end }}</td>
+                            <td class="p-4">
+                                <code class="text-[10px] font-mono text-slate-400 block max-w-[400px] whitespace-pre-line">{{ format_weights(q.weights_json) }}</code>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md text-xs font-bold">{{ q.popularity }}</span>
+                            </td>
+                            <td class="p-4">
+                                <p class="text-[10px] text-slate-400 truncate max-w-[100px]">{{ q.chosen_route_path }}</p>
+                            </td>
+                            <td class="p-4 text-xs font-semibold text-slate-500 max-w-[100px]">{{ q.timestamp }}</td>
                         </tr>
                     </tbody>
-
                 </table>
             </div>
         </div>
