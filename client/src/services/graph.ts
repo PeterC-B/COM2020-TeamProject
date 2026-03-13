@@ -69,3 +69,15 @@ export async function fetchNodeContext(node_id: number){
 
     return response.data.data
 }
+
+export async function fetchEdgeContext(edge_id: number){
+    const response = await fetch(
+        `/graph/edge?edge_id=${edge_id}`
+    )
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch edge data`)
+    }  
+
+    return response.json()
+}

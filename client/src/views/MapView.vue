@@ -9,6 +9,24 @@ import { assertFeatureCollection, type GeoJson, type coordinates } from '@/compo
 import { useMainStore } from '@/stores/main'
 import ContextBox from '@/components/ContextBox.vue'
 
+type ContextPayload =
+    | {
+        kind: 'node'
+        id: number
+        name: string
+        nodeType: string
+        coordinates: [number, number]
+        extra?: string
+    }
+    | {
+        kind: 'edge'
+        id: number
+        access_score: number
+        greenery: number
+        lighting: number
+        surface_quality: number
+    }
+
 type SelectionPayload = {
     start: [number, number] | null
     end: [number, number] | null
@@ -28,34 +46,71 @@ const selection = ref<SelectionPayload>({
 })
 
 const showContext = ref(false);
-const contextNode = ref<any | null>(null);
+const contextPayload = ref<ContextPayload | null>(null)
 let contextTimer: number | null = null;
 let isHovering = false;
-const hoveredNodeId = ref<number | null>(null);
+const hoveredFeatureId = ref<number | null>(null);
 
-function onShowContext(node: any) {
+function to_text(text:string): string{
+    return text.replace(/_/g, ' ')
+}
+
+function capital_case(word: string): string{
+    const lower = word.toLowerCase()
+    return lower.charAt(0).toUpperCase() + lower.slice(1)
+}
+
+function buildContextPayload(feature: any): ContextPayload | null {
+    const geomType = feature._geometry?.type
+
+    if (geomType === 'Point') {
+        return {
+            kind: 'node',
+            id: feature.properties.node_id,
+            name:
+                feature.properties.name !== 'NaN'
+                    ? feature.properties.name
+                    : capital_case(to_text(feature.properties.type)),
+            nodeType: capital_case(to_text(feature.properties.type)),
+            coordinates: feature._geometry.coordinates,
+            extra:
+                feature.properties.highway !== 'NaN'
+                    ? capital_case(to_text(feature.properties.highway))
+                    : undefined,
+        }
+    }
+
+    if (geomType === 'LineString') {
+        return {
+            kind: 'edge',
+            id: feature.properties.edge_id,
+            access_score: feature.properties.access_score,
+            greenery: feature.properties.greenery,
+            lighting: feature.properties.lighting,
+            surface_quality: feature.properties.surface_quality,
+        }
+    }
+
+    return null
+}
+
+function onShowContext(feature: any) {
+    const payload = buildContextPayload(feature)
+    if (!payload) return
+
+    const id = payload.id
     isHovering = true
 
-    const nodeId = node.node_id
+    if (hoveredFeatureId.value === id) return
+    hoveredFeatureId.value = id
 
-    if (showContext.value && hoveredNodeId.value !== nodeId) {
-        hoveredNodeId.value = nodeId
-        contextNode.value = node
-        return
-    }
-
-    if (hoveredNodeId.value === nodeId) return
-
-    hoveredNodeId.value = nodeId
-
-    if (contextTimer) {
-        clearTimeout(contextTimer)
-    }
+    if (contextTimer) clearTimeout(contextTimer)
 
     contextTimer = window.setTimeout(() => {
         if (!isHovering) return
+        if (hoveredFeatureId.value !== id) return
 
-        contextNode.value = node
+        contextPayload.value = payload
         showContext.value = true
     }, 1000)
 }
@@ -68,9 +123,9 @@ function onHideContext() {
         contextTimer = null
     }
 
-    hoveredNodeId.value = null
+    hoveredFeatureId.value = null
     showContext.value = false
-    contextNode.value = null
+    contextPayload.value = null
 }
 
 const mainStore = useMainStore()
@@ -289,7 +344,7 @@ onMounted(async () => {
 
                 <ContextBox
                     :open="showContext"
-                    :node="contextNode"
+                    :payload="contextPayload"
                     @close="onHideContext"
                 />
 

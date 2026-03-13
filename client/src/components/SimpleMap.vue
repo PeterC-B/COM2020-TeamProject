@@ -183,8 +183,6 @@ onMounted(() => {
                 edges.value = edgeCollection
                 map_center.value = toMapCoordinates(graphData.features?.center)
 
-                console.log(nodeCollection)
-
                 map.addSource('edges', {
                     type: 'geojson',
                     data: edgeCollection,
@@ -237,9 +235,26 @@ onMounted(() => {
                     map.getCanvas().style.cursor = features.length ? 'pointer' : ''
                 })
 
+                let hoveringNode = false;
+
                 map.on('mousemove', 'nodes-circle', (e) => {
                     const feature = e.features?.[0]
                     if (!feature || feature.geometry.type !== 'Point') return
+
+                    hoveringNode = true
+                    emit('show-context', feature)
+                })
+
+                map.on('mouseleave', 'nodes-circle', () => {
+                    hoveringNode = false
+                    emit('hide-context')
+                })
+
+                map.on('mousemove', 'edges-line-hit', (e) => {
+                    if (hoveringNode) return
+
+                    const feature = e.features?.[0]
+                    if (!feature || feature.geometry.type !== 'LineString') return
 
                     emit('show-context', feature)
                 })

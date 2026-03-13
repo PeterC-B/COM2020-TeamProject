@@ -16,10 +16,10 @@ def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_u
             print(f"Error: {e}")
             raise ValidationError()
     
-    @bp.route("/node", methods=["GET"])
+    '''@bp.route("/node", methods=["GET"])
     def get_node_data():
         node_id = request.args.get("node_id")
-        return ok(data=fetch_node_data.execute(node_id))
+        return ok(data=fetch_node_data.execute(node_id))'''
     
     @bp.route("/edge", methods=["GET"])
     def get_edge_data():
