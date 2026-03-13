@@ -4,7 +4,17 @@ from app.api.responses import ok
 from flask import Blueprint, request
 
 
-def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_uc, fetch_node_data, fetch_edge_data, fetch_location_name):
+def create_graph_route_blueprint(
+    get_graph_data_uc,
+    get_graph_data_from_coords_uc,
+    fetch_node_data,
+    fetch_edge_data,
+    fetch_location_name,
+    list_graph_presets,
+    get_graph_preset,
+    get_graph_preset_snapshot,
+    activate_graph_preset,
+):
     bp = Blueprint("graph", __name__, url_prefix="/api/graph")
 
     @bp.route("", methods=["GET"])
@@ -42,9 +52,7 @@ def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_u
                 coords = (float(lat), float(lon))
             except ValueError:
                 return {"error": "lat and lon are invalid"}, 400
-
-            # return ok(data={"message": "Received coordinates", "lat": lat, "lon": lon})
-            
+             
             data = get_graph_data_from_coords_uc.execute(coords)
             return ok(data=data)
         except Exception as e:
@@ -62,9 +70,23 @@ def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_u
             raise ValidationError(message="node_id must be an integer")
         data = fetch_location_name.execute(node_id)
         return ok(data=data)
+
+    @bp.route("/presets", methods=["GET"])
+    def list_presets():
+        return ok(data=list_graph_presets.execute())
+
+    @bp.route("/presets/<preset_code>", methods=["GET"])
+    def get_preset(preset_code):
+        return ok(data=get_graph_preset.execute(preset_code))
+
+    @bp.route("/presets/<preset_code>/snapshot", methods=["GET"])
+    def get_preset_snapshot(preset_code):
+        return ok(data=get_graph_preset_snapshot.execute(preset_code))
+
+    @bp.route("/presets/<preset_code>/activate", methods=["POST"])
+    def activate_preset(preset_code):
+        return ok(data=activate_graph_preset.execute(preset_code))
         
-    
-    # Route to return the top 5 location suggestions based on a like string query
     @bp.route("/locations", methods=["GET"])
     def get_like_locations():
         query = request.args.get("like_string")

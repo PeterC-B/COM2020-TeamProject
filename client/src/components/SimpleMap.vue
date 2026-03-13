@@ -88,6 +88,12 @@ function getSelectableNodeIds(): number[] {
     if (!featureCollection?.features) return []
 
     return featureCollection.features
+        .filter((feature) => {
+            const rawName = feature.properties?.name
+            if (typeof rawName !== 'string') return false
+            const name = rawName.trim()
+            return Boolean(name) && name.toLowerCase() !== 'nan'
+        })
         .map((feature) => Number(feature.properties?.node_id))
         .filter((value) => Number.isFinite(value))
 }
@@ -106,6 +112,20 @@ function applySelectableNodeFilters() {
     const idFilter: FilterSpecification = ['in', ['get', 'node_id'], ['literal', selectableNodeIds]]
     map.setFilter('nodes-circle', idFilter)
     map.setFilter('nodes-circle-hit', idFilter)
+}
+
+function getLocationNameForNode(nodeId: number | null): string | null {
+    if (nodeId === null) return null
+    const featureCollection = props.locations
+    if (!featureCollection?.features) return null
+
+    const match = featureCollection.features.find(
+        (feature) => Number(feature.properties?.node_id) === nodeId,
+    )
+    const rawName = match?.properties?.name
+    if (typeof rawName !== 'string') return null
+    const trimmed = rawName.trim()
+    return trimmed && trimmed.toLowerCase() !== 'nan' ? trimmed : null
 }
 
 function toMapCoordinates(point: [number, number]): [number, number] {
@@ -260,7 +280,7 @@ onMounted(() => {
                     if (layerToSelection[layerId] === 'node') {
                         const nodeId = parseFeatureId(feature.properties?.node_id)
                         const point = parseFeaturePointCoordinates(feature)
-                        applyNodeSelection(nodeId, point)
+                        applyNodeSelection(nodeId, point, getLocationNameForNode(nodeId))
                         return
                     }
                     if (layerToSelection[layerId] === 'edge') {

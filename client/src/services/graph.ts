@@ -1,5 +1,5 @@
 import type { coordinates } from '@/components/simple-map/geoJsonUtils'
-import { get, type ApiEnvelope } from '@/services/api'
+import { get, post, type ApiEnvelope } from '@/services/api'
 import type { FeatureCollection } from 'geojson'
 
 const GRAPH_ENDPOINT = '/graph'
@@ -15,11 +15,37 @@ export type GraphDataResponse = {
 
 export type LocationNameResponse = string
 
+export type GraphPreset = {
+    code: string
+    name: string
+    lat: number
+    lon: number
+    is_active: boolean
+    has_snapshot?: boolean
+    snapshot?: GraphDataResponse | null
+}
+
 export function fetchGraphData(params: Record<string, unknown> = {}) {
     const response = get<ApiEnvelope<GraphDataResponse>>(GRAPH_ENDPOINT, params).then(
         ({ data }) => data.data,
     )
     return response
+}
+
+export function fetchGraphPresets() {
+    return get<ApiEnvelope<GraphPreset[]>>(`${GRAPH_ENDPOINT}/presets`).then(({ data }) => data.data)
+}
+
+export function fetchGraphPresetSnapshot(presetCode: string) {
+    return get<ApiEnvelope<GraphDataResponse>>(`${GRAPH_ENDPOINT}/presets/${presetCode}/snapshot`).then(
+        ({ data }) => data.data,
+    )
+}
+
+export function activateGraphPreset(presetCode: string) {
+    return post<ApiEnvelope<GraphDataResponse>>(`${GRAPH_ENDPOINT}/presets/${presetCode}/activate`, {}).then(
+        ({ data }) => data.data,
+    )
 }
 
 export async function fetchLocationName(node_id: number) {

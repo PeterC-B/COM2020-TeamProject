@@ -7,7 +7,13 @@ import {
     type coordinates,
 } from '@/components/simple-map/geoJsonUtils'
 import SimpleMap from '@/components/SimpleMap.vue'
-import { fetchGraphByCoordinates, fetchGraphData, fetchLikeLocations } from '@/services/graph'
+import {
+    activateGraphPreset,
+    fetchGraphByCoordinates,
+    fetchGraphData,
+    fetchGraphPresets,
+    fetchLikeLocations,
+} from '@/services/graph'
 import { fetchYensRoutes, type YensRoutesResponse } from '@/services/routing'
 import { useMainStore } from '@/stores/main'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -75,7 +81,7 @@ const weights = ref({
     amenity_proximity: 5,
 })
 
-const presetLocations: PresetLocation[] = [
+const defaultPresetLocations: PresetLocation[] = [
     { code: 'bristol', name: 'Bristol', lat: 51.4545, lon: -2.5879 },
     { code: 'liverpool', name: 'Liverpool', lat: 53.4084, lon: -2.9916 },
     { code: 'exeter', name: 'Exeter', lat: 50.7184, lon: -3.5339 },
@@ -87,6 +93,7 @@ const presetLocations: PresetLocation[] = [
     { code: 'cardiff', name: 'Cardiff', lat: 51.4816, lon: -3.1791 },
     { code: 'southampton', name: 'Southampton', lat: 50.9097, lon: -1.4044 },
 ]
+const presetLocations = ref<PresetLocation[]>([...defaultPresetLocations])
 const activePresetCode = ref<string | null>(null)
 
 const canRequestRoute = computed(() =>
@@ -167,7 +174,7 @@ function onMapCenterChange(value: [number, number]) {
     mapCenter.value = value
 }
 
-function selectPresetLocation(preset: PresetLocation) {
+async function selectPresetLocation(preset: PresetLocation) {
     suppressSuggestionFetch.value = true
     locationQuery.value = preset.name
     showSuggestions.value = false
@@ -175,6 +182,22 @@ function selectPresetLocation(preset: PresetLocation) {
     selectAreaError.value = null
     activePresetCode.value = preset.code
     mapCenter.value = [preset.lat, preset.lon]
+
+    selectingArea.value = true
+    try {
+        const graphData = await activateGraphPreset(preset.code)
+        nodes.value = assertFeatureCollection(graphData.features?.nodes, 'nodes')
+        edges.value = assertFeatureCollection(graphData.features?.edges, 'edges')
+        locations.value = assertFeatureCollection(graphData.features?.locations, 'locations')
+        mapCenter.value = graphData.features?.center ?? [preset.lat, preset.lon]
+    } catch (err) {
+        selectAreaError.value =
+            err instanceof Error
+                ? err.message
+                : 'Failed to load preset snapshot. Ask backend to preload presets.'
+    } finally {
+        selectingArea.value = false
+    }
 }
 
 async function selectCurrentArea() {
@@ -258,6 +281,20 @@ async function requestRoute() {
 
 onMounted(async () => {
     showDisclaimer.value = true
+
+    try {
+        const presets = await fetchGraphPresets()
+        if (Array.isArray(presets) && presets.length > 0) {
+            presetLocations.value = presets.map((preset) => ({
+                code: preset.code,
+                name: preset.name,
+                lat: Number(preset.lat),
+                lon: Number(preset.lon),
+            }))
+        }
+    } catch (err) {
+        console.error('Failed to load graph presets, using defaults', err)
+    }
 
     try {
         const graphData = await fetchGraphData()
