@@ -1,8 +1,14 @@
 {
   "devDependencies": {
+    "@tailwindcss/vite": "^4.2.1",
+    "@tsconfig/node24": "^24.0.4",
     "@types/jest": "^30.0.0",
+    "@vitejs/plugin-vue": "^6.0.5",
+    "@vue/tsconfig": "^0.9.0",
     "axios-mock-adapter": "^2.1.0",
     "jest": "^30.3.0",
-    "ts-jest": "^29.4.6"
+    "ts-jest": "^29.4.6",
+    "vite-plugin-vue-devtools": "^8.1.0",
+    "vitest": "^4.1.0"
   }
 }
