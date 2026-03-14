@@ -1,11 +1,16 @@
-from flask import Blueprint
-from server.app.api.responses import ok
-from server.app.domain.missions.missions_read import MissionReadSchema
-from flask import request
+from flask import Blueprint, request
+from app.api.responses import ok, created
+from app.domain.missions.missions_read import MissionReadSchema
 
 
-def create_missions_blueprint(list_missions_uc, get_mission_uc, create_mission_uc):
-    bp = Blueprint("missions", __name__, url_prefix="/missions")
+def create_missions_blueprint(
+    list_missions_uc,
+    get_mission_uc,
+    create_mission_uc,
+    update_mission_uc,
+    delete_mission_uc,
+):
+    bp = Blueprint("missions", __name__, url_prefix="/api/missions")
 
     @bp.route("", methods=["GET"])
     def list_missions():
@@ -18,10 +23,27 @@ def create_missions_blueprint(list_missions_uc, get_mission_uc, create_mission_u
         mission = get_mission_uc.execute(mission_id)
         data = MissionReadSchema().dump(mission)
         return ok(data=data)
-    
-    @bp.route('', methods=['POST'])
+
+    @bp.route("", methods=["POST"])
     def create_mission():
-        mission = create_mission_uc.execute(request.json)
-        return ok(data=MissionReadSchema().dump(mission), status=201)
+        mission = create_mission_uc.execute(request.get_json())
+        data = MissionReadSchema().dump(mission)
+        return created(data=data)
+
+    @bp.route("/<uuid:mission_id>", methods=["PUT"])
+    def update_mission(mission_id):
+        mission = update_mission_uc.execute(
+            mission_id,
+            request.get_json(),
+        )
+        data = MissionReadSchema().dump(mission)
+        return ok(data=data)
+    
+    @bp.route("/<uuid:mission_id>", methods=["DELETE"])
+    def delete_mission(mission_id):
+        delete_mission_uc.execute(
+            mission_id
+        )
+        return {"message": "Mission deleted"}, 200
 
     return bp

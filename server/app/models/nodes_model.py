@@ -1,10 +1,7 @@
 # ORM model representation of a user in the database
-from sqlalchemy import Float, BigInteger
-from sqlalchemy import Enum as SQLEnum
+from app.extensions import db
+from sqlalchemy import BigInteger, String, Float
 from sqlalchemy.orm import Mapped, mapped_column
-from server.app.models.enums.HIGHWAY_FEATURES import HighwayFeatures
-
-from server.app.extensions import db
 
 # TODO: Whenever changed, edit the report documentation
 
@@ -15,4 +12,4 @@ class NodesModel(db.Model):
     x_coordinate: Mapped[float] = mapped_column(Float(15), nullable=False)
     y_coordinate: Mapped[float] = mapped_column(Float(15), nullable=False)
 
-    feature: Mapped[HighwayFeatures] = mapped_column(SQLEnum(HighwayFeatures), nullable=True)
+    feature: Mapped[str] = mapped_column(String(), nullable=True)

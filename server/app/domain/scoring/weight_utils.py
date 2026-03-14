@@ -8,13 +8,12 @@ import app.api.helpers.algorithm_helper as help_algos
 import geopandas as gpd
 import osmnx as ox
 import numpy as np
+import pandas as pd
 
 NODES_GDF = help_algos.nodes_csv_to_gdf()
 EDGES_GDF = help_algos.edges_csv_to_gdf()
 
-GRAPH = ox.graph_from_gdfs(NODES_GDF, EDGES_GDF)
-COORDS = (51.460498, -2.585757)
-DISTANCE = 450
+DISTANCE = 700
 
 # Full set of supported indicators
 DEFAULT_WEIGHTS = {
@@ -124,7 +123,7 @@ def normalize_pub_distance(
     return min_score + raw * (max_score - min_score)
 
 
-def add_pub_distance(coords: tuple[int, int] = COORDS, distance : int = DISTANCE, nodes_gdf : gpd.GeoDataFrame = NODES_GDF, edges_gdf : gpd.GeoDataFrame = EDGES_GDF):
+def add_pub_distance(coords: tuple[float, float], edges_gdf : gpd.GeoDataFrame, distance : int = DISTANCE):
     pubs = ox.features_from_point(
         center_point=coords,
         tags={"amenity": ["pub", "bar", "biergarten", "casino", "nightclub", "gambling"]},
@@ -168,21 +167,26 @@ def calculate_weight(edge_data : gpd.GeoDataFrame):
 
     return length * (greenery_score + safety_score + speed_score)
 
-def calculate_weights(edges_gdf : gpd.GeoDataFrame, safety_priority : float, speed_priority : float, greenery_priority : float) -> gpd.GeoDataFrame:
+def apply_weights(G, safety_priority=0.5, speed_priority=0.5, greenery_priority=0.5):
+    for u, v, k, data in G.edges(keys=True, data=True):
+
+        safety_score = (data.get("access_score", 0) or 0) * safety_priority
+        speed_score = (1 / (data.get("travel_time", 1))) * speed_priority
+        greenery_score = (1 - data.get("greenery", 0.5)) * data.get("pollution") * (1-greenery_priority)
+
+        data["weight"] = (safety_score + speed_score * greenery_score) * data.get("length")
+
+def calculate_weights(edges_gdf : gpd.GeoDataFrame, centre : tuple[float, float], safety_priority : float = 0.5, speed_priority : float = 0.5, greenery_priority : float = 0.5) -> gpd.GeoDataFrame:
     edges_gdf_copy = edges_gdf.copy()
 
-    edges_gdf_copy = add_pub_distance(edges_gdf=edges_gdf_copy)
+    edges_gdf_copy = add_pub_distance(edges_gdf=edges_gdf_copy, coords=centre)
     edges_gdf_copy["normalised_pub_distance"] = (
         edges_gdf_copy["distance_to_pub"]
         .apply(normalize_pub_distance)
     )
 
-    edges_gdf_copy.to_csv("server/app/domain/scoring/test_1.csv")
-
     edges_gdf_copy["safety_score"] = edges_gdf_copy.apply(calculate_safety_score, axis=1, args=(safety_priority,))
     edges_gdf_copy["speed_score"] = edges_gdf_copy.apply(calculate_speed_score, axis=1, args=(speed_priority,))
     edges_gdf_copy["greenery_score"] = edges_gdf_copy.apply(calculate_greenery_score, axis=1, args=(greenery_priority,))
-
     edges_gdf_copy["weight"] = edges_gdf_copy.apply(calculate_weight, axis=1)
-
-    edges_gdf_copy.to_csv("server/app/domain/scoring/test.csv")
+    return edges_gdf_copy

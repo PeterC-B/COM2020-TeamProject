@@ -1,4 +1,5 @@
-from server.app.domain.routing.algorithms.yen_algorithm import process_yens_routing_request
+from app.domain.routing.algorithms.yen_algorithm import \
+    process_yens_routing_request
 
 
 class RouteYens:

@@ -1,25 +1,41 @@
-#from os import environ
+from dotenv import load_dotenv
 
-#from app import create_app
+load_dotenv()
+from os import getenv
 
-#app = create_app()
-
-
-#if __name__ == '__main__':
-#    app.run(host=environ.get('HOST'), port=environ.get('BACKEND_PORT'), debug=True)
-
-#import os
-#from app import create_app
-
-#app = create_app()
-
-#if __name__ == "__main__":
-#    port = int(os.environ.get("PORT", 8000))
- #   host = "0.0.0.0"
- #   debug = os.environ.get("DEBUG", "False") == "True"
-#    app.run(host=host, port=port, debug=debug)
-
-from server.app import create_app
+from app import create_app
 
 app = create_app()
 
+if __name__ == '__main__':
+
+    host_address = getenv('HOST')
+    if host_address is None:
+        raise ValueError("HOST environment variable is not set.")
+
+    backend_port = getenv('BACKEND_PORT')
+    if backend_port is None:
+        raise ValueError("BACKEND_PORT environment variable is not set.")
+    
+    if not backend_port.isdigit():
+        raise ValueError("BACKEND_PORT environment variable must be a valid integer.")
+    else:
+        backend_port = int(backend_port)
+    
+    debug_mode = getenv('DEBUG')
+    if debug_mode is None:
+        raise ValueError("DEBUG environment variable is not set.")
+
+    if debug_mode.lower() == 'true':
+        debug_mode = True
+    elif debug_mode.lower() == 'false':
+        debug_mode = False
+    else:
+        raise ValueError("DEBUG environment variable must be 'true' or 'false'.")
+    
+    print("Starting server with the following configuration:")
+    print(f"Host: {host_address}")
+    print(f"Port: {backend_port}")
+    print(f"Debug mode: {debug_mode}")
+
+    app.run(host=host_address, port=backend_port, debug=debug_mode)

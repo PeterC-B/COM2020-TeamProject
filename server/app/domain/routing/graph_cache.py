@@ -13,8 +13,8 @@ import pickle
 import networkx as nx
 
 
-CACHE_PATH = "server/data/processed/routing_graph_cache.pkl"
-CACHE_VERSION = "v1"   # bump this if indicators or scoring change
+CACHE_PATH = "data/routing_graph_cache.pkl"
+CACHE_VERSION = "v2"   # bump this if indicators or scoring change
 
 
 def cache_exists() -> bool:

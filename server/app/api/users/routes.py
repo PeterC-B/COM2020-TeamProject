@@ -2,13 +2,17 @@
 
 from flask import Blueprint, request
 
-from server.app.api.responses import created, ok
-from server.app.schemas.user.user_read import UserReadSchema
-from server.app.schemas.user.user_register import UserRegisterSchema
+from app.api.responses import created, ok
+from app.schemas.user.user_read import UserReadSchema
+from app.schemas.user.user_register import UserRegisterSchema
 
 
-def create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc):
-    bp = Blueprint("user", __name__, url_prefix="/user")
+def create_user_route_blueprint(
+        register_user_uc, 
+        list_users_uc, 
+        login_user_uc, 
+        forgot_password_uc):
+    bp = Blueprint("user", __name__, url_prefix="/api/user")
 
     @bp.route("/register", methods=["POST"])
     def register_user():
@@ -45,7 +49,21 @@ def create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc):
                 "access_token": result.access_token,
                 "role": result.role,
                 "username": result.username,
+                "email": result.email,
+                "user_id": result.user_id
             }
         )
+    
+    @bp.route("/forgot-password", methods=["POST"])
+    def forgot_password():
+        payload = request.get_json(silent=True) or {}
+
+        username = payload.get("username")
+        email = payload.get("email")
+        new_password = payload.get("new_password")
+
+        result = forgot_password_uc.execute(username, email, new_password)
+
+        return ok(data={"reset": result.reset})
     
     return bp

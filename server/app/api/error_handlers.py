@@ -1,17 +1,15 @@
+from app.api.responses import error
+from app.domain.errors import (AppError, AuthError, ConflictError,
+                               DatabaseConnectionError,
+                               DatabaseConflictError,
+                               DatabaseTransactionError,
+                               ForbiddenError, InfrastructureError,
+                               NotFoundError, ValidationError)
 from flask import request
 from marshmallow import ValidationError as MarshmallowValidationError
+from sqlalchemy.exc import (DataError, IntegrityError, InterfaceError,
+                            OperationalError, ProgrammingError)
 from werkzeug.exceptions import HTTPException
-
-from server.app.api.responses import error
-from server.app.domain.errors import (
-    AppError,
-    AuthError,
-    ConflictError,
-    ForbiddenError,
-    InfrastructureError,
-    NotFoundError,
-    ValidationError,
-)
 
 
 def register_error_handlers(app) -> None:
@@ -71,6 +69,33 @@ def register_error_handlers(app) -> None:
             status=500,
         )
 
+    @app.errorhandler(DatabaseConnectionError)
+    def handle_database_connection_error(err: DatabaseConnectionError):
+        return error(
+            code=err.code,
+            message=err.message,
+            details=err.details,
+            status=503,
+        )
+
+    @app.errorhandler(DatabaseConflictError)
+    def handle_database_conflict_error(err: DatabaseConflictError):
+        return error(
+            code=err.code,
+            message=err.message,
+            details=err.details,
+            status=409,
+        )
+
+    @app.errorhandler(DatabaseTransactionError)
+    def handle_database_transaction_error(err: DatabaseTransactionError):
+        return error(
+            code=err.code,
+            message=err.message,
+            details=err.details,
+            status=500,
+        )
+
     @app.errorhandler(AppError)
     def handle_generic_app_error(err: AppError):
         """
@@ -90,6 +115,29 @@ def register_error_handlers(app) -> None:
             details={"fields": err.messages},
         )
         return handle_validation_error(mapped)
+
+    @app.errorhandler(OperationalError)
+    @app.errorhandler(InterfaceError)
+    def handle_sqlalchemy_connection_error(err):
+        mapped = DatabaseConnectionError(
+            details={"path": request.path, "type": err.__class__.__name__},
+        )
+        return handle_database_connection_error(mapped)
+
+    @app.errorhandler(IntegrityError)
+    def handle_sqlalchemy_integrity_error(err):
+        mapped = DatabaseConflictError(
+            details={"path": request.path, "type": err.__class__.__name__},
+        )
+        return handle_database_conflict_error(mapped)
+
+    @app.errorhandler(DataError)
+    @app.errorhandler(ProgrammingError)
+    def handle_sqlalchemy_transaction_error(err):
+        mapped = DatabaseTransactionError(
+            details={"path": request.path, "type": err.__class__.__name__},
+        )
+        return handle_database_transaction_error(mapped)
 
     # HTTP Errors eg. 404 not found, 405 method not allowed etc.
 

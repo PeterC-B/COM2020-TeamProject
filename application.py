@@ -1,6 +1,6 @@
 # application.py (located in your root folder)
 
-from server.app import app as application
+from app import app as application
 
 # If your Flask variable inside app.py is named 'app', 
 # this line imports it and renames it to 'application' 

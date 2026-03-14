@@ -51,3 +51,21 @@ class InfrastructureError(AppError):
     # External systems failures
     code: str = "INFRASTRUCTURE_ERROR"
     message: str = "Internal service error"
+
+
+@dataclass(eq=False)
+class DatabaseConnectionError(InfrastructureError):
+    code: str = "DB_CONNECTION_ERROR"
+    message: str = "Database unavailable or authentication failed"
+
+
+@dataclass(eq=False)
+class DatabaseConflictError(ConflictError):
+    code: str = "DB_CONFLICT"
+    message: str = "Database constraint violation"
+
+
+@dataclass(eq=False)
+class DatabaseTransactionError(InfrastructureError):
+    code: str = "DB_TRANSACTION_ERROR"
+    message: str = "Database transaction failed"

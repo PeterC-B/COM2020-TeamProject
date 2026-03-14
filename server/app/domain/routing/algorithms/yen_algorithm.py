@@ -5,12 +5,14 @@ import networkx as nx
 
 from app.api.utils.response_utils import (compare_routes,
                                                  format_route_response)
+from app.domain.errors import InfrastructureError, NotFoundError, ValidationError
 from app.domain.routing.algorithms.dijkstra_algorithm import dijkstra
 from app.domain.routing.graph_cache import load_cached_graph
 from app.domain.routing.nearest_node import get_nearest_node
 from app.domain.scoring.cost_functions import healthy_cost
 from app.domain.scoring.weight_utils import (apply_default_weights,
                                                     validate_weights)
+from app.data.convert import build_graph, build_edges_geojson, build_nodes_geojson
 
 
 def parse_coordinates(coords):
@@ -145,7 +147,7 @@ def process_yens_routing_request(data, graph=None):
     Returns (payload_dict, status_code)
     """
     if not data:
-        return {"error": "Missing JSON body"}, 400
+        raise ValidationError(message="Missing JSON body")
 
     start = data.get("start")
     end = data.get("end")
@@ -153,23 +155,26 @@ def process_yens_routing_request(data, graph=None):
     k = data.get("k", 3)
 
     if start is None:
-        return {"error": "Missing required field: 'start'"}, 400
+        raise ValidationError(message="Missing required field", details={"field": "start"})
     if end is None:
-        return {"error": "Missing required field: 'end'"}, 400
+        raise ValidationError(message="Missing required field", details={"field": "end"})
 
     if not isinstance(k, int) or k < 1:
-        return {"error": "Parameter 'k' must be a positive integer"}, 400
+        raise ValidationError(
+            message="Parameter 'k' must be a positive integer",
+            details={"field": "k", "value": k},
+        )
 
     if raw_weights is None:
         weights = apply_default_weights()
     elif not validate_weights(raw_weights):
-        return {"error": "Invalid weight configuration"}, 400
+        raise ValidationError(message="Invalid weight configuration")
     else:
         weights = apply_default_weights(raw_weights)
 
     graph = graph if graph is not None else load_cached_graph()
     if graph is None:
-        return {"error": "No cached graph found. Build the graph first."}, 500
+        raise InfrastructureError(message="No cached graph found. Build the graph first.")
 
     try:
         start_coords = parse_coordinates(start)
@@ -177,7 +182,7 @@ def process_yens_routing_request(data, graph=None):
         start_node = get_nearest_node(graph, start_coords)
         end_node = get_nearest_node(graph, end_coords)
     except (TypeError, ValueError, KeyError):
-        return {"error": "Invalid coordinates provided"}, 400
+        raise ValidationError(message="Invalid coordinates provided")
 
     paths = yens_from_multidigraph(
         graph,
@@ -189,7 +194,7 @@ def process_yens_routing_request(data, graph=None):
     )
 
     if not paths:
-        return {"error": "No route  s found"}, 404
+        raise NotFoundError(message="No routes found")
 
     routes = [
         format_route_response(

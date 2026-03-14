@@ -15,7 +15,20 @@ Indicators extracted:
 import geopandas as gpd
 import networkx as nx
 import osmnx as ox
+from app.models.location_model import LocationModel
+from app.models.enums.LOCATION_TYPE import LocationType
 
+AMENITY_TAGS = {
+    "amenity":[
+        "dentist", "doctors", "hospital", "clinic", "cinema", "library", "community_centre", "place_of_worship", "school", "cafe"
+    ],
+    "leisure":[
+        "playground"
+    ],
+    "tourism":[
+        "artwork"
+    ]
+}
 
 # Lighting
 # -----------------------------
@@ -28,9 +41,9 @@ def extract_lighting(edge_data):
     lit = str(lit).lower()
 
     if lit == "yes":
-        return 0.2
+        return 0.1
 
-    return 0.8
+    return 0.9
 
 
 # Greenery
@@ -129,7 +142,6 @@ def attach_edge_indicators(edges_gdf: gpd.GeoDataFrame):
 
     edges_gdf_copy = edges_gdf.copy()
 
-    edges_gdf_copy["distance"] = edges_gdf_copy["length"]
     edges_gdf_copy["lighting"] = edges_gdf_copy.apply(extract_lighting, axis=1)
     edges_gdf_copy["greenery"] = edges_gdf_copy.apply(extract_greenery, axis=1)
     edges_gdf_copy["pollution"] = edges_gdf_copy.apply(extract_pollution, axis=1)
@@ -140,65 +152,50 @@ def attach_edge_indicators(edges_gdf: gpd.GeoDataFrame):
 
 # Amenity Proximity (fixed for OSMnx 1.x)
 # -----------------------------
-def compute_amenity_proximity(graph, center_coords, search_radius=450):
+def compute_amenity_proximity(graph, center_coords, search_radius=500):
     """
     Compute amenity proximity for each edge using spatial distance to nightlife amenities.
     Works with OSMnx 1.x (edges GeoDataFrame uses MultiIndex: (u, v, key)).
     """
 
-    # Extract edges GeoDataFrame (MultiIndex: u, v, key)
-    edges_gdf = ox.graph_to_gdfs(graph, nodes=False, edges=True)
+    pois = ox.features_from_point(
+        center_point=center_coords,
+        tags={"amenity": True},
+        dist=search_radius
+    ).head(50)
 
-    # Fetch nightlife amenities
-    amenities = ox.features_from_point(
-        center_coords,
-        tags={"amenity": ["bar", "pub", "nightclub", "casino", "biergarten", "gambling"]},
-        dist=search_radius,
-    )
+    locations = []
 
-    # If no amenities found, assign default
-    if amenities.empty:
-        for _, _, _, data in graph.edges(keys=True, data=True):
-            data["amenity_proximity"] = 0.2
-        return graph
+    lons = pois.geometry.x.tolist()
+    lats = pois.geometry.y.tolist()
 
-    # Project to metric CRS
-    edges_m = edges_gdf.to_crs(epsg=27700)
-    amenities_m = amenities.to_crs(epsg=27700)
+    nearest_nodes = ox.distance.nearest_nodes(graph, X=lons, Y=lats)
 
-    # Spatial join
-    joined = gpd.sjoin_nearest(
-        edges_m,
-        amenities_m,
-        how="left",
-        distance_col="dist_to_amenity",
-    )
+    for (_, row), node_id in zip(pois.iterrows(), nearest_nodes):
 
-    # Decay function
-    def decay(d):
-        if d is None:
-            return 0.2
-        if d > 1000:
-            return 0.0
-        return 1 / (d + 1)
+        lat = row.geometry.y
+        lon = row.geometry.x
 
-    joined["amenity_proximity"] = joined["dist_to_amenity"].apply(decay)
+        node_id = ox.distance.nearest_nodes(graph, X=lon, Y=lat)
 
-    # Assign back to graph
-    for idx, row in joined.iterrows():
-        u, v, key = idx  # MultiIndex unpack
-        graph[u][v][key]["amenity_proximity"] = row["amenity_proximity"]
+        location = LocationModel(
+            name=row.get("name") or "Unknown",
+            node_id=node_id,
+            type=LocationType.GENERAL_AMENITY,
+            information=row.get("amenity")
+        )
 
-    return graph
+        locations.append(location)
+    return locations
 
 if __name__ == "__main__":
-    from server.scripts.visualisation.visualisation_utils import plot_blank_graph, add_lighting_tag, add_surface_tag
+    from scripts.visualisation.visualisation_utils import plot_blank_graph, add_lighting_tag, add_surface_tag
     graph = plot_blank_graph((51.460498, -2.585757), 450, "walk")
 
     graph = add_lighting_tag(graph, (51.460498, -2.585757), 450)
     graph = add_surface_tag(graph, (51.460498, -2.585757), 450)
     fig, ax = ox.plot_graph(graph, show=False, close=False, node_size=2)
-    #fig.savefig("server/app/domain/indicators/graph.png", dpi=300)
+    #fig.savefig("app/domain/indicators/graph.png", dpi=300)
     nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
     edges_gdf.to_csv("app/domain/indicators/surface.csv")
     edges_gdf = attach_edge_indicators(edges_gdf)
@@ -213,4 +210,4 @@ if __name__ == "__main__":
         "pollution",
         "surface_quality",
     ]]
-    #edges_export.to_csv("server/app/domain/indicators/edges.csv")
+    #edges_export.to_csv("app/domain/indicators/edges.csv")

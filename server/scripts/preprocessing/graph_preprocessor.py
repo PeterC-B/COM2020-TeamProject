@@ -18,32 +18,22 @@ Outputs:
 
 import os
 import pickle
-import osmnx as ox
+
 import networkx as nx
-import pandas as pd
+import osmnx as ox
+from app.domain.indicators.attribute_extraction import (
+    attach_edge_indicators, compute_amenity_proximity)
+from app.domain.indicators.normalisation import normalise_graph_attributes
 
-from server.app.domain.indicators.attribute_extraction import (
-    attach_edge_indicators,
-    compute_amenity_proximity,
-)
-from server.app.domain.indicators.normalisation import normalise_graph_attributes
-
-
-# ---------------------------------------------------------
 # Output paths
-# ---------------------------------------------------------
-
-OUTPUT_DIR = "server/data/processed"
+OUTPUT_DIR = "app/data/processed"
 GRAPH_PKL = os.path.join(OUTPUT_DIR, "processed_graph.pkl")
 GRAPH_GRAPHML = os.path.join(OUTPUT_DIR, "processed_graph.graphml")
 NODES_CSV = os.path.join(OUTPUT_DIR, "nodes_table.csv")
 EDGES_CSV = os.path.join(OUTPUT_DIR, "edges_table.csv")
 
 
-# ---------------------------------------------------------
 # Helpers
-# ---------------------------------------------------------
-
 def ensure_output_dir():
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
@@ -98,10 +88,7 @@ def save_graph(graph: nx.MultiDiGraph):
     print(f"  - {EDGES_CSV}")
 
 
-# ---------------------------------------------------------
 # Main pipeline
-# ---------------------------------------------------------
-
 def build_processed_graph(place_name: str):
     """
     Full preprocessing pipeline.
@@ -126,9 +113,6 @@ def build_processed_graph(place_name: str):
     return graph
 
 
-# ---------------------------------------------------------
 # Entry point
-# ---------------------------------------------------------
-
 if __name__ == "__main__":
     build_processed_graph("Bristol, UK")

@@ -1,15 +1,16 @@
 import uuid
 
-from sqlalchemy import UUID, ForeignKey, Integer
+from app.extensions import db
+from app.models.enums.MISSION_STATUS import MissionStatus
+from app.models.missions_model import MissionsModel
+from app.models.user_account_model import UserAccountModel
+from sqlalchemy import UUID
 from sqlalchemy import Enum as SQLEnum
-from server.app.models.missions_model import MissionsModel
-from server.app.models.user_account_model import UserAccountModel
-from server.app.models.enums.MISSION_STATUS import MissionStatus
+from sqlalchemy import ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 # TODO: Whenever changed, edit the report documentation
 
-from server.app.extensions import db
 
 class MissionProgressModel(db.Model):
     __tablename__ = "mission_progress"

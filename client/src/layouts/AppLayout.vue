@@ -1,11 +1,28 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import { computed } from 'vue'
+import { useMainStore } from '@/stores/main'
 
-const navItems = [
-    { label: 'Home', path: '/' },
-    { label: 'Map', path: '/map' },
-    { label: 'Profile', path: '/profile' },
-]
+const mainStore = useMainStore()
+
+const navItems = computed(() => {
+    const items = [
+        { label: 'Home', path: '/' },
+        { label: 'Map', path: '/map' },
+        { label: 'Missions', path: '/missions' },
+        { label: 'Leaderboard', path: '/leaderboard' },
+        { label: 'Profile', path: '/profile' },
+    ]
+
+    if (mainStore.userRole === 'administrators' || mainStore.userRole === 'developers') {
+        items.push({ label: 'Analytics', path: '/analytics/route-queries'})
+    }
+    if (mainStore.userRole === 'developers') {
+        //items.push({ label: 'Context Pop Up', path: '/context_box_dev'})
+    }
+
+    return items
+})
 </script>
 
 <template>

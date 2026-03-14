@@ -2,12 +2,12 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import UUID, DateTime, String
+from app.extensions import db
+from app.models.enums.ACCESS_TYPE import UserAccessType
+from sqlalchemy import UUID, DateTime
 from sqlalchemy import Enum as SQLEnum
-from server.app.models.enums.ACCESS_TYPE import UserAccessType
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
-
-from server.app.extensions import db
 
 # TODO: Whenever changed, edit the report documentation
 
@@ -21,3 +21,5 @@ class UserAccountModel(db.Model):
 
     role: Mapped[UserAccessType] = mapped_column(SQLEnum(UserAccessType), nullable=False, default=UserAccessType.TRAVELLERS)
     created_at: Mapped[datetime] = mapped_column(DateTime(), nullable=False, default=datetime.now)
+    reset_token: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    reset_token_expiry: Mapped[datetime | None] = mapped_column(DateTime(), nullable=True)

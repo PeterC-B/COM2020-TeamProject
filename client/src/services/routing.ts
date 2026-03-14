@@ -1,4 +1,4 @@
-import { post } from '@/services/api'
+import { post, type ApiEnvelope } from '@/services/api'
 
 const BASE_PATH = '/routing'
 
@@ -11,6 +11,7 @@ export type RouteRequest = {
     start: [number, number]
     end: [number, number]
     weights?: Record<string, number>
+    user_id: string
 }
 
 export type RouteResponse = {
@@ -19,7 +20,6 @@ export type RouteResponse = {
     indicators?: {
         lighting?: number
         greenery?: number
-        pollution?: number
         surface_quality?: number
         amenity_proximity?: number
         weighted_score?: number
@@ -43,9 +43,16 @@ export type YensRoutesResponse = {
     }
 }
 
-export function fetchYensRoutes({ start, end, k, weights }: YensRouteRequest) {
-    console.log('Fetching Yens routes with parameters:', { start, end, k, weights })
-    return post<YensRoutesResponse>(ROUTE_ENDPOINTS.yens, { start, end, k, weights }).then(
-        ({ data }) => data,
+export function fetchYensRoutes({ start, end, k, weights, user_id }: YensRouteRequest) {
+    console.log(user_id)
+    const response = post<ApiEnvelope<YensRoutesResponse>>(ROUTE_ENDPOINTS.yens, {
+        start,
+        end,
+        k,
+        weights,
+        user_id
+    }).then(
+        ({ data }) => data.data,
     )
+    return response
 }

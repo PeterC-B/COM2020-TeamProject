@@ -10,6 +10,8 @@ OSMnx-style node attributes:
 import networkx as nx
 from math import inf
 
+from app.domain.errors import NotFoundError
+
 
 def get_nearest_node(graph: nx.MultiDiGraph, coords: tuple):
     """
@@ -43,7 +45,7 @@ def get_nearest_node(graph: nx.MultiDiGraph, coords: tuple):
             best_node = node_id
 
     if best_node is None:
-        raise ValueError("No nodes in graph contain coordinate data")
+        raise NotFoundError(message="No nodes in graph contain coordinate data")
 
     return best_node
 

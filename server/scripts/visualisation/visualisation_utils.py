@@ -13,21 +13,16 @@ import matplotlib.cm as cm
 import matplotlib.colors as mcolors
 
 
-# -------------------------------------------------------------------
 # Output directory for all generated graphs
 # -------------------------------------------------------------------
 
-GRAPH_DIR = "server/app/api/infrastructure/graphs"
+GRAPH_DIR = "app/api/infrastructure/graphs"
 
 def ensure_graph_dir():
     """Ensure the graph output directory exists."""
     os.makedirs(GRAPH_DIR, exist_ok=True)
 
-
-# -------------------------------------------------------------------
 # Local visualisation-only helpers (kept out of backend logic)
-# -------------------------------------------------------------------
-
 def add_crime_rating(edges_gdf: gpd.GeoDataFrame, add_colours: bool = False) -> gpd.GeoDataFrame:
     """
     Convert access_score into a colour-coded crime heatmap.
@@ -79,7 +74,7 @@ def add_feature_to_graph(graph, ax, coords, feature):
         color=feature[2],
         label=feature[0],
         alpha=feature[3],
-        markersize=feature[4],
+        markersize=feature[4],  
     )
 
 def add_lighting_tag(graph, coords, distance) -> nx.MultiDiGraph:
@@ -159,12 +154,7 @@ def add_surface_tag(graph, coords, distance):
 
     return ox.graph_from_gdfs(nodes_gdf, edges_gdf)
 
-
-
-# -------------------------------------------------------------------
 # Visualisation functions
-# -------------------------------------------------------------------
-
 def print_shortest_path_graph(
     graph: nx.MultiDiGraph,
     node_path: list,

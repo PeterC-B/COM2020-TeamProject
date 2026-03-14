@@ -3,6 +3,7 @@ import {
     assertFeatureCollection,
     parseFeatureId,
     parseFeaturePointCoordinates,
+    type coordinates,
     type GeoJson,
 } from '@/components/simple-map/geoJsonUtils'
 import { useMapSelection } from '@/components/simple-map/useMapSelection'
@@ -15,12 +16,16 @@ import {
     NODE_HIT_LAYER,
 } from '@/lib/mapLayers'
 import { fetchGraphData } from '@/services/graph'
-import maplibregl, { type Map } from 'maplibre-gl'
+import maplibregl, { type FilterSpecification, type LngLatLike, type Map } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 const props = defineProps<{
     routes?: Array<Array<[number, number]>>
+    nodes?: GeoJson | null
+    edges?: GeoJson | null
+    center?: coordinates | null
+    locations?: GeoJson | null
 }>()
 
 const emit = defineEmits<{
@@ -31,7 +36,13 @@ const emit = defineEmits<{
             end: [number, number] | null
             startNodeId: number | null
             endNodeId: number | null
+            start_location: string | null
+            end_location: string | null
         },
+    ): void
+    (
+        event: 'center-change',
+        payload: [number, number],
     ): void
 }>()
 
@@ -40,6 +51,8 @@ let map: Map | null = null
 
 const nodes = ref<GeoJson | null>(null)
 const edges = ref<GeoJson | null>(null)
+const map_center = ref<LngLatLike | null>(null)
+const locations = ref<GeoJson | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
 const {
@@ -70,6 +83,51 @@ const routeSourceId = 'routes'
 const routeColors = ['#2563eb', '#ef4444', '#16a34a']
 const routeLayerIds = routeColors.map((_, index) => `route-line-${index}`)
 
+function getSelectableNodeIds(): number[] {
+    const featureCollection = props.locations
+    if (!featureCollection?.features) return []
+
+    return featureCollection.features
+        .filter((feature) => {
+            const rawName = feature.properties?.name
+            if (typeof rawName !== 'string') return false
+            const name = rawName.trim()
+            return Boolean(name) && name.toLowerCase() !== 'nan'
+        })
+        .map((feature) => Number(feature.properties?.node_id))
+        .filter((value) => Number.isFinite(value))
+}
+
+function applySelectableNodeFilters() {
+    if (!map) return
+    if (!map.getLayer('nodes-circle') || !map.getLayer('nodes-circle-hit')) return
+
+    const selectableNodeIds = getSelectableNodeIds()
+    if (!selectableNodeIds.length) {
+        map.setFilter('nodes-circle', ['==', ['get', 'node_id'], -1])
+        map.setFilter('nodes-circle-hit', ['==', ['get', 'node_id'], -1])
+        return
+    }
+
+    const idFilter: FilterSpecification = ['in', ['get', 'node_id'], ['literal', selectableNodeIds]]
+    map.setFilter('nodes-circle', idFilter)
+    map.setFilter('nodes-circle-hit', idFilter)
+}
+
+function getLocationNameForNode(nodeId: number | null): string | null {
+    if (nodeId === null) return null
+    const featureCollection = props.locations
+    if (!featureCollection?.features) return null
+
+    const match = featureCollection.features.find(
+        (feature) => Number(feature.properties?.node_id) === nodeId,
+    )
+    const rawName = match?.properties?.name
+    if (typeof rawName !== 'string') return null
+    const trimmed = rawName.trim()
+    return trimmed && trimmed.toLowerCase() !== 'nan' ? trimmed : null
+}
+
 function toMapCoordinates(point: [number, number]): [number, number] {
     // Backend route geometry is (lat, lon), but MapLibre expects (lon, lat).
     const [lat, lon] = point
@@ -94,6 +152,13 @@ function buildRouteFeatureCollection(routes: Array<Array<[number, number]>>): Ge
         }),
     }
 }
+
+function emitMapCenter() {
+    if (!map) return
+    const center = map.getCenter()
+    emit('center-change', [center.lat, center.lng])
+}
+
 
 function renderRoutes(routes: Array<Array<[number, number]>> = []) {
     if (!map || !map.isStyleLoaded()) return
@@ -123,16 +188,36 @@ function renderRoutes(routes: Array<Array<[number, number]>> = []) {
             },
         })
     })
+
+    map.setCenter(map_center.value ? map_center.value : [-2.585757, 51.460498])
 }
 
 // Initialize map and load graph data.
 onMounted(() => {
-    map! = new maplibregl.Map({
+    map = new maplibregl.Map({
         container: mapEl.value!,
-        style: 'https://demotiles.maplibre.org/style.json',
+        style: {
+            version: 8,
+            sources: {
+                osm: {
+                    type: 'raster',
+                    tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+                    tileSize: 256,
+                    attribution: '© OpenStreetMap contributors',
+                },
+            },
+            layers: [
+                {
+                    id: 'osm',
+                    type: 'raster',
+                    source: 'osm',
+                },
+            ],
+        },
         center: [-2.585757, 51.460498],
-        zoom: 15,
+        zoom: 14,
     })
+
     setMap(map)
 
     map.addControl(new maplibregl.NavigationControl(), 'top-right')
@@ -147,13 +232,17 @@ onMounted(() => {
                 if (!map) return
                 const nodeCollection = assertFeatureCollection(graphData.features?.nodes, 'nodes')
                 const edgeCollection = assertFeatureCollection(graphData.features?.edges, 'edges')
+                const locationCollection = assertFeatureCollection(graphData.features?.locations, 'locations')
                 nodes.value = nodeCollection
                 edges.value = edgeCollection
+                locations.value = locationCollection
+                map_center.value = toMapCoordinates(graphData.features?.center)
+                console.log(locationCollection)
 
                 map.addSource('edges', {
                     type: 'geojson',
                     data: edgeCollection,
-                })
+                })  
                 map.addSource('nodes', {
                     type: 'geojson',
                     data: nodeCollection,
@@ -166,9 +255,14 @@ onMounted(() => {
                 map.addLayer(NODE_BASE_LAYER)
                 map.addLayer(NODE_HIT_LAYER)
                 map.addLayer(NODE_HIGHLIGHT_LAYER)
+                applySelectableNodeFilters()
                 renderRoutes(props.routes)
+                emitMapCenter()
 
-                // Hit layers make node and edge selection easier.
+                map.on('moveend', () => {
+                    emitMapCenter()
+                })
+
                 map.on('click', (event) => {
                     if (!map) return
                     const features = map.queryRenderedFeatures(event.point, {
@@ -186,7 +280,7 @@ onMounted(() => {
                     if (layerToSelection[layerId] === 'node') {
                         const nodeId = parseFeatureId(feature.properties?.node_id)
                         const point = parseFeaturePointCoordinates(feature)
-                        applyNodeSelection(nodeId, point)
+                        applyNodeSelection(nodeId, point, getLocationNameForNode(nodeId))
                         return
                     }
                     if (layerToSelection[layerId] === 'edge') {
@@ -214,11 +308,18 @@ onMounted(() => {
                     bounds.extend([lng, lat])
                 }
                 if (!bounds.isEmpty()) {
-                    map.fitBounds(bounds, { padding: 24, maxZoom: 16 })
+                    map.fitBounds(bounds, { padding: 40, maxZoom: 20 })
                     // Keep camera constrained to the dataset extent.
-                    map.setMaxBounds(bounds)
                     map.setRenderWorldCopies(false)
                 }
+
+                //map.setLayoutProperty('edges-line', 'visibility', 'none')
+                //map.setLayoutProperty('edges-line-hit', 'visibility', 'none')
+                //map.setLayoutProperty('edges-line-highlight', 'visibility', 'none')
+
+                map.setLayoutProperty('nodes-circle', 'visibility', 'visible')
+                map.setLayoutProperty('nodes-circle-hit', 'visibility', 'visible')
+                map.setLayoutProperty('nodes-circle-highlight', 'visibility', 'visible')
         })
     })
 })
@@ -237,6 +338,76 @@ watch(selectedNodeId, (nodeId) => {
     map!.setFilter('nodes-circle-highlight', ['==', ['get', 'node_id'], value])
 })
 
+watch(
+  () => props.nodes,
+  (newNodes) => {
+    if (!map || !newNodes) return;
+
+    if (map.getLayer('nodes-circle')) map.removeLayer('nodes-circle');
+    if (map.getLayer('nodes-circle-hit')) map.removeLayer('nodes-circle-hit');
+    if (map.getLayer('nodes-circle-highlight')) map.removeLayer('nodes-circle-highlight');
+    if (map.getSource('nodes')) map.removeSource('nodes');
+
+    map.addSource('nodes', {
+      type: 'geojson',
+      data: newNodes,
+    });
+
+    map.addLayer(NODE_BASE_LAYER);
+    map.addLayer(NODE_HIT_LAYER);
+    map.addLayer(NODE_HIGHLIGHT_LAYER);
+
+    applySelectableNodeFilters();
+
+    const bounds = new maplibregl.LngLatBounds();
+    newNodes.features.forEach((f) => {
+      if (f.geometry.type !== 'Point') return;
+
+      const coords = f.geometry.coordinates;
+      if (!Array.isArray(coords) || coords.length < 2) return;
+
+      const [lng, lat] = coords;
+
+      if (typeof lng === 'number' && typeof lat === 'number' && Number.isFinite(lng) && Number.isFinite(lat)) {
+        bounds.extend([lng, lat]);
+      }
+    });
+
+    if (!bounds.isEmpty()) {
+      map.fitBounds(bounds, { padding: 40, maxZoom: 16 });
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+    () => props.edges,
+    (newEdges) => {
+        if (!map || !newEdges) return
+        const source = map.getSource('edges') as maplibregl.GeoJSONSource
+        if (source) source.setData(newEdges)
+    },
+)
+
+watch(
+    () => props.locations,
+    (newLocations) => {
+        if (!map || !newLocations) return
+        locations.value = newLocations
+        applySelectableNodeFilters()
+    },
+    { immediate: true }
+)
+
+watch(
+  () => props.center,
+  (newCenter) => {
+    if (!map || !newCenter) return
+    map.setCenter(toMapCoordinates(newCenter))
+  },
+  { immediate: true }
+)
+
 onBeforeUnmount(() => {
     dispose()
     map?.remove()
@@ -252,5 +423,5 @@ watch(
 </script>
 
 <template>
-    <div ref="mapEl" class="h-[calc(100vh-64px)] w-full" />
+    <div ref="mapEl" class="h-[calc(100vh-48px)] w-full" />
 </template>

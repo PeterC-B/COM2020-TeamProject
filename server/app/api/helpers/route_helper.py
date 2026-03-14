@@ -1,14 +1,15 @@
 from json import dump
 from pathlib import Path
 
-import osmnx as ox
-from flask import Blueprint, jsonify, request
-
 import app.api.helpers.algorithm_helper as help_algos
-from client.public.convert import (build_edges_geojson, build_nodes_geojson,
-                                   load_edge_geometries)
+import osmnx as ox
+from app.api.responses import ok
+from app.domain.errors import ValidationError
 from app.domain.routing.algorithms.yen_algorithm import yens
 from app.extensions import db
+from app.data.convert import (build_edges_geojson, build_nodes_geojson,
+                                   load_edge_geometries)
+from flask import Blueprint, request
 
 route_bp = Blueprint("route", __name__)
 
@@ -34,12 +35,18 @@ def run_route_algorithm():
     end_node = request.args.get("end", type=int)
 
     if start_node is None or end_node is None:
-        return jsonify({"error": "Start and end nodes required"}), 400
+        raise ValidationError(
+            message="Start and end nodes required",
+            details={"required_fields": ["start", "end"]},
+        )
 
     edge_list = help_algos.get_dict_of_edges(GRAPH)
 
     if start_node not in GRAPH or end_node not in GRAPH:
-        return jsonify({"error" : "Invalid start or end node"}), 400
+        raise ValidationError(
+            message="Invalid start or end node",
+            details={"start": start_node, "end": end_node},
+        )
     
     shortest_paths = yens(edge_list, start_node, end_node)
     route_geojson = {}
@@ -49,7 +56,7 @@ def run_route_algorithm():
         route_edges = help_algos.edges_in_path(path, EDGES_GDF)
         route_geojson[name] = help_algos.path_to_geojson(route_edges)
 
-    return jsonify(route_geojson)
+    return ok(data=route_geojson)
     
 @route_bp.route("/route_breakdown", methods=["GET"])
 def get_route_breakdown():
@@ -90,7 +97,7 @@ def get_route_breakdown():
         "traffic_feature_count" : feature_dict
     }
 
-    return jsonify({"route_data": route_info})
+    return ok(data={"route_data": route_info})
 
 
 def get_route_breakdown_main(edge_list):
@@ -118,7 +125,7 @@ def get_route_breakdown_main(edge_list):
     }
 
     # Get count of crossings, traffic lights, turning circles
-    from server.app.models.enums.HIGHWAY_FEATURES import HighwayFeatures
+    from app.models.enums.HIGHWAY_FEATURES import HighwayFeatures
     feature_dict = {}
     for feature in HighwayFeatures:
         feature_name = f"{feature.value}s" if feature.value[len(feature.value) - 1] != "s" else feature.value
@@ -138,9 +145,3 @@ def edges_to_json(edge_list : list):
     import json
     with open(JSON_PATH, 'w') as f:
         json.dump(edge_list, f, ensure_ascii=False, indent=4)
-
-if __name__ == "__main__":
-    edge_list = [104804, 282237615, 19875363, 5906108608, 19875366, 104837, 5906030287, 262442708, 104838, 287226483, 3332266263, 287226495, 3696173720, 9464338656, 644926923, 5823455892, 3329881929, 6937982874, 1280853173, 1382252976, 247834407, 242756955, 17406787, 104859, 365559371, 13288882110]
-    with app.app_context():
-        db.create_all()
-        get_route_breakdown_main(edge_list)
