@@ -25,10 +25,10 @@ def create_graph_route_blueprint(
             print(f"Error: {e}")
             raise ValidationError()
     
-    @bp.route("/node", methods=["GET"])
+    '''@bp.route("/node", methods=["GET"])
     def get_node_data():
         node_id = request.args.get("node_id")
-        return ok(data=fetch_node_data.execute(node_id))
+        return ok(data=fetch_node_data.execute(node_id))'''
     
     @bp.route("/edge", methods=["GET"])
     def get_edge_data():
@@ -123,5 +123,19 @@ def create_graph_route_blueprint(
         ]
 
         return ok(data=suggestions)
+
+
+    @bp.route("/node", methods=["GET"])
+    def fetch_node_context():
+        node_id = request.args.get("node_id")
+
+        if node_id is None:
+            return DataError(statement="Node ID is required.")
+        
+        data = fetch_node_context_uc.execute(node_id)
+        return ok(data=data)
+
+        
+
     
     return bp

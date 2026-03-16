@@ -11,7 +11,7 @@ const routes: RouteRecordRaw[] = [
     { path: '/missions', component: () => import('@/views/MissionView.vue'), meta: { requiresAuth: true } },
     { path: '/forgot-password', component: () => import('@/views/ForgotPasswordView.vue') },
     { path: '/leaderboard', component: () => import('@/views/LeaderboardView.vue'), meta: { requiresAuth: true } },
-    { path: '/context_box_dev', component: () => import('@/views/ContextPopUpView.vue'), meta: { requiresAuth: true } },
+    { path: '/context', component: () => import('@/components/ContextBox.vue'), meta: { requiresAuth: true } },
     {
         path: '/profile',
         component: () => import('@/views/ProfileView.vue'),
@@ -27,7 +27,12 @@ const routes: RouteRecordRaw[] = [
         path: '/analytics/route-queries',
         component: () => import('@/views/RouteQueriesView.vue'),
         meta: { requiresAuth: true, requiresAdmin: true }
-    }
+    },
+    {
+        path: '/analytics/missions',
+        component: () => import('@/views/MissionAnalyticsView.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true }
+    },
 
 ]
 
