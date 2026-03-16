@@ -219,6 +219,7 @@ async function saveProgress(){
         mission_id: selectedMission.value.mission_id!,
         status: status,
         score: get_score_from_tier(selectedMission.value.tier),
+        chosen_answer: selectedAnswer.value
     }
     try{
         await saveMissionProgress(progress)

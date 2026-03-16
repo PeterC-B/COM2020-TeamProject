@@ -10,11 +10,29 @@ export type RouteQueriesResponse = {
     name: string
 }
 
+export type MissionAnalyticsItem = {
+    mission_id: string
+    mission_name: string
+    score: number
+    status: string
+    user_id: string
+    chosen_answer: string
+}
+
+export type MissionAnalyticsPayload = {
+    mission_analytics: MissionAnalyticsItem[]
+}
+
 export async function FetchRouteQueries(){
     const response = await get<ApiEnvelope<RouteQueriesResponse[]>>(
         "/routing/queries"
     )
-    console.log(`Response:`)
-    console.log(response)
     return response.data.data
+}
+
+export async function FetchMissionAnalytics(){
+    const response = await get<ApiEnvelope<MissionAnalyticsPayload>>(
+        "/analytics/missions"
+    )
+    return response.data.data.mission_analytics
 }

@@ -20,6 +20,7 @@ class SaveMissionProgress:
         
         status = payload.get('status')
         score = payload.get('score')
+        chosen_answer = payload.get('chosen_answer')
 
         missing = [
             field for field, value in {
@@ -27,6 +28,7 @@ class SaveMissionProgress:
                 "mission_id": mission_id,
                 "status": status,
                 "score": score,
+                "chosen_answer": chosen_answer
             }.items() if not value
         ]
 
@@ -49,7 +51,8 @@ class SaveMissionProgress:
                 user_id=user_id,
                 mission_id=mission_id,
                 status=status_value,
-                score=score
+                score=score,
+                chosenAnswer=chosen_answer
             )
 
             self.leaderboard_repo.add(progress)
