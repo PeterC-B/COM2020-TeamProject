@@ -10,7 +10,6 @@ class SaveMissionProgress:
         self.uow = uow
         self.leaderboard_repo = leaderboard_repo
 
-
     def execute(self, payload):
         try:
             user_id = uuid.UUID(payload.get("user_id"))
@@ -57,4 +56,5 @@ class SaveMissionProgress:
 
             self.leaderboard_repo.add(progress)
             self.uow.commit()
+
         return progress

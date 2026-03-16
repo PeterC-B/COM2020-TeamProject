@@ -64,7 +64,7 @@ onMounted(async () => {
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Start</th>
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">End</th>
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Weights</th>
-                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Rank</th>
+                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Popularity</th>
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Path</th>
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Timestamp</th>
                         </tr>
@@ -79,7 +79,7 @@ onMounted(async () => {
                                 <code class="text-[10px] font-mono text-slate-400 block max-w-[400px] whitespace-pre-line">{{ format_weights(q.weights_json) }}</code>
                             </td>
                             <td class="p-4">
-                                <span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md text-xs font-bold">#{{ q.chosen_route_rank }}</span>
+                                <span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md text-xs font-bold">{{ q.popularity }}</span>
                             </td>
                             <td class="p-4">
                                 <p class="text-[10px] text-slate-400 truncate max-w-[100px]">{{ q.chosen_route_path }}</p>

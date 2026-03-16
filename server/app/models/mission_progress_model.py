@@ -14,7 +14,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 class MissionProgressModel(db.Model):
     __tablename__ = "mission_progress"
     mission_progress_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    
+
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user_account.user_id"), nullable=False)
     user: Mapped["UserAccountModel"] = relationship("UserAccountModel", foreign_keys=[user_id])
 
