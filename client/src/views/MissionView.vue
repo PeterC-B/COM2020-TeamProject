@@ -63,10 +63,20 @@ async function selectMission(id: string) {
         const mission = await fetchMission(id)
         editableMission.value = { ...mission }
         selectedAnswer.value = null
-        selectedMission.value = { ...mission}
-        try{
-            missionProgress.value = await fetchMissionProgress(id, mainStore.user_id ? mainStore.user_id : 'n/a')
+        selectedMission.value = { ...mission }
+
+        try {
+            missionProgress.value = await fetchMissionProgress(
+                id,
+                mainStore.user_id ? mainStore.user_id : 'n/a'
+            )
             completedMission.value = true
+
+            // RESTORE SAVED ANSWER
+            if (missionProgress.value?.selected_answer) {
+                selectedAnswer.value = missionProgress.value.selected_answer
+            }
+
         } catch {
             completedMission.value = false
         }
@@ -196,6 +206,7 @@ const tierProxy = computed({
 })
 
 function pickAnswer(answer: string) {
+    if (completedMission.value) return
     selectedAnswer.value = answer
     saveProgress()
 }
@@ -219,6 +230,7 @@ async function saveProgress(){
         mission_id: selectedMission.value.mission_id!,
         status: status,
         score: get_score_from_tier(selectedMission.value.tier),
+        selected_answer: selectedAnswer.value,
     }
     try{
         await saveMissionProgress(progress)

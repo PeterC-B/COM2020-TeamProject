@@ -132,7 +132,7 @@ def create_app():
     app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc, forgot_password_uc))
     app.register_blueprint(create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_uc, fetch_node_data_uc, fetch_edge_data_uc, fetch_location_name_uc, fetch_node_context_uc))
     app.register_blueprint(create_health_routes(get_health_attributes_uc, get_default_weights_uc, explain_edge_cost_uc))
-    app.register_blueprint(create_missions_blueprint(list_missions_uc, get_mission_uc, create_mission_uc, update_mission_uc, delete_mission_uc))
+    app.register_blueprint(create_missions_blueprint(list_missions_uc, get_mission_uc, get_mission_progress_uc, create_mission_uc, update_mission_uc, delete_mission_uc))
     app.register_blueprint(create_leaderboard_blueprint(get_leaderboard_uc, get_mission_progress_uc, save_mission_progress_uc))
     app.register_blueprint(create_routing_route_blueprint(route_yens_uc, log_route_query_uc, list_route_queries_uc)
 )
