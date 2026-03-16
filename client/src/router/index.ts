@@ -33,6 +33,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/MissionAnalyticsView.vue'),
         meta: { requiresAuth: true, requiresAdmin: true }
     },
+    {
+        path: '/analytics',
+        component: () => import('@/views/AnalyticsHomeView.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true }
+    },
+
 
 ]
 

@@ -15,8 +15,7 @@ const navItems = computed(() => {
     ]
 
     if (mainStore.userRole === 'administrators' || mainStore.userRole === 'developers') {
-        items.push({ label: 'Route Query Analytics', path: '/analytics/route-queries'});
-        items.push({ label: 'Mission Analytics', path: '/analytics/missions'})
+        items.push({ label: 'Analytics', path: '/analytics'});
     }
     if (mainStore.userRole === 'developers') {
         //items.push({ label: 'Context Pop Up', path: '/context_box_dev'})
