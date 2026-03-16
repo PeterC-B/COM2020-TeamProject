@@ -71,16 +71,23 @@ def edges_from_db_to_gdf(edges):
 
 def build_nodes_geojson(nodes_list: list) -> Dict[str, object]:
     features = []
-    for node in nodes_list:
+    for node, location in nodes_list:
         node_id = int(node.node_id)
         x = float(node.x_coordinate)
         y = float(node.y_coordinate)
         highway = node.feature
+        name = location.name
+        information = location.information
         features.append(
             {
                 "type": "Feature",
                 "geometry": {"type": "Point", "coordinates": [x, y]},
-                "properties": {"node_id": node_id, "highway": highway},
+                "properties": {
+                    "node_id": node_id, 
+                    "highway": highway,
+                    "name": name,
+                    "type": information,
+                },
             }
         )
     return {"type": "FeatureCollection", "features": features}
@@ -205,6 +212,20 @@ def main(argv: Iterable[str] | None = None) -> int:
     print(f"Wrote {nodes_out} and {edges_out}")
     return 0
 
+def build_analytics_json(mission_progress_list: list) -> Dict[str, object]:
+    features = []
+    for mission_progress, mission in mission_progress_list:
+        features.append(
+            {
+                "mission_id": str(mission.mission_id),
+                "mission_name": mission.mission_name,
+                "status": mission_progress.status.value,
+                "score": int(mission_progress.score),
+                "user_id": str(mission_progress.user_id),
+                "chosen_answer": mission_progress.chosenAnswer
+            }
+        )
+    return {"mission_analytics": features}
 
 if __name__ == "__main__":
     raise SystemExit(main())

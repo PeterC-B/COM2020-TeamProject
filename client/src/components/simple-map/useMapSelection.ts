@@ -68,7 +68,6 @@ export function useMapSelection(emitSelectionChange: (payload: SelectionPayload)
     ) {
         if (nodeId === null || point === null) return
 
-        console.log(nodeId)
         selectedNodeId.value = nodeId
         selectedEdgeId.value = null
 
