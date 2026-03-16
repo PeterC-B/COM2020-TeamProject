@@ -605,7 +605,7 @@ onMounted(async () => {
                         :routes="routeGeometries" 
                         :nodes="nodes" 
                         :edges="edges" 
-                        :center="map_center" 
+                        :center="mapCenter" 
                         :locations="locations" 
                         :selected_route_index="selectedRouteIndex"
                         @selection-change="onSelectionChange"
@@ -754,6 +754,7 @@ onMounted(async () => {
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </section>
 </template>

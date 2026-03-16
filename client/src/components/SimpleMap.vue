@@ -415,12 +415,11 @@ watch(
 
 watch(
     () => props.locations,
-    (newLocations) => {
-        if (!map || !newLocations) return
-        locations.value = newLocations
+    () => {
+        if (!map) return
         applySelectableNodeFilters()
     },
-    { immediate: true }
+    { immediate: true }   
 )
 
 watch(
