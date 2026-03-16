@@ -46,6 +46,7 @@ const selection = ref<SelectionPayload>({
 })
 
 const showContext = ref(false);
+const selectedRouteIndex = ref<number | null>(null)
 const contextPayload = ref<ContextPayload | null>(null)
 let contextTimer: number | null = null;
 let isHovering = false;
@@ -342,6 +343,7 @@ onMounted(async () => {
                         :edges="edges" 
                         :center="map_center" 
                         :locations="locations" 
+                        :selected_route_index="selectedRouteIndex"
                         @selection-change="onSelectionChange"
                         @show-context="onShowContext"
                         @hide-context="onHideContext"
@@ -374,6 +376,7 @@ onMounted(async () => {
                                     v-for="(route, index) in routeData.routes"
                                     :key="index"
                                     class="group transition-colors hover:bg-slate-50 relative"
+                                    @click="selectedRouteIndex = selectedRouteIndex === index ? null : index"
                                 >
                                     <td
                                         :class="[

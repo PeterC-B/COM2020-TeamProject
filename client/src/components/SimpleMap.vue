@@ -26,6 +26,7 @@ const props = defineProps<{
     edges?: GeoJson | null
     center?: coordinates | null
     locations?: GeoJson | null
+    selected_route_index?: number | null
 }>()
 
 const emit = defineEmits<{
@@ -283,14 +284,6 @@ onMounted(() => {
                     map.fitBounds(bounds, { padding: 40, maxZoom: 20 })
                     map.setRenderWorldCopies(false)
                 }
-
-                //map.setLayoutProperty('edges-line', 'visibility', 'none')
-                //map.setLayoutProperty('edges-line-hit', 'visibility', 'none')
-                //map.setLayoutProperty('edges-line-highlight', 'visibility', 'none')
-
-                //map.setLayoutProperty('nodes-circle', 'visibility', 'none')
-                //map.setLayoutProperty('nodes-circle-hit', 'visibility', 'none')
-                //map.setLayoutProperty('nodes-circle-highlight', 'visibility', 'none')
         })
     })
 })
@@ -402,6 +395,29 @@ watch(
     (routes) => {
         renderRoutes(routes ?? [])
     },
+)
+
+// Grey out the other routes when one is selected
+watch(
+  () => props.selected_route_index,
+  (selectedIndex) => {
+    if (!map) return
+
+    routeLayerIds.forEach((layerId, index) => {
+        console.log(map?.getLayersOrder())
+        if (!map?.getLayer(layerId)) return
+
+        map.setPaintProperty(
+            layerId,
+            'line-opacity',
+            selectedIndex === null
+            ? 0.95                
+            : index === selectedIndex
+            ? 1.0                 
+            : 0.15                
+        )
+        })
+  }
 )
 </script>
 
