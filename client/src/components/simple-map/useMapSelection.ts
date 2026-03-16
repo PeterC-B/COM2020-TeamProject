@@ -61,17 +61,19 @@ export function useMapSelection(emitSelectionChange: (payload: SelectionPayload)
         }
     }
 
-    async function applyNodeSelection(nodeId: number | null, point: [number, number] | null) {
+    async function applyNodeSelection(
+        nodeId: number | null,
+        point: [number, number] | null,
+        locationNameFromMap?: string | null,
+    ) {
         if (nodeId === null || point === null) return
 
         selectedNodeId.value = nodeId
         selectedEdgeId.value = null
 
-        const node_data = await fetchLocationName(nodeId)
-
-        let location_name = node_data.name
-        if(location_name === "NaN"){
-            location_name = node_data.information
+        let location_name = locationNameFromMap ?? null
+        if (!location_name) {
+            location_name = await fetchLocationName(nodeId)
         }
 
         // First click sets start, second sets destination; third click starts a new pair.

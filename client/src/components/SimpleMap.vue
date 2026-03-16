@@ -16,7 +16,7 @@ import {
     NODE_HIT_LAYER,
 } from '@/lib/mapLayers'
 import { fetchGraphData } from '@/services/graph'
-import maplibregl, { type LngLatLike, type Map } from 'maplibre-gl'
+import maplibregl, { type FilterSpecification, type LngLatLike, type Map } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
@@ -44,6 +44,10 @@ const emit = defineEmits<{
 
     (event: 'show-context', node: any): void
     (event: 'hide-context'): void
+    (
+        event: 'center-change',
+        payload: [number, number],
+    ): void
 }>()
 
 const mapEl = ref<HTMLDivElement | null>(null)
@@ -82,6 +86,51 @@ const routeSourceId = 'routes'
 const routeColors = ['#2563eb', '#ef4444', '#16a34a']
 const routeLayerIds = routeColors.map((_, index) => `route-line-${index}`)
 
+function getSelectableNodeIds(): number[] {
+    const featureCollection = props.locations
+    if (!featureCollection?.features) return []
+
+    return featureCollection.features
+        .filter((feature) => {
+            const rawName = feature.properties?.name
+            if (typeof rawName !== 'string') return false
+            const name = rawName.trim()
+            return Boolean(name) && name.toLowerCase() !== 'nan'
+        })
+        .map((feature) => Number(feature.properties?.node_id))
+        .filter((value) => Number.isFinite(value))
+}
+
+function applySelectableNodeFilters() {
+    if (!map) return
+    if (!map.getLayer('nodes-circle') || !map.getLayer('nodes-circle-hit')) return
+
+    const selectableNodeIds = getSelectableNodeIds()
+    if (!selectableNodeIds.length) {
+        map.setFilter('nodes-circle', ['==', ['get', 'node_id'], -1])
+        map.setFilter('nodes-circle-hit', ['==', ['get', 'node_id'], -1])
+        return
+    }
+
+    const idFilter: FilterSpecification = ['in', ['get', 'node_id'], ['literal', selectableNodeIds]]
+    map.setFilter('nodes-circle', idFilter)
+    map.setFilter('nodes-circle-hit', idFilter)
+}
+
+function getLocationNameForNode(nodeId: number | null): string | null {
+    if (nodeId === null) return null
+    const featureCollection = props.locations
+    if (!featureCollection?.features) return null
+
+    const match = featureCollection.features.find(
+        (feature) => Number(feature.properties?.node_id) === nodeId,
+    )
+    const rawName = match?.properties?.name
+    if (typeof rawName !== 'string') return null
+    const trimmed = rawName.trim()
+    return trimmed && trimmed.toLowerCase() !== 'nan' ? trimmed : null
+}
+
 function toMapCoordinates(point: [number, number]): [number, number] {
     // Backend route geometry is (lat, lon), but MapLibre expects (lon, lat).
     const [lat, lon] = point
@@ -105,6 +154,12 @@ function buildRouteFeatureCollection(routes: Array<Array<[number, number]>>): Ge
             ]
         }),
     }
+}
+
+function emitMapCenter() {
+    if (!map) return
+    const center = map.getCenter()
+    emit('center-change', [center.lat, center.lng])
 }
 
 
@@ -200,8 +255,13 @@ onMounted(() => {
                 map.addLayer(NODE_BASE_LAYER)
                 map.addLayer(NODE_HIT_LAYER)
                 map.addLayer(NODE_HIGHLIGHT_LAYER)
-
+                applySelectableNodeFilters()
                 renderRoutes(props.routes)
+                emitMapCenter()
+
+                map.on('moveend', () => {
+                    emitMapCenter()
+                })
 
                 map.on('click', (event) => {
                     if (!map) return
@@ -220,7 +280,7 @@ onMounted(() => {
                     if (layerToSelection[layerId] === 'node') {
                         const nodeId = parseFeatureId(feature.properties?.node_id)
                         const point = parseFeaturePointCoordinates(feature)
-                        applyNodeSelection(nodeId, point)
+                        applyNodeSelection(nodeId, point, getLocationNameForNode(nodeId))
                         return
                     }
                     if (layerToSelection[layerId] === 'edge') {
@@ -321,17 +381,7 @@ watch(
     map.addLayer(NODE_HIT_LAYER);
     map.addLayer(NODE_HIGHLIGHT_LAYER);
 
-    const locationNodeIds = (newNodes.features ?? [])
-      .map(f => f.properties?.node_id)
-      .filter((id): id is number => id !== undefined);
-
-    if (locationNodeIds.length) {
-      map.setFilter('nodes-circle', ['in', ['get', 'node_id'], ['literal', locationNodeIds]]);
-      map.setFilter('nodes-circle-hit', ['in', ['get', 'node_id'], ['literal', locationNodeIds]]);
-    } else {
-      map.setFilter('nodes-circle', null);
-      map.setFilter('nodes-circle-hit', null);
-    }
+    applySelectableNodeFilters();
 
     const bounds = new maplibregl.LngLatBounds();
     newNodes.features.forEach((f) => {
@@ -367,10 +417,8 @@ watch(
     () => props.locations,
     (newLocations) => {
         if (!map || !newLocations) return
-        map.addSource('locations', {
-            type: 'geojson',
-            data: newLocations,
-        })
+        locations.value = newLocations
+        applySelectableNodeFilters()
     },
     { immediate: true }
 )

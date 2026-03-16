@@ -1,11 +1,20 @@
+import requests
+from app.api.error_handlers import NotFoundError, ValidationError
 from app.api.responses import ok
 from flask import Blueprint, request
-import osmnx as ox
-import requests
-from app.api.error_handlers import ValidationError, NotFoundError, DataError
 
 
-def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_uc, fetch_node_data, fetch_edge_data, fetch_location_name, fetch_node_context_uc):
+def create_graph_route_blueprint(
+    get_graph_data_uc,
+    get_graph_data_from_coords_uc,
+    fetch_node_data,
+    fetch_edge_data,
+    fetch_location_name,
+    list_graph_presets,
+    get_graph_preset,
+    get_graph_preset_snapshot,
+    activate_graph_preset,
+):
     bp = Blueprint("graph", __name__, url_prefix="/api/graph")
 
     @bp.route("", methods=["GET"])
@@ -29,21 +38,21 @@ def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_u
     @bp.route("/coordinates", methods=["GET"])
     def get_graph_data_by_coords():
         try:
-            location = request.args.get("location")
+            lat_arg = request.args.get("lat")
+            lon_arg = request.args.get("lon")
 
-            if location is None:
-                return ValidationError(message="Unable to fetch location")
+            print("Received parameters - coords:", lat_arg, "lon:", lon_arg)
 
-            lat, lon = ox.geocode(location)
-
-            if lat is None or lon is None:
-                return ValidationError(message="Unable to fetch location")
+            if lat_arg is not None and lon_arg is not None:
+                lat, lon = lat_arg, lon_arg
+            else:
+                return ValidationError(message="Provide either location or lat/lon")
 
             try:
                 coords = (float(lat), float(lon))
             except ValueError:
                 return {"error": "lat and lon are invalid"}, 400
-            
+             
             data = get_graph_data_from_coords_uc.execute(coords)
             return ok(data=data)
         except Exception as e:
@@ -52,26 +61,38 @@ def create_graph_route_blueprint(get_graph_data_uc, get_graph_data_from_coords_u
 
     @bp.route("/location/name", methods=["GET"])
     def get_location_name():
+        node_id_arg = request.args.get("node_id")
+        if node_id_arg is None:
+            raise NotFoundError(message="Node ID is missing")
         try:
-            node_id = request.args.get("node_id")
-            if node_id is None:
-                raise NotFoundError(message="Node ID is missing")
-            data = fetch_location_name.execute(node_id)
-            return ok(data={
-                "name": data.name,
-                "information": data.information,
-            })
-        except Exception as e:
-            print("Error", e)
-            raise NotFoundError(message=e)
+            node_id = int(node_id_arg)
+        except (TypeError, ValueError):
+            raise ValidationError(message="node_id must be an integer")
+        data = fetch_location_name.execute(node_id)
+        return ok(data=data)
+
+    @bp.route("/presets", methods=["GET"])
+    def list_presets():
+        return ok(data=list_graph_presets.execute())
+
+    @bp.route("/presets/<preset_code>", methods=["GET"])
+    def get_preset(preset_code):
+        return ok(data=get_graph_preset.execute(preset_code))
+
+    @bp.route("/presets/<preset_code>/snapshot", methods=["GET"])
+    def get_preset_snapshot(preset_code):
+        return ok(data=get_graph_preset_snapshot.execute(preset_code))
+
+    @bp.route("/presets/<preset_code>/activate", methods=["POST"])
+    def activate_preset(preset_code):
+        return ok(data=activate_graph_preset.execute(preset_code))
         
-    
     @bp.route("/locations", methods=["GET"])
     def get_like_locations():
         query = request.args.get("like_string")
 
         if not query:
-            return
+            return ValidationError(message="like_string query parameter is required")
         
         response = requests.get(
             "https://nominatim.openstreetmap.org/search",
