@@ -73,8 +73,8 @@ async function selectMission(id: string) {
             completedMission.value = true
 
             // RESTORE SAVED ANSWER
-            if (missionProgress.value?.selected_answer) {
-                selectedAnswer.value = missionProgress.value.selected_answer
+            if (missionProgress.value?.chosenAnswer) {
+                selectedAnswer.value = missionProgress.value.chosenAnswer
             }
 
         } catch {
@@ -230,7 +230,7 @@ async function saveProgress(){
         mission_id: selectedMission.value.mission_id!,
         status: status,
         score: get_score_from_tier(selectedMission.value.tier),
-        chosen_answer: selectedAnswer.value
+        chosenAnswer: selectedAnswer.value
     }
     try{
         await saveMissionProgress(progress)
@@ -338,9 +338,13 @@ onMounted(loadMissions)
                                 {{ mission.mission_name || 'Untitled Mission' }}
                             </p>
                             <span
-                                class="mt-1 inline-flex rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600"
+                                :class="['mt-1 inline-flex rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600',
+                                    mission.tier === 'EASY' ? 'mission-green' : '',
+                                    mission.tier === 'MEDIUM' ? 'mission-amber' : '',
+                                    mission.tier === 'HARD' ? 'mission-red' : '',
+                                ]"
                             >
-                                Tier: {{ capital_case(mission.tier) }}
+                                {{ capital_case(mission.tier) }}
                             </span>
                         </li>
                     </ul>
@@ -463,7 +467,7 @@ onMounted(loadMissions)
                         </div>
 
                         <p
-                            v-if="selectedAnswer && !(isCreating || (canEdit && isEditing))"
+                            v-if="(selectedAnswer && !(isCreating || (canEdit && isEditing))) || missionProgress"
                             class="mt-3 text-sm font-semibold"
                             :class="
                                 selectedAnswer === editableMission.answer
@@ -511,3 +515,22 @@ onMounted(loadMissions)
         </div>
     </section>
 </template>
+
+<style scoped>
+/* mapping mission tiers to appropriate colours */
+.mission-green {
+    color: rgb(255, 255, 255);
+    background-color: #16a34a;
+    font-weight: bold;
+}
+.mission-amber {
+    color: rgb(255, 255, 255);
+    background-color: #cc7b00;
+    font-weight: bold;
+}
+.mission-red {
+    color: rgb(255, 255, 255);
+    background-color: #ec0000;
+    font-weight: bold;
+}
+</style>

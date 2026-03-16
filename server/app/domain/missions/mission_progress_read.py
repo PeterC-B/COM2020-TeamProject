@@ -11,4 +11,4 @@ class MissionProgressReadSchema(Schema):
     mission_id = fields.UUID(required=True)
     status = fields.Enum(MissionStatus, by_value=True, required=True)
     score = fields.Integer(required=True)
-    selected_answer = fields.String(allow_none=True)
+    chosenAnswer = fields.String(allow_none=True)
