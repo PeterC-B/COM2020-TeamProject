@@ -1,5 +1,5 @@
 import requests
-from app.api.error_handlers import NotFoundError, ValidationError
+from app.api.error_handlers import NotFoundError, ValidationError, DataError
 from app.api.responses import ok
 from flask import Blueprint, request
 
@@ -14,6 +14,7 @@ def create_graph_route_blueprint(
     get_graph_preset,
     get_graph_preset_snapshot,
     activate_graph_preset,
+    fetch_node_context_uc
 ):
     bp = Blueprint("graph", __name__, url_prefix="/api/graph")
 
@@ -72,7 +73,7 @@ def create_graph_route_blueprint(
         return ok(data=data)
 
     @bp.route("/presets", methods=["GET"])
-    def list_presets():
+    def list_presets():    
         return ok(data=list_graph_presets.execute())
 
     @bp.route("/presets/<preset_code>", methods=["GET"])
@@ -85,7 +86,11 @@ def create_graph_route_blueprint(
 
     @bp.route("/presets/<preset_code>/activate", methods=["POST"])
     def activate_preset(preset_code):
-        return ok(data=activate_graph_preset.execute(preset_code))
+        try:
+            return ok(data=activate_graph_preset.execute(preset_code))
+        except Exception as e:
+            print("Error:", e)
+            raise NotFoundError()
         
     @bp.route("/locations", methods=["GET"])
     def get_like_locations():

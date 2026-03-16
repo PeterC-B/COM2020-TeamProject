@@ -168,6 +168,7 @@ def create_app():
             get_graph_preset_uc,
             get_graph_preset_snapshot_uc,
             activate_graph_preset_uc,
+            fetch_node_context_uc
         )
     )
     app.register_blueprint(create_health_routes(get_health_attributes_uc, get_default_weights_uc, explain_edge_cost_uc))

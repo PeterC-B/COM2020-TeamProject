@@ -38,4 +38,4 @@ if __name__ == '__main__':
     print(f"Port: {backend_port}")
     print(f"Debug mode: {debug_mode}")
 
-    app.run(host=host_address, port=backend_port, debug=debug_mode)
+    app.run(host=host_address, port=backend_port, debug=debug_mode, use_reloader=False)

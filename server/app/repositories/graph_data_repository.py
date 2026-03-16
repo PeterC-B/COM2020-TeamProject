@@ -9,6 +9,7 @@ from app.models.enums.LOCATION_TYPE import LocationType
 from app.models.graph_preset_model import GraphPresetModel
 from app.models.location_model import LocationModel
 from app.models.nodes_model import NodesModel
+from app.api.error_handlers import InterfaceError
 
 DEFAULT_GRAPH_PRESETS = [
     {"preset_code": "bristol", "name": "Bristol", "latitude": 51.4545, "longitude": -2.5879},
@@ -37,11 +38,12 @@ class GraphDataRepository:
 
         nodes_geojson = build_nodes_geojson(nodes_list)
         edges_geojson = build_edges_geojson(edges_list)
+        locations_geojson = build_locations_geojson(locations_list, nodes_list)
 
         return {
             "nodes": nodes_geojson,
             "edges": edges_geojson,
-            "locations": location_geojson,
+            "locations": locations_geojson,
             "center": centre,
         }
 
