@@ -12,6 +12,7 @@ from app.api.missions.routes import create_missions_blueprint
 from app.api.routing.routing_endpoints import create_routing_route_blueprint
 from app.api.users.routes import create_user_route_blueprint
 from app.api.leaderboard.routes import create_leaderboard_blueprint
+from app.api.analytics.routes import create_analytics_blueprint
 from app.config import Config
 from app.extensions import db, jwt, ma, migrate
 from app.repositories.graph_data_repository import GraphDataRepository
@@ -20,6 +21,7 @@ from app.repositories.routing_graph_repository import RoutingGraphRepository
 from app.repositories.leaderboard_repository import LeaderboardRepository
 from app.repositories.route_query_repository import RouteQueryRepository
 from app.repositories.user_repository import UserRepository
+from app.repositories.analytics_repository import AnalyticsRepository
 from app.use_cases.route_queries.list_route_queries import ListRouteQueries
 from app.use_cases.route_queries.log_route_query import LogRouteQuery
 from app.use_cases.users.forgot_password import ForgotPassword
@@ -44,6 +46,7 @@ from app.use_cases.users.list_users import ListUsers
 from app.use_cases.users.login_user import LoginUser
 from app.use_cases.users.register_user import RegisterUser
 from app.use_cases.missions.update_mission import UpdateMission
+from app.use_cases.analytics.get_mission_analytics import GetMissionAnalytics
 from app.models.change_logging import init_change_logging
 from app.unit_of_work.sqlalchemy_uow import SqlAlchemyUnitOfWork
 
@@ -101,6 +104,7 @@ def create_app():
     missions_repo = MissionsRepository(session)
     leaderboard_repo = LeaderboardRepository(session)
     route_query_repo = RouteQueryRepository(session)
+    analytics_repo = AnalyticsRepository(session)
 
     # Initialise the Use Cases
     register_user_uc = RegisterUser(uow, user_repo)
@@ -127,6 +131,7 @@ def create_app():
     get_mission_progress_uc = GetMissionProgress(leaderboard_repo)
     log_route_query_uc = LogRouteQuery(uow, route_query_repo)
     list_route_queries_uc = ListRouteQueries(route_query_repo)
+    get_mission_analytics_uc = GetMissionAnalytics(analytics_repo)
 
     # Initialise the Routes
     app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc, forgot_password_uc))
@@ -134,8 +139,8 @@ def create_app():
     app.register_blueprint(create_health_routes(get_health_attributes_uc, get_default_weights_uc, explain_edge_cost_uc))
     app.register_blueprint(create_missions_blueprint(list_missions_uc, get_mission_uc, get_mission_progress_uc, create_mission_uc, update_mission_uc, delete_mission_uc))
     app.register_blueprint(create_leaderboard_blueprint(get_leaderboard_uc, get_mission_progress_uc, save_mission_progress_uc))
-    app.register_blueprint(create_routing_route_blueprint(route_yens_uc, log_route_query_uc, list_route_queries_uc)
-)
+    app.register_blueprint(create_routing_route_blueprint(route_yens_uc, log_route_query_uc, list_route_queries_uc))
+    app.register_blueprint(create_analytics_blueprint(get_mission_analytics_uc))
 
 
     # Import error handlers

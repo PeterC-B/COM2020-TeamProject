@@ -27,7 +27,12 @@ const routes: RouteRecordRaw[] = [
         path: '/analytics/route-queries',
         component: () => import('@/views/RouteQueriesView.vue'),
         meta: { requiresAuth: true, requiresAdmin: true }
-    }
+    },
+    {
+        path: '/analytics/missions',
+        component: () => import('@/views/MissionAnalyticsView.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true }
+    },
 
 ]
 

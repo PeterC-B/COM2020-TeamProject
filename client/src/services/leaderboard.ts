@@ -5,7 +5,7 @@ export interface MissionProgress {
     mission_id: string
     status: 'incorrect' | 'correct'
     score: number
-    selected_answer?: string | null
+    chosen_answer: string
 }
 
 export async function saveMissionProgress(payload: MissionProgress){
