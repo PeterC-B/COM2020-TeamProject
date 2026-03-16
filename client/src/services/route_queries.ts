@@ -14,7 +14,5 @@ export async function FetchRouteQueries(){
     const response = await get<ApiEnvelope<RouteQueriesResponse[]>>(
         "/routing/queries"
     )
-    console.log(`Response:`)
-    console.log(response)
     return response.data.data
 }
