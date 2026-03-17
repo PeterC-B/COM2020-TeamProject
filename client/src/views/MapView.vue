@@ -16,6 +16,25 @@ import {
 } from '@/services/graph'
 import { fetchYensRoutes, type YensRoutesResponse } from '@/services/routing'
 import { useMainStore } from '@/stores/main'
+import ContextBox from '@/components/ContextBox.vue'
+
+type ContextPayload =
+    | {
+        kind: 'node'
+        id: number
+        name: string
+        nodeType: string
+        coordinates: [number, number]
+        extra?: string
+    }
+    | {
+        kind: 'edge'
+        id: number
+        access_score: number
+        greenery: number
+        lighting: number
+        surface_quality: number
+    }
 import { computed, onMounted, ref, watch } from 'vue'
 
 type SelectionPayload = {
@@ -42,6 +61,91 @@ const selection = ref<SelectionPayload>({
     start_location: null,
     end_location: null,
 })
+
+const showContext = ref(false);
+const selectedRouteIndex = ref<number | null>(null)
+const contextPayload = ref<ContextPayload | null>(null)
+let contextTimer: number | null = null;
+let isHovering = false;
+const hoveredFeatureId = ref<number | null>(null);
+
+function to_text(text:string): string{
+    return text.replace(/_/g, ' ')
+}
+
+function capital_case(word: string): string{
+    const lower = word.toLowerCase()
+    return lower.charAt(0).toUpperCase() + lower.slice(1)
+}
+
+function buildContextPayload(feature: any): ContextPayload | null {
+    const geomType = feature._geometry?.type
+
+    if (geomType === 'Point') {
+        return {
+            kind: 'node',
+            id: feature.properties.node_id,
+            name:
+                feature.properties.name !== 'NaN'
+                    ? feature.properties.name
+                    : capital_case(to_text(feature.properties.type)),
+            nodeType: capital_case(to_text(feature.properties.type)),
+            coordinates: feature._geometry.coordinates,
+            extra:
+                feature.properties.highway !== 'NaN'
+                    ? capital_case(to_text(feature.properties.highway))
+                    : undefined,
+        }
+    }
+
+    if (geomType === 'LineString') {
+        return {
+            kind: 'edge',
+            id: feature.properties.edge_id,
+            access_score: feature.properties.access_score,
+            greenery: feature.properties.greenery,
+            lighting: feature.properties.lighting,
+            surface_quality: feature.properties.surface_quality,
+        }
+    }
+
+    return null
+}
+
+function onShowContext(feature: any) {
+    const payload = buildContextPayload(feature)
+    if (!payload) return
+
+    const id = payload.id
+    isHovering = true
+
+    if (hoveredFeatureId.value === id) return
+    hoveredFeatureId.value = id
+
+    if (contextTimer) clearTimeout(contextTimer)
+
+    contextTimer = window.setTimeout(() => {
+        if (!isHovering) return
+        if (hoveredFeatureId.value !== id) return
+
+        contextPayload.value = payload
+        showContext.value = true
+    }, 1000)
+}
+
+function onHideContext() {
+    isHovering = false
+
+    if (contextTimer) {
+        clearTimeout(contextTimer)
+        contextTimer = null
+    }
+
+    hoveredFeatureId.value = null
+    showContext.value = false
+    contextPayload.value = null
+}
+
 const mainStore = useMainStore()
 const userId = computed(() => mainStore.user_id)
 
@@ -486,9 +590,30 @@ onMounted(async () => {
                         {{ routeError }}
                     </p>
                 </div>
+
+                <ContextBox
+                    class="absolute top-2 left-1 z-50 pointer-events-auto"
+                    :open="showContext"
+                    :payload="contextPayload"
+                    @close="onHideContext"
+                />
             </aside>
 
             <div class="space-y-6 lg:col-span-8">
+                <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-sm ring-1 ring-slate-100">
+                    <SimpleMap 
+                        :routes="routeGeometries" 
+                        :nodes="nodes" 
+                        :edges="edges" 
+                        :center="mapCenter" 
+                        :locations="locations" 
+                        :selected_route_index="selectedRouteIndex"
+                        @selection-change="onSelectionChange"
+                        @show-context="onShowContext"
+                        @hide-context="onHideContext"
+                        class="h-[700px] rounded-xl" 
+                    />
+
                 <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div class="mb-3 flex items-center justify-between">
                         <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400">
@@ -559,6 +684,7 @@ onMounted(async () => {
                                     v-for="(route, index) in routeData.routes"
                                     :key="index"
                                     class="group transition-colors hover:bg-slate-50 relative"
+                                    @click="selectedRouteIndex = selectedRouteIndex === index ? null : index"
                                 >
                                     <td
                                         :class="[
@@ -628,6 +754,7 @@ onMounted(async () => {
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </section>
 </template>

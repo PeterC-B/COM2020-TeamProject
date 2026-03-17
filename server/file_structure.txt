@@ -1,0 +1,436 @@
+Folder PATH listing
+Volume serial number is 2E35-658B
+C:.
+|   .gitignore
+|   dev_start.py
+|   docker-compose.yml
+|   file_structure.txt
+|   manage.py
+|   requirements.txt
+|   run.py
+|   
++---app
+|   |   config.py
+|   |   __init__.py
+|   |   
+|   +---api
+|   |   |   blueprints.py
+|   |   |   error_handlers.py
+|   |   |   responses.py
+|   |   |   __init__.py
+|   |   |   
+|   |   +---graph
+|   |   |   |   graph_endpoints.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           graph_endpoints.cpython-314.pyc
+|   |   |           
+|   |   +---health
+|   |   |   |   health_endpoints.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           health_endpoints.cpython-314.pyc
+|   |   |           
+|   |   +---helpers
+|   |   |   |   algorithm_helper.py
+|   |   |   |   edge_list.json
+|   |   |   |   route_helper.py
+|   |   |   |   route_info.json
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           algorithm_helper.cpython-314.pyc
+|   |   |           
+|   |   +---infrastructure
+|   |   |   +---cache
+|   |   |   |       c46215dd1d5d47e129d2004ad2c33156b27f05cc.json
+|   |   |   |       
+|   |   |   \---graphs
+|   |   |       |   blank_graph.png
+|   |   |       |   
+|   |   |       \---png
+|   |   |               blank_graph.png
+|   |   |               filled_graph.png
+|   |   |               shortestPathGraph.png
+|   |   |               
+|   |   +---leaderboard
+|   |   |   |   routes.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           routes.cpython-314.pyc
+|   |   |           
+|   |   +---missions
+|   |   |   |   routes.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           routes.cpython-314.pyc
+|   |   |           
+|   |   +---routing
+|   |   |   |   routing_endpoints.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           routing_endpoints.cpython-314.pyc
+|   |   |           
+|   |   +---users
+|   |   |   |   routes.py
+|   |   |   |   __init__.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           routes.cpython-312.pyc
+|   |   |           routes.cpython-314.pyc
+|   |   |           __init__.cpython-312.pyc
+|   |   |           __init__.cpython-314.pyc
+|   |   |           
+|   |   +---utils
+|   |   |   |   error_utils.py
+|   |   |   |   response_utils.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           response_utils.cpython-314.pyc
+|   |   |           
+|   |   \---__pycache__
+|   |           error_handlers.cpython-312.pyc
+|   |           error_handlers.cpython-314.pyc
+|   |           responses.cpython-312.pyc
+|   |           responses.cpython-314.pyc
+|   |           __init__.cpython-312.pyc
+|   |           __init__.cpython-314.pyc
+|   |           
+|   +---data
+|   |   |   convert.py
+|   |   |   
+|   |   +---processed
+|   |   |   |   bristol.graphml
+|   |   |   |   edges_geometry.csv
+|   |   |   |   edges_table.csv
+|   |   |   |   nodes_table.csv
+|   |   |   |   processed_graph.graphml
+|   |   |   |   
+|   |   |   \---maplibre
+|   |   |           edges.geojson
+|   |   |           nodes.geojson
+|   |   |           
+|   |   +---raw
+|   |   |       edges.csv
+|   |   |       raw_graph.graphml
+|   |   |       
+|   |   \---__pycache__
+|   |           convert.cpython-314.pyc
+|   |           
+|   +---domain
+|   |   |   errors.py
+|   |   |   user.py
+|   |   |   __init__.py
+|   |   |   
+|   |   +---analytics
+|   |   |       graph_tables.py
+|   |   |       
+|   |   +---indicators
+|   |   |   |   attribute_extraction.py
+|   |   |   |   edges.csv
+|   |   |   |   graph.png
+|   |   |   |   normalisation.py
+|   |   |   |   surface.csv
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           attribute_extraction.cpython-312.pyc
+|   |   |           attribute_extraction.cpython-314.pyc
+|   |   |           normalisation.cpython-312.pyc
+|   |   |           normalisation.cpython-314.pyc
+|   |   |           __init__.cpython-312.pyc
+|   |   |           __init__.cpython-314.pyc
+|   |   |           
+|   |   +---missions
+|   |   |   |   missions_read.py
+|   |   |   |   mission_progress_read.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           missions_read.cpython-314.pyc
+|   |   |           mission_progress_read.cpython-314.pyc
+|   |   |           
+|   |   +---routing
+|   |   |   |   geometry_utils.py
+|   |   |   |   graph_cache.py
+|   |   |   |   graph_loader.py
+|   |   |   |   nearest_node.py
+|   |   |   |   validate_coordinates.py
+|   |   |   |   
+|   |   |   +---algorithms
+|   |   |   |   |   astar_algorithm.py
+|   |   |   |   |   dijkstra_algorithm.py
+|   |   |   |   |   yen_algorithm.py
+|   |   |   |   |   
+|   |   |   |   \---__pycache__
+|   |   |   |           astar_algorithm.cpython-312.pyc
+|   |   |   |           astar_algorithm.cpython-314.pyc
+|   |   |   |           dijkstra_algorithm.cpython-312.pyc
+|   |   |   |           dijkstra_algorithm.cpython-314.pyc
+|   |   |   |           yen_algorithm.cpython-312.pyc
+|   |   |   |           yen_algorithm.cpython-314.pyc
+|   |   |   |           __init__.cpython-312.pyc
+|   |   |   |           __init__.cpython-314.pyc
+|   |   |   |           
+|   |   |   \---__pycache__
+|   |   |           geometry_utils.cpython-312.pyc
+|   |   |           geometry_utils.cpython-314.pyc
+|   |   |           graph_cache.cpython-312.pyc
+|   |   |           graph_cache.cpython-314.pyc
+|   |   |           graph_loader.cpython-312.pyc
+|   |   |           graph_loader.cpython-314.pyc
+|   |   |           nearest_node.cpython-312.pyc
+|   |   |           nearest_node.cpython-314.pyc
+|   |   |           validate_coordinates.cpython-312.pyc
+|   |   |           validate_coordinates.cpython-314.pyc
+|   |   |           __init__.cpython-312.pyc
+|   |   |           __init__.cpython-314.pyc
+|   |   |           
+|   |   +---scoring
+|   |   |   |   cost_functions.py
+|   |   |   |   test.csv
+|   |   |   |   test_1.csv
+|   |   |   |   weight_utils.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           cost_functions.cpython-314.pyc
+|   |   |           weight_utils.cpython-312.pyc
+|   |   |           weight_utils.cpython-314.pyc
+|   |   |           
+|   |   \---__pycache__
+|   |           errors.cpython-312.pyc
+|   |           errors.cpython-314.pyc
+|   |           __init__.cpython-312.pyc
+|   |           __init__.cpython-314.pyc
+|   |           
+|   +---extensions
+|   |   |   __init__.py
+|   |   |   
+|   |   \---__pycache__
+|   |           __init__.cpython-314.pyc
+|   |           
+|   +---models
+|   |   |   Base.py
+|   |   |   change_logging.py
+|   |   |   database_change_log_model.py
+|   |   |   edges_model.py
+|   |   |   location_model.py
+|   |   |   missions_model.py
+|   |   |   mission_progress_model.py
+|   |   |   nodes_model.py
+|   |   |   route_query_model.py
+|   |   |   user_account_model.py
+|   |   |   __init__.py
+|   |   |   
+|   |   +---enums
+|   |   |   |   ACCESS_TYPE.py
+|   |   |   |   HIGHWAY_FEATURES.py
+|   |   |   |   LOCATION_TYPE.py
+|   |   |   |   MISSION_STATUS.py
+|   |   |   |   MISSION_TIER.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           ACCESS_TYPE.cpython-314.pyc
+|   |   |           HIGHWAY_FEATURES.cpython-314.pyc
+|   |   |           LOCATION_TYPE.cpython-314.pyc
+|   |   |           MISSION_STATUS.cpython-314.pyc
+|   |   |           MISSION_TIER.cpython-314.pyc
+|   |   |           
+|   |   \---__pycache__
+|   |           Base.cpython-314.pyc
+|   |           change_logging.cpython-314.pyc
+|   |           database_change_log_model.cpython-314.pyc
+|   |           edges_model.cpython-314.pyc
+|   |           location_model.cpython-314.pyc
+|   |           missions_model.cpython-314.pyc
+|   |           mission_progress_model.cpython-314.pyc
+|   |           nodes_model.cpython-314.pyc
+|   |           route_query_model.cpython-314.pyc
+|   |           user_account_model.cpython-314.pyc
+|   |           __init__.cpython-314.pyc
+|   |           
+|   +---repositories
+|   |   |   db_error_mapper.py
+|   |   |   file_reader.py
+|   |   |   graph_data_repository.py
+|   |   |   leaderboard_repository.py
+|   |   |   mission_repository.py
+|   |   |   route_query_repository.py
+|   |   |   routing_graph_repository.py
+|   |   |   user_repository.py
+|   |   |   __init__.py
+|   |   |   
+|   |   \---__pycache__
+|   |           db_error_mapper.cpython-314.pyc
+|   |           graph_data_repository.cpython-314.pyc
+|   |           leaderboard_repository.cpython-314.pyc
+|   |           mission_repository.cpython-314.pyc
+|   |           route_query_repository.cpython-314.pyc
+|   |           routing_graph_repository.cpython-314.pyc
+|   |           user_repository.cpython-314.pyc
+|   |           __init__.cpython-314.pyc
+|   |           
+|   +---schemas
+|   |   |   route_query_schema.py
+|   |   |   
+|   |   +---user
+|   |   |   |   user_read.py
+|   |   |   |   user_register.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           user_read.cpython-312.pyc
+|   |   |           user_read.cpython-314.pyc
+|   |   |           user_register.cpython-314.pyc
+|   |   |           
+|   |   \---__pycache__
+|   |           route_query_schema.cpython-314.pyc
+|   |           
+|   +---security
+|   |   |   passwords.py
+|   |   |   
+|   |   \---__pycache__
+|   |           passwords.cpython-314.pyc
+|   |           
+|   +---tests
+|   |   |   conftest.py
+|   |   |   
+|   |   \---__pycache__
+|   |           conftest.cpython-314-pytest-9.0.2.pyc
+|   |           
+|   +---unit_of_work
+|   |   |   sqlalchemy_uow.py
+|   |   |   __init__.py
+|   |   |   
+|   |   \---__pycache__
+|   |           sqlalchemy_uow.cpython-314.pyc
+|   |           __init__.cpython-314.pyc
+|   |           
+|   +---use_cases
+|   |   |   __init__.py
+|   |   |   
+|   |   +---graph
+|   |   |   |   fetch_edge_data.py
+|   |   |   |   fetch_location_name.py
+|   |   |   |   fetch_node_data.py
+|   |   |   |   get_graph_data.py
+|   |   |   |   get_graph_data_for_coords.py
+|   |   |   |   __init__.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           fetch_edge_data.cpython-314.pyc
+|   |   |           fetch_location_name.cpython-314.pyc
+|   |   |           fetch_node_data.cpython-314.pyc
+|   |   |           get_graph_data.cpython-314.pyc
+|   |   |           get_graph_data_for_coords.cpython-314.pyc
+|   |   |           __init__.cpython-314.pyc
+|   |   |           
+|   |   +---health
+|   |   |   |   explain_edge_cost.py
+|   |   |   |   get_attributes.py
+|   |   |   |   get_default_weights.py
+|   |   |   |   __init__.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           explain_edge_cost.cpython-314.pyc
+|   |   |           get_attributes.cpython-314.pyc
+|   |   |           get_default_weights.cpython-314.pyc
+|   |   |           __init__.cpython-314.pyc
+|   |   |           
+|   |   +---leaderboard
+|   |   |   |   get_leaderboard.py
+|   |   |   |   get_mission_progress.py
+|   |   |   |   save_mission_progress.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           get_leaderboard.cpython-314.pyc
+|   |   |           get_mission_progress.cpython-314.pyc
+|   |   |           save_mission_progress.cpython-314.pyc
+|   |   |           
+|   |   +---missions
+|   |   |   |   create_mission.py
+|   |   |   |   delete_mission.py
+|   |   |   |   get_mission.py
+|   |   |   |   list_missions.py
+|   |   |   |   update_mission.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           create_mission.cpython-314.pyc
+|   |   |           delete_mission.cpython-314.pyc
+|   |   |           get_mission.cpython-314.pyc
+|   |   |           list_missions.cpython-314.pyc
+|   |   |           save_mission_progress.cpython-314.pyc
+|   |   |           update_mission.cpython-314.pyc
+|   |   |           
+|   |   +---route_queries
+|   |   |   |   list_route_queries.py
+|   |   |   |   log_route_query.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           list_route_queries.cpython-314.pyc
+|   |   |           log_route_query.cpython-314.pyc
+|   |   |           
+|   |   +---routing
+|   |   |   |   route_yens.py
+|   |   |   |   __init__.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           route_yens.cpython-314.pyc
+|   |   |           __init__.cpython-314.pyc
+|   |   |           
+|   |   +---users
+|   |   |   |   forgot_password.py
+|   |   |   |   get_user.py
+|   |   |   |   list_users.py
+|   |   |   |   login_user.py
+|   |   |   |   register_user.py
+|   |   |   |   update_user.py
+|   |   |   |   __init__.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           forgot_password.cpython-314.pyc
+|   |   |           list_users.cpython-314.pyc
+|   |   |           login_user.cpython-314.pyc
+|   |   |           register_user.cpython-314.pyc
+|   |   |           __init__.cpython-314.pyc
+|   |   |           
+|   |   \---__pycache__
+|   |           __init__.cpython-314.pyc
+|   |           
+|   \---__pycache__
+|           config.cpython-314.pyc
+|           create_app.cpython-312.pyc
+|           __init__.cpython-312.pyc
+|           __init__.cpython-314.pyc
+|           
++---cache
++---scripts
+|   |   check_locations.py
+|   |   seed_graph_to_db.py
+|   |   seed_route_queries.py
+|   |   setup_fresh_db.py
+|   |   
+|   +---preprocessing
+|   |   |   graph_preprocessor.py
+|   |   |   
+|   |   \---__pycache__
+|   |           graph_preprocessor.cpython-312.pyc
+|   |           graph_preprocessor.cpython-314.pyc
+|   |           
+|   +---visualisation
+|   |   |   test_plot.py
+|   |   |   visualisation_utils.py
+|   |   |   
+|   |   \---__pycache__
+|   |           test_plot.cpython-314-pytest-9.0.2.pyc
+|   |           test_plot.cpython-314.pyc
+|   |           visualisation_utils.cpython-312.pyc
+|   |           visualisation_utils.cpython-314.pyc
+|   |           
+|   \---__pycache__
+|           check_locations.cpython-314.pyc
+|           seed_graph_to_db.cpython-314.pyc
+|           seed_route_queries.cpython-314.pyc
+|           
+\---__pycache__
+        dev_start.cpython-314.pyc
+        run.cpython-314.pyc
+        __init__.cpython-312.pyc
+        __init__.cpython-314.pyc
+        

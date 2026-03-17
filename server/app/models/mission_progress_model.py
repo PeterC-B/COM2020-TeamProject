@@ -4,9 +4,8 @@ from app.extensions import db
 from app.models.enums.MISSION_STATUS import MissionStatus
 from app.models.missions_model import MissionsModel
 from app.models.user_account_model import UserAccountModel
-from sqlalchemy import UUID
 from sqlalchemy import Enum as SQLEnum
-from sqlalchemy import ForeignKey, Integer
+from sqlalchemy import ForeignKey, Integer, String, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 # TODO: Whenever changed, edit the report documentation
@@ -15,7 +14,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 class MissionProgressModel(db.Model):
     __tablename__ = "mission_progress"
     mission_progress_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    
+
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user_account.user_id"), nullable=False)
     user: Mapped["UserAccountModel"] = relationship("UserAccountModel", foreign_keys=[user_id])
 
@@ -24,3 +23,5 @@ class MissionProgressModel(db.Model):
 
     status: Mapped[MissionStatus] = mapped_column(SQLEnum(MissionStatus), nullable=False, default=MissionStatus.NOT_STARTED)
     score: Mapped[int] = mapped_column(Integer(), nullable=False)
+
+    chosenAnswer: Mapped[str] = mapped_column(String(), nullable=False)

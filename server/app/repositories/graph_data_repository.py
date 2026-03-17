@@ -37,7 +37,6 @@ class GraphDataRepository:
 
         nodes_geojson = build_nodes_geojson(nodes_list)
         edges_geojson = build_edges_geojson(edges_list)
-        location_geojson = build_locations_geojson(locations_list, nodes_list)
 
         return {
             "nodes": nodes_geojson,
@@ -55,7 +54,7 @@ class GraphDataRepository:
         sum_lon = 0.0
         count = 0
 
-        for node in nodes:
+        for node, _ in nodes:
             if node.x_coordinate is not None and node.y_coordinate is not None:
                 sum_lat += node.x_coordinate
                 sum_lon += node.y_coordinate
@@ -86,15 +85,21 @@ class GraphDataRepository:
         return self.session.query(EdgesModel).all()
 
     def get_all_nodes(self) -> list:
-        return self.session.query(NodesModel).all()
-
+        try:
+            stmt = (
+                select(NodesModel, LocationModel)
+                .join(LocationModel, NodesModel.node_id == LocationModel.node_id)
+            )
+            return self.session.execute(stmt).all()
+        except Exception as e:
+            raise InterfaceError(e)
+    
     def get_all_locations(self) -> list:
         stmt = select(LocationModel).where(LocationModel.name != "NaN")
         return self.session.execute(stmt).scalars().all()
 
     def get_location_name(self, node_id):
-        stmt = select(LocationModel.name).where(LocationModel.node_id == node_id)
-        print(node_id)
+        stmt = select(LocationModel).where(LocationModel.node_id == node_id)
         return self.session.execute(stmt).scalars().first()
 
     def get_used_locations(self) -> list:
@@ -107,6 +112,14 @@ class GraphDataRepository:
 
     def get_node_by_id(self, node_id):
         stmt = select(NodesModel).where(NodesModel.node_id == node_id)
+        return self.session.execute(stmt).scalars().first()
+    
+    def get_node_context(self, node_id):
+        stmt = (
+            select(NodesModel)
+            .join(LocationModel, NodesModel.node_id == LocationModel.node_id)
+            .where(NodesModel.node_id == node_id)
+        )
         return self.session.execute(stmt).scalars().first()
 
     def clear_tables(self):

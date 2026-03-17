@@ -1,5 +1,7 @@
 """Routing API endpoint for Yen's algorithm."""
 
+import json
+
 from app.api.responses import ok
 from flask import Blueprint, request
 from app.schemas.route_query_schema import RouteQuerySchema
@@ -50,23 +52,79 @@ def create_routing_route_blueprint(route_yens_uc, log_route_query_uc, list_route
     @bp.route("/queries", methods=["GET"])
     def list_route_queries():
         try:
-            result = list_route_queries_uc.execute()
-            data = [
-                {
-                    "query_id": rq.query_id,
-                    "user_id": rq.user_id,
-                    "start": rq.start,
-                    "end": rq.end,
-                    "weights_json": rq.weights_json,
-                    "chosen_route_rank": rq.chosen_route_rank,
-                    "chosen_route_path": rq.chosen_route_path,
-                    "timestamp": rq.timestamp,
-                    "name": user.username if user else None,
-                }
-                for rq, user in result
-            ]
+            rows = list_route_queries_uc.execute()
+
+            def normalize_coord(coord):
+                if isinstance(coord, list) and len(coord) == 2:
+                    lat, lon = coord
+                    return f"{float(lat):.6f},{float(lon):.6f}"
+
+                if isinstance(coord, dict) and "lat" in coord and "lon" in coord:
+                    return f"{float(coord['lat']):.6f},{float(coord['lon']):.6f}"
+
+                if isinstance(coord, str):
+                    cleaned = coord.strip().replace("[", "").replace("]", "")
+                    parts = cleaned.split(",")
+                    if len(parts) != 2:
+                        raise ValueError(f"Invalid coordinate format: {coord}")
+                    lat = float(parts[0].strip())
+                    lon = float(parts[1].strip())
+                    return f"{lat:.6f},{lon:.6f}"
+
+                raise ValueError(f"Unsupported coordinate type: {coord}")
+
+            def normalize_weights(weights):
+                if isinstance(weights, dict):
+                    return json.dumps(weights, sort_keys=True)
+
+                if weights is None:
+                    return "{}"
+
+                if isinstance(weights, str):
+                    try:
+                        parsed = json.loads(weights)
+                        if isinstance(parsed, dict):
+                            return json.dumps(parsed, sort_keys=True)
+                    except:
+                        pass
+
+                try:
+                    return json.dumps(weights, sort_keys=True)
+                except:
+                    return "{}"
+
+            grouped = {}
+
+            for rq, user in rows:
+                start_norm = normalize_coord(rq.start)
+                end_norm = normalize_coord(rq.end)
+                weights_norm = normalize_weights(rq.weights_json)
+
+                key = (start_norm, end_norm, weights_norm, ",".join(map(str, rq.chosen_route_path)))
+
+                if key not in grouped:
+                    grouped[key] = {
+                        "start": rq.start,
+                        "end": rq.end,
+                        "weights_json": rq.weights_json,
+                        "chosen_route_path": rq.chosen_route_path,
+                        "timestamp": rq.timestamp,
+                        "popularity": 1,
+                        "name": user.username if user else None,
+                    }
+                else:
+                    grouped[key]["popularity"] += 1
+                    if rq.timestamp > grouped[key]["timestamp"]:
+                        grouped[key]["timestamp"] = rq.timestamp
+
+            data = list(grouped.values())
+            data.sort(key=lambda x: x["popularity"], reverse=True)
+
             return ok(data=data)
+
         except Exception as e:
-            raise(ValidationError(message=e))
+            print("ROUTE QUERY ERROR:", e)
+            raise e
+
 
     return bp
