@@ -422,14 +422,6 @@ onMounted(loadMissions)
                                 class="w-full rounded-lg border border-slate-200 p-2 text-sm"
                             />
                             -->
-                            <style>
-                            .answer-grid {
-                            display: grid;
-                            grid-template-columns: 1fr 1fr;
-                            gap: 10px;
-                            }
-                            </style>
-
                             <div class="answer-grid">
                             <input type="text" placeholder="Answer A" id="ans-1">
                             <input type="text" placeholder="Answer B" id="ans-2">
@@ -548,5 +540,10 @@ onMounted(loadMissions)
     color: rgb(255, 255, 255);
     background-color: #ec0000;
     font-weight: bold;
+}
+.answer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
 }
 </style>
