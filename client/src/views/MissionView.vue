@@ -414,12 +414,28 @@ onMounted(loadMissions)
                                 <span class="ml-1 text-xs text-slate-400">(comma separated)</span>
                             </label>
 
+                            <!--
                             <textarea
                                 v-model="editableMission.possible_answers"
                                 rows="2"
                                 placeholder="Answer A, Answer B, Answer C"
                                 class="w-full rounded-lg border border-slate-200 p-2 text-sm"
                             />
+                            -->
+                            <style>
+                            .answer-grid {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 10px;
+                            }
+                            </style>
+
+                            <div class="answer-grid">
+                            <input type="text" placeholder="Answer A" id="ans-1">
+                            <input type="text" placeholder="Answer B" id="ans-2">
+                            <input type="text" placeholder="Answer C" id="ans-3">
+                            <input type="text" placeholder="Answer D" id="ans-4">
+                            </div>
 
                             <p class="mt-1 text-xs text-slate-400">
                                 These will be shuffled for travellers.
