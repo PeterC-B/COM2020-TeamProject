@@ -1,7 +1,7 @@
-import router from '@/router'
+import router from '@/router/index'
 import { useMainStore } from '@/stores/main'
 import axios from 'axios'
-import type { T } from 'vue-router/dist/router-CWoNjPRp.mjs'
+//import type { T } from 'vue-router/dist/router-CWoNjPRp.mjs'
 
 export type ApiEnvelope<T, M = Record<string, unknown>> = {
     data: T
