@@ -546,4 +546,9 @@ onMounted(loadMissions)
     grid-template-columns: 1fr 1fr;
     gap: 10px;
 }
+.answer-grid input {
+  border: 2px solid #666;
+  border-radius: 6px;
+  padding: 8px;
+}
 </style>
