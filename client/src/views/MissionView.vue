@@ -113,6 +113,11 @@ function startEditMission() {
     editableMission.value = { ...selectedMission.value }
 }
 
+function answersToList() {
+    const answers = editableMission.value?.possible_answers
+    return answers?.split(",")
+}
+
 async function startDeleteMission() {
     if(!canEdit.value){
         error.value = 'You do not have permission to delete missions'
@@ -411,7 +416,6 @@ onMounted(loadMissions)
                         <div v-if="(canEdit && isEditing) || isCreating">
                             <label class="mb-1 block text-sm font-semibold text-slate-700">
                                 Possible Answers
-                                <span class="ml-1 text-xs text-slate-400">(comma separated)</span>
                             </label>
 
                             <!--
@@ -423,10 +427,10 @@ onMounted(loadMissions)
                             />
                             -->
                             <div class="answer-grid">
-                            <input type="text" placeholder="Answer A" id="ans-1">
-                            <input type="text" placeholder="Answer B" id="ans-2">
-                            <input type="text" placeholder="Answer C" id="ans-3">
-                            <input type="text" placeholder="Answer D" id="ans-4">
+                            <input type="text" placeholder="Answer A" id="ans-1"> {{ answersToList()?[0]:"error" }}
+                            <input type="text" placeholder="Answer B" id="ans-2"> {{ answersToList()?[1]:"error" }}
+                            <input type="text" placeholder="Answer C" id="ans-3"> {{ answersToList()?[2]:"error" }}
+                            <input type="text" placeholder="Answer D" id="ans-4"> {{ answersToList()?[3]:"error" }}
                             </div>
 
                             <p class="mt-1 text-xs text-slate-400">
