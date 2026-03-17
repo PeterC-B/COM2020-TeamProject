@@ -547,7 +547,7 @@ onMounted(loadMissions)
     gap: 10px;
 }
 .answer-grid input {
-  border: 2px solid #666;
+  border: 1px solid #ccc;
   border-radius: 6px;
   padding: 8px;
 }
