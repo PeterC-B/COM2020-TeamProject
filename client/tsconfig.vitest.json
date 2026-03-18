@@ -5,9 +5,9 @@
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.vitest.tsbuildinfo",
     "baseUrl": ".",
-    "lib": [],
-    "types": ["node", "json", "vitest/globals"],
-    "paths":{
+    "resolveJsonModule": true,
+    "types": ["node", "vitest/globals"],
+    "paths": {
       "@/*": ["src/*"]
     }
   }
