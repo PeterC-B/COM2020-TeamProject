@@ -7,6 +7,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
+    root: process.cwd(),
     plugins: [vue(), vueDevTools(), tailwindcss()],
     resolve: {
         alias: {
@@ -21,4 +22,10 @@ export default defineConfig({
             },
         },
     },
+    test: {
+    environment: 'jsdom',
+    globals: true,
+    root: fileURLToPath(new URL('../', import.meta.url)), 
+    include: ['tests/**/*.{test,spec}.ts'],
+  },
 })
