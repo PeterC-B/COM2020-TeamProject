@@ -1,4 +1,4 @@
-import { get } from './api'
+import { get, type ApiEnvelope } from './api'
 
 export interface EdgeAnalyticsRow {
     edge_id: number
@@ -15,6 +15,6 @@ export interface EdgeAnalyticsRow {
 }
 
 export async function FetchEdgeAnalytics(): Promise<EdgeAnalyticsRow[]> {
-    const response = await get<{ status: string; data: EdgeAnalyticsRow[] }>('/analytics/edges')
+    const response = await get<ApiEnvelope<EdgeAnalyticsRow[]>>('/analytics/edges')
     return response.data.data
 }

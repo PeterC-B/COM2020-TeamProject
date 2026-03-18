@@ -64,6 +64,8 @@ from app.use_cases.users.login_user import LoginUser
 from app.use_cases.users.register_user import RegisterUser
 from app.use_cases.missions.update_mission import UpdateMission
 from app.use_cases.analytics.get_mission_analytics import GetMissionAnalytics
+from app.use_cases.analytics.get_node_analytics import GetNodeAnalytics
+from app.use_cases.analytics.get_edge_analytics import GetEdgeAnalytics
 from app.models.change_logging import init_change_logging
 from app.unit_of_work.sqlalchemy_uow import SqlAlchemyUnitOfWork
 
@@ -154,6 +156,8 @@ def create_app():
     log_route_query_uc = LogRouteQuery(uow, route_query_repo)
     list_route_queries_uc = ListRouteQueries(route_query_repo)
     get_mission_analytics_uc = GetMissionAnalytics(analytics_repo)
+    get_node_analytics_uc = GetNodeAnalytics(analytics_repo)
+    get_edge_analytics_uc = GetEdgeAnalytics(analytics_repo)
 
     # Initialise the Routes
     app.register_blueprint(create_user_route_blueprint(register_user_uc, list_users_uc, login_user_uc, forgot_password_uc))
@@ -175,7 +179,7 @@ def create_app():
     app.register_blueprint(create_missions_blueprint(list_missions_uc, get_mission_uc, get_mission_progress_uc, create_mission_uc, update_mission_uc, delete_mission_uc))
     app.register_blueprint(create_leaderboard_blueprint(get_leaderboard_uc, get_mission_progress_uc, save_mission_progress_uc))
     app.register_blueprint(create_routing_route_blueprint(route_yens_uc, log_route_query_uc, list_route_queries_uc))
-    app.register_blueprint(create_analytics_blueprint(get_mission_analytics_uc))
+    app.register_blueprint(create_analytics_blueprint(get_mission_analytics_uc, get_node_analytics_uc, get_edge_analytics_uc))
 
 
     # Import error handlers
