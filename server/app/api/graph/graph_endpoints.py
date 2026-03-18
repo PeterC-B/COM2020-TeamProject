@@ -26,10 +26,10 @@ def create_graph_route_blueprint(
             print(f"Error: {e}")
             raise ValidationError()
     
-    '''@bp.route("/node", methods=["GET"])
+    @bp.route("/node", methods=["GET"])
     def get_node_data():
         node_id = request.args.get("node_id")
-        return ok(data=fetch_node_data.execute(node_id))'''
+        return ok(data=fetch_node_data.execute(node_id))
     
     @bp.route("/edge", methods=["GET"])
     def get_edge_data():
@@ -73,7 +73,7 @@ def create_graph_route_blueprint(
         return ok(data=data)
 
     @bp.route("/presets", methods=["GET"])
-    def list_presets():    
+    def list_presets():
         return ok(data=list_graph_presets.execute())
 
     @bp.route("/presets/<preset_code>", methods=["GET"])
@@ -86,11 +86,7 @@ def create_graph_route_blueprint(
 
     @bp.route("/presets/<preset_code>/activate", methods=["POST"])
     def activate_preset(preset_code):
-        try:
-            return ok(data=activate_graph_preset.execute(preset_code))
-        except Exception as e:
-            print("Error:", e)
-            raise NotFoundError()
+        return ok(data=activate_graph_preset.execute(preset_code))
         
     @bp.route("/locations", methods=["GET"])
     def get_like_locations():
@@ -128,8 +124,7 @@ def create_graph_route_blueprint(
         ]
 
         return ok(data=suggestions)
-
-
+    
     @bp.route("/node", methods=["GET"])
     def fetch_node_context():
         node_id = request.args.get("node_id")
@@ -140,7 +135,4 @@ def create_graph_route_blueprint(
         data = fetch_node_context_uc.execute(node_id)
         return ok(data=data)
 
-        
-
-    
     return bp

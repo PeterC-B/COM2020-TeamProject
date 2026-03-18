@@ -237,6 +237,3 @@ class FetchDataForCoordinates:
         mark("build response payload")
         print(f"[FetchDataForCoordinates] done total={(time.perf_counter() - started_at):.2f}s")
         return result
-        mark("build response payload")
-        print(f"[FetchDataForCoordinates] done total={(time.perf_counter() - started_at):.2f}s")
-        return result

@@ -1,9 +1,10 @@
 from app.domain.errors import NotFoundError, ValidationError
-
+from app.use_cases.graph.get_graph_data_for_coords import FetchDataForCoordinates
 
 class ActivateGraphPreset:
-    def __init__(self, graph_data_repo):
+    def __init__(self, uow, graph_data_repo):
         self.graph_data_repo = graph_data_repo
+        self.uow = uow
 
     def execute(self, preset_code):
         self.graph_data_repo.ensure_default_presets()
@@ -11,13 +12,43 @@ class ActivateGraphPreset:
         if not preset:
             raise NotFoundError(message="Preset location not found")
 
-        snapshot = preset.get("snapshot")
+        snapshot = preset["snapshot"]
+
         if not snapshot or not isinstance(snapshot, dict):
             raise ValidationError(message="Preset snapshot not found")
+        
+        #if not isinstance(features, dict):
+           # raise ValidationError(message="Preset snapshot is invalid")
 
-        features = snapshot.get("features")
-        if not isinstance(features, dict):
-            raise ValidationError(message="Preset snapshot is invalid")
+        if snapshot["nodes"]["features"] == [] or snapshot["edges"]["features"] == [] or snapshot["locations"]["features"] == [] or snapshot["locations"]["center"] is None:
+            fetcher = FetchDataForCoordinates(
+                uow=self.uow,
+                graph_data_repo=self.graph_data_repo
+            )
 
-        self.graph_data_repo.load_graph_features(features)
+            snapshot = fetcher.execute(
+                coords=(preset["lat"], preset["lon"])
+            )
+            self.graph_data_repo.upsert_graph_preset_snapshot(preset["code"], snapshot)
+        
+        try:
+            self.graph_data_repo.load_graph_features(snapshot)
+            print(snapshot)
+            return snapshot
+        except:
+            try:
+                fetcher = FetchDataForCoordinates(
+                    uow=self.uow,
+                    graph_data_repo=self.graph_data_repo
+                )
+
+                new_snapshot = fetcher.execute(
+                    coords=(preset["lat"], preset["lon"])
+                )
+                self.graph_data_repo.upsert_graph_preset_snapshot(preset["code"], new_snapshot)
+                self.graph_data_repo.load_graph_features(new_snapshot)
+                print("New Snapshot", new_snapshot)
+                return new_snapshot
+            except Exception as e:
+                print("New snap", e)
         return snapshot

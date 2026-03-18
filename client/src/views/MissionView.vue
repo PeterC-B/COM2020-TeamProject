@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import {
     fetchMissions,
     fetchMission,
@@ -113,9 +113,17 @@ function startEditMission() {
     editableMission.value = { ...selectedMission.value }
 }
 
+const answerInputs = ref<string[]>(['', '', '', ''])
+
 function answersToList() {
     const answers = editableMission.value?.possible_answers
-    return answers?.split(",")
+    answerInputs.value = answers
+        ? answers.split(',').map(a => a.trim())
+        : ['', '', '', '']
+}
+
+function answersToString(){
+    return answerInputs.value.toString()
 }
 
 async function startDeleteMission() {
@@ -141,10 +149,12 @@ async function startDeleteMission() {
 async function saveMission() {
     if (!canEdit.value) {
         error.value = 'You do not have permission to modify missions'
-        return
+        return 
     }
 
     if (!editableMission.value) return
+
+    syncAnswersToMission()
 
     saving.value = true
     error.value = null
@@ -258,6 +268,34 @@ function get_score_from_tier(tier: string): number{
 function capital_case(word: string): string{
     const lower = word.toLowerCase()
     return lower.charAt(0).toUpperCase() + lower.slice(1)
+}
+
+
+watch(
+    () => editableMission.value?.possible_answers,
+    (answers) => {
+        const parsed = answers
+        ? answers.split(',').map(a => a.trim())
+        : []
+
+        answerInputs.value = [
+        parsed[0] ?? '',
+        parsed[1] ?? '',
+        parsed[2] ?? '',
+        parsed[3] ?? '',
+        ]
+    },
+    { immediate: true }
+)
+
+function syncAnswersToMission() {
+    if (!editableMission.value) return
+
+    editableMission.value.possible_answers =
+        answerInputs.value
+        .map(a => a.trim())
+        .filter(Boolean)
+        .join(', ')
 }
 
 onMounted(loadMissions)
@@ -427,10 +465,10 @@ onMounted(loadMissions)
                             />
                             -->
                             <div class="answer-grid">
-                            <input type="text" placeholder="Answer A" id="ans-1"> {{ answersToList()?[0]:"error" }}
-                            <input type="text" placeholder="Answer B" id="ans-2"> {{ answersToList()?[1]:"error" }}
-                            <input type="text" placeholder="Answer C" id="ans-3"> {{ answersToList()?[2]:"error" }}
-                            <input type="text" placeholder="Answer D" id="ans-4"> {{ answersToList()?[3]:"error" }}
+                                <input type="text" placeholder="Answer A" id="ans_1" v-model="answerInputs[0]"> 
+                                <input type="text" placeholder="Answer B" id="ans_2" v-model="answerInputs[1]">
+                                <input type="text" placeholder="Answer C" id="ans_3" v-model="answerInputs[2]"> 
+                                <input type="text" placeholder="Answer D" id="ans_4" v-model="answerInputs[3]"> 
                             </div>
 
                             <p class="mt-1 text-xs text-slate-400">

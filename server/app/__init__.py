@@ -138,7 +138,7 @@ def create_app():
     list_graph_presets_uc = ListGraphPresets(graph_data_repo)
     get_graph_preset_uc = GetGraphPreset(graph_data_repo)
     get_graph_preset_snapshot_uc = GetGraphPresetSnapshot(graph_data_repo)
-    activate_graph_preset_uc = ActivateGraphPreset(graph_data_repo)
+    activate_graph_preset_uc = ActivateGraphPreset(uow, graph_data_repo)
     get_health_attributes_uc = GetHealthAttributes()
     get_default_weights_uc = GetDefaultWeights()
     explain_edge_cost_uc = ExplainEdgeCost()

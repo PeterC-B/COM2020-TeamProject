@@ -288,8 +288,9 @@ async function selectPresetLocation(preset: PresetLocation) {
     mapCenter.value = [preset.lat, preset.lon]
 
     selectingArea.value = true
-    try {
+    try {  
         const graphData = await activateGraphPreset(preset.code)
+        console.log(graphData)
         nodes.value = assertFeatureCollection(graphData.features?.nodes, 'nodes')
         edges.value = assertFeatureCollection(graphData.features?.edges, 'edges')
         locations.value = assertFeatureCollection(graphData.features?.locations, 'locations')
