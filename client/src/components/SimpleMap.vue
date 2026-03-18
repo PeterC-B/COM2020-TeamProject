@@ -367,12 +367,18 @@ watch(selectedNodeId, (nodeId) => {
 watch(
   () => props.nodes,
   (newNodes) => {
-    if (!map || !newNodes) return;
+    if (!map || !newNodes) return
+    if (newNodes.type !== 'FeatureCollection' || !Array.isArray(newNodes.features)) {
+        console.warn('Invalid nodes FeatureCollection', newNodes)
+        return
+    }
 
     if (map.getLayer('nodes-circle')) map.removeLayer('nodes-circle');
     if (map.getLayer('nodes-circle-hit')) map.removeLayer('nodes-circle-hit');
     if (map.getLayer('nodes-circle-highlight')) map.removeLayer('nodes-circle-highlight');
     if (map.getSource('nodes')) map.removeSource('nodes');
+    
+    console.log("New nodes:" + newNodes)
 
     map.addSource('nodes', {
         type: 'geojson',

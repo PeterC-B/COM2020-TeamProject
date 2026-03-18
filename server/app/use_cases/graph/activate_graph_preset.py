@@ -40,7 +40,7 @@ class ActivateGraphPreset:
         
         try:
             self.graph_data_repo.load_graph_features(features)
-            return features
+            return snapshot
         except:
             try:
                 fetcher = FetchDataForCoordinates(

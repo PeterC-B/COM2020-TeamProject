@@ -291,6 +291,7 @@ async function selectPresetLocation(preset: PresetLocation) {
     selectingArea.value = true
     try {  
         const graphData = await activateGraphPreset(preset.code)
+        console.log("Graph Data: ")
         console.log(graphData)
         nodes.value = assertFeatureCollection(graphData.features?.nodes, 'nodes')
         edges.value = assertFeatureCollection(graphData.features?.edges, 'edges')
