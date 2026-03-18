@@ -34,11 +34,14 @@ if __name__ == '__main__':
         raise ValueError("DEBUG environment variable must be 'true' or 'false'.")
     
     reloader = getenv('DEV_RELOADER')
-    if reloader == 'false':
+    if reloader is None or reloader == 'true':
+        reloader = True
+    elif reloader == 'false':
         reloader = False
+    
     print("Starting server with the following configuration:")
     print(f"Host: {host_address}")
     print(f"Port: {backend_port}")
     print(f"Debug mode: {debug_mode}")
 
-    app.run(host=host_address, port=backend_port, debug=debug_mode, use_reloader=False)
+    app.run(host=host_address, port=backend_port, debug=debug_mode, use_reloader=reloader)
