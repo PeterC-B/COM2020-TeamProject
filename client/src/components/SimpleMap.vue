@@ -191,8 +191,6 @@ function renderRoutes(routes: Array<Array<[number, number]>> = []) {
             },
         })
     })
-
-    map.setCenter(map_center.value ? map_center.value : [-2.585757, 51.460498])
 }
 
 // Initialize map and load graph data.
@@ -302,6 +300,8 @@ onMounted(() => {
                     const feature = e.features?.[0]
                     if (!feature || feature.geometry.type !== 'Point') return
 
+                    console.log(feature)
+
                     hoveringNode = true
                     emit('show-context', feature)
                 })
@@ -315,6 +315,8 @@ onMounted(() => {
 
                     const feature = e.features?.[0]
                     if (!feature || feature.geometry.type !== 'LineString') return
+
+                    console.log(feature)
 
                     emit('show-context', feature)
                 })
@@ -373,8 +375,8 @@ watch(
     if (map.getSource('nodes')) map.removeSource('nodes');
 
     map.addSource('nodes', {
-      type: 'geojson',
-      data: newNodes,
+        type: 'geojson',
+        data: newNodes,
     });
 
     map.addLayer(NODE_BASE_LAYER);
@@ -385,20 +387,20 @@ watch(
 
     const bounds = new maplibregl.LngLatBounds();
     newNodes.features.forEach((f) => {
-      if (f.geometry.type !== 'Point') return;
+        if (f.geometry.type !== 'Point') return;
 
-      const coords = f.geometry.coordinates;
-      if (!Array.isArray(coords) || coords.length < 2) return;
+        const coords = f.geometry.coordinates;
+        if (!Array.isArray(coords) || coords.length < 2) return;
 
-      const [lng, lat] = coords;
+        const [lng, lat] = coords;
 
-      if (typeof lng === 'number' && typeof lat === 'number' && Number.isFinite(lng) && Number.isFinite(lat)) {
-        bounds.extend([lng, lat]);
-      }
+        if (typeof lng === 'number' && typeof lat === 'number' && Number.isFinite(lng) && Number.isFinite(lat)) {
+            bounds.extend([lng, lat]);
+        }
     });
 
     if (!bounds.isEmpty()) {
-      map.fitBounds(bounds, { padding: 40, maxZoom: 16 });
+        map.fitBounds(bounds, { padding: 40, maxZoom: 16 });
     }
   },
   { immediate: true }
@@ -414,25 +416,26 @@ watch(
 )
 
 watch(
-  () => props.locations,
-  () => {
-    if (!map) return
-    applySelectableNodeFilters()
-  },
-  { immediate: true }
+    () => props.locations,
+    () => {
+        if (!map) return
+        applySelectableNodeFilters()
+    },
+    { immediate: true }
 )
 
 watch(
-  () => props.center,
-  (newCenter) => {
-    if (!map || !newCenter) return
-    map.setCenter(toMapCoordinates(newCenter))
-  },
-  { immediate: true }
+    () => props.center,
+    (newCenter) => {
+        if (!map || !newCenter) return
+        console.log(newCenter)
+        map.setCenter(toMapCoordinates(newCenter))
+    },
+    { immediate: true }
 )
 
 onBeforeUnmount(() => {
-    dispose()
+    dispose()   
     map?.remove()
     map = null
 })

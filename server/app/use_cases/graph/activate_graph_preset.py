@@ -15,12 +15,19 @@ class ActivateGraphPreset:
         snapshot = preset["snapshot"]
 
         if not snapshot or not isinstance(snapshot, dict):
-            raise ValidationError(message="Preset snapshot not found")
-        
-        #if not isinstance(features, dict):
-           # raise ValidationError(message="Preset snapshot is invalid")
+            fetcher = FetchDataForCoordinates(
+                uow=self.uow,
+                graph_data_repo=self.graph_data_repo
+            )
 
-        if snapshot["nodes"]["features"] == [] or snapshot["edges"]["features"] == [] or snapshot["locations"]["features"] == [] or snapshot["locations"]["center"] is None:
+            snapshot = fetcher.execute(
+                coords=(preset["lat"], preset["lon"])
+            )
+            self.graph_data_repo.upsert_graph_preset_snapshot(preset["code"], snapshot)
+        
+        features = snapshot["features"]
+
+        if features["nodes"]["features"] == [] or features["edges"]["features"] == [] or features["locations"]["features"] == [] or features["center"] is None:
             fetcher = FetchDataForCoordinates(
                 uow=self.uow,
                 graph_data_repo=self.graph_data_repo
@@ -32,9 +39,8 @@ class ActivateGraphPreset:
             self.graph_data_repo.upsert_graph_preset_snapshot(preset["code"], snapshot)
         
         try:
-            self.graph_data_repo.load_graph_features(snapshot)
-            print(snapshot)
-            return snapshot
+            self.graph_data_repo.load_graph_features(features)
+            return features
         except:
             try:
                 fetcher = FetchDataForCoordinates(
@@ -46,9 +52,8 @@ class ActivateGraphPreset:
                     coords=(preset["lat"], preset["lon"])
                 )
                 self.graph_data_repo.upsert_graph_preset_snapshot(preset["code"], new_snapshot)
-                self.graph_data_repo.load_graph_features(new_snapshot)
-                print("New Snapshot", new_snapshot)
+                self.graph_data_repo.load_graph_features(new_snapshot["features"])
+                
                 return new_snapshot
             except Exception as e:
-                print("New snap", e)
-        return snapshot
+                raise ValidationError(e)

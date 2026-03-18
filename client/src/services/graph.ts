@@ -105,6 +105,8 @@ export async function fetchNodeContext(node_id: number){
         `/graph/node?node_id=${node_id}`
     )
 
+    console.log(response.data.data)
+
     return response.data.data
 }
 
@@ -116,6 +118,8 @@ export async function fetchEdgeContext(edge_id: number){
     if (!response.ok) {
         throw new Error(`Failed to fetch edge data`)
     }  
+
+    console.log(response)
 
     return response.json()
 }

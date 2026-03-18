@@ -113,6 +113,7 @@ def build_edges_geojson(
                     "greenery": float(edge.greenery),
                     "pollution": float(edge.pollution),
                     "surface_quality": float(edge.surface_quality),
+                    "pub_distance": float(edge.pub_distance)
                 },
             }
         )

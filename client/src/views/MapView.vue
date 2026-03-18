@@ -70,6 +70,7 @@ let isHovering = false;
 const hoveredFeatureId = ref<number | null>(null);
 
 function to_text(text:string): string{
+    if (typeof text !== 'string') return ''
     return text.replace(/_/g, ' ')
 }
 

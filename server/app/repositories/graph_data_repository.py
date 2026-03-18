@@ -153,6 +153,7 @@ class GraphDataRepository:
             geometry = feature["geometry"]
             coordinates = geometry["coordinates"]
             properties = feature["properties"]
+
             if len(coordinates) < 2:
                 continue
 
