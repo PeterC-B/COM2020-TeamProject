@@ -14717,11 +14717,13 @@ C:.
 |               AnalyticsHomeView.vue
 |               ForgotPasswordView.vue
 |               HomeView.vue
+|               LeaderboardAnalyticsView.vue
 |               LeaderboardView.vue
 |               LoginView.vue
 |               MapView.vue
 |               MissionAnalyticsView.vue
 |               MissionView.vue
+|               NodeBreakdownAnalytics.vue
 |               NotFoundView.vue
 |               ProfileView.vue
 |               RegisterView.vue
@@ -25543,7 +25545,6 @@ C:.
 |   |   .gitignore
 |   |   dev_start.py
 |   |   docker-compose.yml
-|   |   file_structure.txt
 |   |   manage.py
 |   |   requirements.txt
 |   |   run.py
@@ -25966,20 +25967,56 @@ C:.
 |   |           __init__.cpython-314.pyc
 |   |           
 |   +---cache
+|   |       01fce26d12ac2dbab5b9716ca0ada0f0444e3273.json
 |   |       0919354f40ada6bba89d7272137f501d5d613c94.json
+|   |       1197b5b74431c8ae291f3dcecf7b46141d6e33b3.json
+|   |       1412020e4b13aaff0a25fd69452266e7b480c9d1.json
 |   |       151dadd9e9f1392dbe6d1912c95a061a6928d6df.json
+|   |       154287b527598033ca7182f16ec73e70ec52ca45.json
+|   |       25b795081d410dbc9905939018b18d6bbbc4fb1f.json
+|   |       29fd4693bb75e438a003b3edf7431e4658e354b5.json
+|   |       2e5d5362fc6e4d2730415b641de4470cd7d10c6c.json
 |   |       38f474407cf644c3f46188ba6670a5841c532192.json
 |   |       3fea8799502c678917abb71cceb8d4468d2d84cf.json
 |   |       42435d302890617468b1e34c1820273af3b9fbdd.json
+|   |       49bb4d566f86aca172854cf524057b02c7670536.json
+|   |       4a22a7649e99eab0909234e8e1f89d58ec2fbfad.json
+|   |       4acba2f109a52761203fd41ed9f4b09304b1c737.json
+|   |       51f78fcfdb38afc92784fdd56af94c1968b465ef.json
+|   |       526346597d8690c88f709726de1d1c49f0656ce1.json
+|   |       5a70164abac2ad0dc7fe3e3c5f1781d43055c2f9.json
+|   |       5bcc336874a2ac77cc3059955a5aec5579db3e7b.json
 |   |       5e95242f2c789230f78e86e0813355411e456faa.json
 |   |       67af4a641ba66623d6926a6108475317e8771a57.json
 |   |       6983a36252c47fa5b8ea3af89b31d0aab77ea571.json
+|   |       69ea01fcb0b1ccc3cb594ea5da2ed6caffbf6249.json
 |   |       6b59da2679fb1fd5cbbde561b7502ced3b4c62c5.json
+|   |       6fb988a3e00330df191acddf9f82bfb8c4b24222.json
+|   |       74fd897102ea974f34ae24f7fdee2001f61eea84.json
+|   |       842d25fb0053cc7ba6d41118607ae0dcd7392eff.json
+|   |       87ef74fabce3c52a8224b582ce0d03d655718768.json
+|   |       8c9015fd5cf2ecf0e63b121317ea155c47112703.json
+|   |       8fff02c2ad3f2090c9b36d6e351ba90319d4493d.json
+|   |       93764cacad01ccd0768284f627d69702c3def045.json
+|   |       98201f95dbb9b8273ce36c1cc6372b27308c354c.json
 |   |       9b56b760e24ef41b059d78fb4b229ab00f05483e.json
+|   |       9d5c8cda94f086c57dae9f02e6d6fdd4d2676224.json
+|   |       a084d14327fc5fdbe2f9a1aa5e89100b5c395b52.json
+|   |       a945ecc9e86e1ad1aed2bb2c25f74bb004e4efb7.json
+|   |       aa26d5dec5d2688fbeb75554c9ab1a28f6d3c9e3.json
+|   |       b133e24a611d7fe5ea5c98e7f231840e06c95e01.json
+|   |       bae9b57521e61a3267b7d058f79e3cd73ac48e3b.json
+|   |       bd62b441f23885033701c156aaf0bfa91bedf86f.json
+|   |       c4e049f691ee634cb7a67bca87d07a0a12997e52.json
 |   |       c94c91099bcc517cbb57c3a338c38768dcc3d012.json
+|   |       d118ec0d17c95d826765fa2feac41af5eafb23c8.json
+|   |       d2a5161a2ea131a0dc9c7f4045789fed4bceddb7.json
+|   |       d8f06e74615ba41dd65224ac1cc4129dac222e43.json
 |   |       d92fdeb519e73e76f678df0ab576db82272b824f.json
+|   |       eeaf19f3a922ce1b80234188f114c67e37226737.json
 |   |       f7d3987a2eb9c9a67c50a3866b3d924bc7a40bca.json
 |   |       fb9f71498f13a8781318459167dd62e266bd5b52.json
+|   |       fe7b35832381fec50e2700a49e324cdfc86a876a.json
 |   |       
 |   +---data
 |   |   |   convert.py
