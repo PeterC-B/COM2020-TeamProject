@@ -18,6 +18,9 @@
             >
                 Mission Progress
             </router-link>
+
+            <router-link to="/analytics/leaderboard">Leaderboard</router-link>
+
         </div>
     </section>
 </template>
