@@ -16,7 +16,7 @@ def create_analytics_blueprint(get_mission_analytics_uc, get_node_analytics_uc, 
             analytics = get_mission_analytics_uc.execute()
             return ok(data=analytics)
         except Exception as e:
-            print("Error:", e)
+            print("Error", e)
             raise NotFoundError(message=str(e))
 
     @bp.route("/nodes", methods=["GET"])

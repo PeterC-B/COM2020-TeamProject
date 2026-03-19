@@ -56,4 +56,4 @@ class ActivateGraphPreset:
                 
                 return new_snapshot
             except Exception as e:
-                raise ValidationError(e)
+                raise ValidationError(message=e)

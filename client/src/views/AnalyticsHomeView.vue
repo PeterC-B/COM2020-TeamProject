@@ -29,14 +29,6 @@
             </router-link>
 
             <router-link
-                to="/analytics/route-breakdown"
-                class="px-6 py-3 text-sm font-bold transition-all hover:text-indigo-600 border-b-2 border-transparent hover:border-indigo-600 text-slate-500"
-                active-class="text-indigo-600 border-indigo-600 bg-indigo-50/30"
-            >
-                Route Breakdown
-            </router-link>
-
-            <router-link
                 to="/analytics/node-analytics"
                 class="px-6 py-3 text-sm font-bold transition-all hover:text-indigo-600 border-b-2 border-transparent hover:border-indigo-600 text-slate-500"
                 active-class="text-indigo-600 border-indigo-600 bg-indigo-50/30"

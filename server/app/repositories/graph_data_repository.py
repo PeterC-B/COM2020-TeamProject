@@ -171,7 +171,7 @@ class GraphDataRepository:
                     key=int(properties["key"]),
                     length=float(properties["length"]),
                     travel_time=float(properties["travel_time"]),
-                    access_score=float(properties["score_band"]),
+                    access_score=float(properties["access_score"]),
                     geometry=self._linestring_to_wkt(coordinates),
                     lighting=float(properties["lighting"]),
                     greenery=float(properties["greenery"]),

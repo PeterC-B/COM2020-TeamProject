@@ -31,8 +31,10 @@ export async function FetchRouteQueries(){
 }
 
 export async function FetchMissionAnalytics(){
-    const response = await get<ApiEnvelope<MissionAnalyticsPayload>>(
+    const response = await get<ApiEnvelope<MissionAnalyticsItem[]>>(
         "/analytics/missions"
     )
-    return response.data.data.mission_analytics
+    console.log("mission anal")
+    console.log(response.data.data)
+    return response.data.data
 }

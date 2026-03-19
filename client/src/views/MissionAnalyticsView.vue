@@ -73,7 +73,7 @@ const missionAccuracy = computed<MissionAccuracy[]>(() => {
 
 onMounted(async () => {
     try {
-        queries.value = await FetchMissionAnalytics()
+        queries.value = (await FetchMissionAnalytics())
     } catch (err: any) {
         error.value = 'Failed to load mission progress.'
     } finally {
