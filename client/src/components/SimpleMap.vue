@@ -55,6 +55,7 @@ let map: Map | null = null
 
 const nodes = ref<GeoJson | null>(null)
 const edges = ref<GeoJson | null>(null)
+const locations = ref<GeoJson | null>(null)
 const map_center = ref<LngLatLike | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
@@ -233,8 +234,11 @@ onMounted(() => {
                 if (!map) return
                 const nodeCollection = assertFeatureCollection(graphData.features?.nodes, 'nodes')
                 const edgeCollection = assertFeatureCollection(graphData.features?.edges, 'edges')
+                const locationCollection = assertFeatureCollection(graphData.features.locations, 'locations')
                 nodes.value = nodeCollection
                 edges.value = edgeCollection
+                locations.value = locationCollection
+
                 map_center.value = toMapCoordinates(graphData.features?.center)
 
                 map.addSource('edges', {
@@ -244,6 +248,10 @@ onMounted(() => {
                 map.addSource('nodes', {
                     type: 'geojson',
                     data: nodeCollection,
+                })
+                map.addSource('locations', {
+                    type: 'geojson',
+                    data: locationCollection
                 })
 
                 // Add render layers
@@ -316,8 +324,6 @@ onMounted(() => {
                     const feature = e.features?.[0]
                     if (!feature || feature.geometry.type !== 'LineString') return
 
-                    console.log(feature)
-
                     emit('show-context', feature)
                 })
 
@@ -378,8 +384,6 @@ watch(
     if (map.getLayer('nodes-circle-highlight')) map.removeLayer('nodes-circle-highlight');
     if (map.getSource('nodes')) map.removeSource('nodes');
     
-    console.log("New nodes:" + newNodes)
-
     map.addSource('nodes', {
         type: 'geojson',
         data: newNodes,

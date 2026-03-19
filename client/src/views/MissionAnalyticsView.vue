@@ -4,7 +4,6 @@ import { useMainStore } from '@/stores/main'
 import { FetchMissionAnalytics } from '@/services/route_queries'
 import { computed } from 'vue'
 
-const mainStore = useMainStore()
 const queries = ref<any[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
@@ -104,8 +103,6 @@ onMounted(async () => {
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Times completed</th>
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Percentage</th>
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Most common answer</th>
-                            <!--<th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Path</th>
-                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Timestamp</th>-->
                         </tr>
                     </thead>
 
@@ -118,10 +115,6 @@ onMounted(async () => {
                                 <span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md text-xs font-bold">{{ q.percentage }}%</span>
                             </td>
                             <td class="p-4 text-sm text-slate-600 max-w-[150px]">{{ q.most_chosen_answer ?? 'NaN' }}</td>
-                            <!--<td class="p-4">
-                                <p class="text-[10px] text-slate-400 truncate max-w-[100px]">{{ q.chosen_route_path }}</p>
-                            </td>
-                            <td class="p-4 text-xs font-semibold text-slate-500 max-w-[100px]">{{ q.timestamp }}</td>-->
                         </tr>
                     </tbody>
                 </table>
