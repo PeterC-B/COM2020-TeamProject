@@ -614,6 +614,7 @@ onMounted(async () => {
                         @selection-change="onSelectionChange"
                         @show-context="onShowContext"
                         @hide-context="onHideContext"
+                        @center-change="onMapCenterChange"
                         class="h-[700px] rounded-xl" 
                     />
 
