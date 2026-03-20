@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { FetchRouteQueries, type RouteQueriesResponse } from '@/services/route_queries'
+import { buildCsvContent, downloadCsv } from '@/lib/csv'
 
 const queries = ref<RouteQueriesResponse[]>([])
 const loading = ref(true)
@@ -8,31 +9,18 @@ const error = ref<string | null>(null)
 
 const csvHeaders = ['User', 'Start', 'End', 'Weights', 'Rank', 'Path', 'Timestamp']
 
-const serializeField = (value: unknown) => {
-    if (value === null || value === undefined) {
-        return ''
-    }
+const buildRouteQueriesCsvContent = () => {
+    const rows = queries.value.map((query) => [
+        query.name ?? 'Anonymous',
+        query.start,
+        query.end,
+        query.weights_json,
+        query.chosen_route_rank,
+        query.chosen_route_path,
+        query.timestamp,
+    ])
 
-    const text = typeof value === 'string' ? value : JSON.stringify(value)
-    return `"${text.replace(/"/g, '""')}"`
-}
-
-const buildCsvContent = () => {
-    const rows = queries.value.map((query) => {
-        const cells = [
-            query.name ?? 'Anonymous',
-            query.start,
-            query.end,
-            query.weights_json,
-            query.chosen_route_rank,
-            query.chosen_route_path,
-            query.timestamp,
-        ]
-
-        return cells.map(serializeField).join(',')
-    })
-
-    return [csvHeaders.join(','), ...rows].join('\r\n')
+    return buildCsvContent(csvHeaders, rows)
 }
 
 const downloadRouteQueriesCsv = () => {
@@ -40,15 +28,7 @@ const downloadRouteQueriesCsv = () => {
         return
     }
 
-    const blob = new Blob([buildCsvContent()], { type: 'text/csv;charset=utf-8;' })
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `route-queries-${new Date().toISOString().slice(0, 10)}.csv`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
+    downloadCsv(buildRouteQueriesCsvContent(), `route-queries-${new Date().toISOString().slice(0, 10)}.csv`)
 }
 
 function format_weights(weights: JSON): string{
