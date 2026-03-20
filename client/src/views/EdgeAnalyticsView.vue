@@ -1,9 +1,50 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { FetchEdgeAnalytics, type EdgeAnalyticsRow } from '@/services/edge_analytics'
+import { buildCsvContent, downloadCsv } from '@/lib/csv'
 
 const rows = ref<EdgeAnalyticsRow[]>([])
 const loading = ref(true)
+
+const csvHeaders = [
+  'Edge ID',
+  'From',
+  'To',
+  'Length (m)',
+  'Travel Time (s)',
+  'Access Score',
+  'Lighting',
+  'Greenery',
+  'Pollution',
+  'Surface Quality',
+  'Pub Distance',
+]
+
+const buildEdgeAnalyticsCsvContent = () => {
+  const rowData = rows.value.map((row) => [
+    row.edge_id,
+    row.from_node,
+    row.to_node,
+    row.length.toFixed(2),
+    row.travel_time.toFixed(2),
+    row.access_score.toFixed(2),
+    row.lighting.toFixed(2),
+    row.greenery.toFixed(2),
+    row.pollution.toFixed(2),
+    row.surface_quality.toFixed(2),
+    row.pub_distance.toFixed(2),
+  ])
+
+  return buildCsvContent(csvHeaders, rowData)
+}
+
+const downloadEdgeAnalyticsCsv = () => {
+  if (!rows.value.length) {
+    return
+  }
+
+  downloadCsv(buildEdgeAnalyticsCsvContent(), `edge-analytics-${new Date().toISOString().slice(0, 10)}.csv`)
+}
 
 onMounted(async () => {
   rows.value = await FetchEdgeAnalytics()
@@ -13,7 +54,16 @@ onMounted(async () => {
 
 <template>
   <div class="p-6 w-full">
-    <h1 class="text-2xl font-semibold mb-6">Edge Analytics</h1>
+    <div class="flex items-center justify-between gap-6 mb-6 flex-wrap">
+      <h1 class="text-2xl font-semibold">Edge Analytics</h1>
+      <button
+        class="rounded-md border border-slate-200 bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:border-slate-900 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+        :disabled="loading || !rows.length"
+        @click="downloadEdgeAnalyticsCsv"
+      >
+        Export CSV
+      </button>
+    </div>
 
     <div v-if="loading" class="text-gray-500 text-lg">
       Loading edge analytics…
