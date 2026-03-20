@@ -35,7 +35,6 @@ def compute_indicator_summary(graph:nx.MultiDiGraph, path, weights):
         "greenery": 0.0,
         "pollution": 0.0,
         "surface_quality": 0.0,
-        "amenity_proximity": 0.0,
     }
 
     edge_count = 0

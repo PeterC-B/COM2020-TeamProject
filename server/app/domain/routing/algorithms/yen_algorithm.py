@@ -34,9 +34,8 @@ def build_weighted_adjacency(graph: nx.MultiDiGraph, weights):
     weighted_graph = {}
 
     for from_node, to_node, _edge_key, edge_data in graph.edges(keys=True, data=True):
-        edge_cost = healthy_cost(edge_data, weights)
-        #edge_cost = edge_data["weight"]
-
+        #edge_cost = healthy_cost(edge_data, weights)
+        edge_cost = edge_data["weight"]
         if from_node not in weighted_graph:
             weighted_graph[from_node] = {}
 
