@@ -10,7 +10,7 @@ export type RouteRequest = {
     // Backend expects (lat, lon)
     start: [number, number]
     end: [number, number]
-    weights?: Record<string, number>
+    weights?: Record<string, number | boolean>
     user_id: string
 }
 
@@ -54,5 +54,7 @@ export function fetchYensRoutes({ start, end, k, weights, user_id }: YensRouteRe
     }).then(
         ({ data }) => data.data,
     )
+
+    console.log(response)
     return response
 }
