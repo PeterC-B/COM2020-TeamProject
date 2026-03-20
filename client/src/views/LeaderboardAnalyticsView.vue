@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { fetchAllMissionProgress } from '@/services/leaderboard'
+import { buildCsvContent, downloadCsv } from '@/lib/csv'
 
 const loading = ref(true)
 const error = ref<string | null>(null)
@@ -55,15 +56,56 @@ const leaderboard = computed(() => {
             ? Math.round((u.total_score / u.missions_attempted) * 100) / 100
             : 0,
         tier: u.total_score >= 100 ? 'Gold'
-            : u.total_score >= 50 ? 'Silver'
+        : u.total_score >= 50 ? 'Silver'
             : 'Bronze'
     }))
 })
+
+const csvHeaders = [
+    'Rank',
+    'User',
+    'Score (Earned / Potential)',
+    'Missions Completed',
+    'Accuracy',
+    'Avg Score',
+    'Tier',
+]
+
+const buildLeaderboardCsvContent = () => {
+    const rows = leaderboard.value.map((user) => [
+        user.rank,
+        user.user_id,
+        `${user.total_score} / ${user.potential_score}`,
+        user.missions_attempted,
+        user.accuracy,
+        user.avg_score,
+        user.tier,
+    ])
+
+    return buildCsvContent(csvHeaders, rows)
+}
+
+const downloadLeaderboardCsv = () => {
+    if (!leaderboard.value.length) {
+        return
+    }
+
+    downloadCsv(buildLeaderboardCsvContent(), `leaderboard-analytics-${new Date().toISOString().slice(0, 10)}.csv`)
+}
 </script>
 
 <template>
     <div class="mx-auto max-w-7xl p-6 antialiased">
-        <h1 class="text-3xl font-bold text-slate-900 mb-8">Leaderboard Analytics</h1>
+        <div class="flex items-center justify-between gap-6 mb-8 flex-wrap">
+            <h1 class="text-3xl font-bold text-slate-900">Leaderboard Analytics</h1>
+            <button
+                class="rounded-md border border-slate-200 bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:border-slate-900 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+                :disabled="loading || !leaderboard.length"
+                @click="downloadLeaderboardCsv"
+            >
+                Export CSV
+            </button>
+        </div>
 
         <div v-if="loading" class="p-12 text-center rounded-2xl border border-slate-200 bg-white text-slate-500 font-bold">
             Loading...

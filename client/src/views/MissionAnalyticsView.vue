@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useMainStore } from '@/stores/main'
+import { ref, onMounted, computed } from 'vue'
 import { FetchMissionAnalytics } from '@/services/route_queries'
-import { computed } from 'vue'
+import { buildCsvContent, downloadCsv } from '@/lib/csv'
 
 const queries = ref<any[]>([])
 const loading = ref(true)
@@ -69,6 +68,28 @@ const missionAccuracy = computed<MissionAccuracy[]>(() => {
     .sort((a, b) => b.percentage - a.percentage)
 })
 
+const csvHeaders = ['Mission', 'Times Correct', 'Times Completed', 'Percentage', 'Most Common Answer']
+
+const buildMissionAnalyticsCsvContent = () => {
+  const rows = missionAccuracy.value.map((entry) => [
+    entry.mission_name,
+    entry.correct,
+    entry.total,
+    entry.percentage,
+    entry.most_chosen_answer,
+  ])
+
+  return buildCsvContent(csvHeaders, rows)
+}
+
+const downloadMissionAnalyticsCsv = () => {
+  if (!missionAccuracy.value.length) {
+    return
+  }
+
+  downloadCsv(buildMissionAnalyticsCsvContent(), `mission-analytics-${new Date().toISOString().slice(0, 10)}.csv`)
+}
+
 
 onMounted(async () => {
     try {
@@ -83,7 +104,16 @@ onMounted(async () => {
 
 <template>
     <div class="mx-auto max-w-7xl p-6 antialiased">
-        <h1 class="text-3xl font-bold text-slate-900 mb-8">Mission Analytics</h1>
+        <div class="flex items-center justify-between gap-6 mb-8 flex-wrap">
+            <h1 class="text-3xl font-bold text-slate-900">Mission Analytics</h1>
+            <button
+                class="rounded-md border border-slate-200 bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:border-slate-900 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+                :disabled="loading || !missionAccuracy.length"
+                @click="downloadMissionAnalyticsCsv"
+            >
+                Export CSV
+            </button>
+        </div>
 
         <div v-if="loading" class="p-12 text-center rounded-2xl border border-slate-200 bg-white text-slate-500 font-bold">
             Loading...
