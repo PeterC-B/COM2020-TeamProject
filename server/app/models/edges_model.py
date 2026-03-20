@@ -1,7 +1,7 @@
 # ORM model representation of a user in the database
 from app.extensions import db
 from app.models.nodes_model import NodesModel
-from sqlalchemy import Float, ForeignKey, Integer, String
+from sqlalchemy import Float, ForeignKey, Integer, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 # TODO: Whenever changed, edit the report documentation
@@ -32,3 +32,5 @@ class EdgesModel(db.Model):
     pollution: Mapped[float] = mapped_column(Float(), nullable=False)
     surface_quality: Mapped[float] = mapped_column(Float(), nullable=False)
     pub_distance: Mapped[float] = mapped_column(Float(), nullable=False)
+
+    is_accessible: Mapped[bool] = mapped_column(Boolean(), nullable=True, default=True)

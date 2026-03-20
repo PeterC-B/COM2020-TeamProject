@@ -59,22 +59,22 @@ def extract_greenery(edge_data):
 
     highway = str(highway).lower()
 
-    if highway in {"path", "footway", "cycleway", "bridleway"}:
-        return 0.9
-
     if edge_data.get("landuse") in {"forest", "grass", "meadow", "park"}:
-        return 0.9
-
-    if highway in {"residential", "living_street"}:
         return 0.6
 
+    if highway in {"path", "footway", "cycleway", "bridleway"}:
+        return 0.6
+
+    if highway in {"residential", "living_street"}:
+        return 0.5
+
     if highway in {"primary", "secondary", "tertiary"}:
-        return 0.3
+        return 0.4
 
     if highway in {"motorway", "trunk"}:
-        return 0.1
+        return 0.3
 
-    return 0.4
+    return 0.5
 
 
 # Pollution
@@ -91,18 +91,18 @@ def extract_pollution(edge_data):
     highway = str(highway).lower()
 
     if highway in {"motorway", "trunk"}:
-        return 1.0
+        return 0.6
 
     if highway in {"primary", "secondary"}:
-        return 0.7
+        return 0.5
 
     if highway in {"tertiary", "residential"}:
         return 0.4
 
     if highway in {"footway", "cycleway", "path"}:
-        return 0.1
+        return 0.3
 
-    return 0.3
+    return 0.5
 
 
 # Surface Quality
@@ -115,13 +115,13 @@ def extract_surface_quality(edge_data):
 
     surface = str(surface).lower()
 
-    #good = {"paved", "asphalt", "concrete", "paving_stones"}
-    #medium = {"compacted", "fine_gravel", "gravel"}
-    #poor = {"dirt", "earth", "mud", "sand", "grass"}
+    good = {"paved", "asphalt", "concrete", "paving_stones"}
+    medium = {"compacted", "fine_gravel", "gravel"}
+    poor = {"dirt", "earth", "mud", "sand", "grass"}
 
-    good = {"asphalt", "concrete"}
-    medium = {"paved"}
-    poor = {"paving_stones"}
+    #good = {"asphalt", "concrete"}
+    #medium = {"paved"}
+    #poor = {"paving_stones"}
 
     if surface in good:
         return 0.9
