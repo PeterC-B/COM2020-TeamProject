@@ -21,7 +21,7 @@ def compute_path_distance(graph: nx.MultiDiGraph, path):
 
         # Use the first edge key (OSMnx graphs rarely have parallel edges)
         first_key = next(iter(edge_data))
-        total += edge_data[first_key].get("length", 0.0)
+        total += edge_data[first_key].get("distance", 0.0)
 
     return total
 
@@ -165,7 +165,6 @@ def compare_routes(routes):
             - longest_distance
             - average_distance
     """
-
     if not routes:
         return {
             "count": 0,

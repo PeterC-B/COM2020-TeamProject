@@ -22,7 +22,7 @@ DEFAULT_WEIGHTS = {
     "greenery": 1.0,
     "pollution": 1.0,
     "surface_quality": 1.0,
-    "amenity_proximity": 1.0,
+    "accessible": 1.0,
 }
 
 
@@ -70,7 +70,7 @@ def apply_default_weights(weights=None):
 
     if weights is None:
         return DEFAULT_WEIGHTS.copy()
-
+    
     final = {}
 
     for key, default_val in DEFAULT_WEIGHTS.items():
@@ -97,6 +97,10 @@ def calculate_safety_score(edge_data : gpd.GeoDataFrame, safety_priority : float
     drinking_place_distance = edge_data.get("normalised_pub_distance")
     return (1-safety_priority) * lighting * drinking_place_distance
 
+def check_if_accessible(highway: str):
+    if highway.__contains__("steps"):
+        return False
+    return True
 
 def normalize_pub_distance(
     distance_to_pub: float,
@@ -159,7 +163,11 @@ def calculate_greenery_score(edge_data : gpd.GeoDataFrame, greenery_priority : f
     pollution = edge_data.get("pollution")
     return (1-greenery) * pollution * (1-greenery_priority)
 
-def calculate_weight(edge_data : gpd.GeoDataFrame):
+def calculate_weight(edge_data : gpd.GeoDataFrame, accessible : float):
+    print("Accessible:", accessible_ ," : ", accessible)
+    accessible_ = edge_data.get("is_accessible")
+    if accessible_ == True and accessible == 1.0:
+        return 99999999
     greenery_score = edge_data.get("greenery_score")
     safety_score = edge_data.get("safety_score")
     speed_score = edge_data.get("speed_score")
@@ -167,16 +175,18 @@ def calculate_weight(edge_data : gpd.GeoDataFrame):
 
     return length * (greenery_score + safety_score + speed_score)
 
-def apply_weights(G, safety_priority=0.5, speed_priority=0.5, greenery_priority=0.5):
+def apply_weights(G, safety_priority=0.5, speed_priority=0.5, greenery_priority=0.5, is_accessible = True):
     for u, v, k, data in G.edges(keys=True, data=True):
 
         safety_score = (data.get("access_score", 0) or 0) * safety_priority
         speed_score = (1 / (data.get("travel_time", 1))) * speed_priority
-        greenery_score = (1 - data.get("greenery", 0.5)) * data.get("pollution") * (1-greenery_priority)
+        greenery_score = (1 - data.get("greenery", 0.5)) * data.get("pollution") * (1-greenery_priority) * 10
+        accessible_score = 999999999999 if (is_accessible and not data.get("accessible")) else 0
 
-        data["weight"] = (safety_score + speed_score * greenery_score) * data.get("length")
+        data["weight"] = (safety_score + speed_score + greenery_score + accessible_score) * data.get("distance")
 
-def calculate_weights(edges_gdf : gpd.GeoDataFrame, centre : tuple[float, float], safety_priority : float = 0.5, speed_priority : float = 0.5, greenery_priority : float = 0.5) -> gpd.GeoDataFrame:
+def calculate_weights(edges_gdf : gpd.GeoDataFrame, centre : tuple[float, float], safety_priority : float = 0.5, speed_priority : float = 0.5, greenery_priority : float = 0.5, accessible : float = 0.0) -> gpd.GeoDataFrame:
+    
     edges_gdf_copy = edges_gdf.copy()
 
     edges_gdf_copy = add_pub_distance(edges_gdf=edges_gdf_copy, coords=centre)
@@ -188,5 +198,5 @@ def calculate_weights(edges_gdf : gpd.GeoDataFrame, centre : tuple[float, float]
     edges_gdf_copy["safety_score"] = edges_gdf_copy.apply(calculate_safety_score, axis=1, args=(safety_priority,))
     edges_gdf_copy["speed_score"] = edges_gdf_copy.apply(calculate_speed_score, axis=1, args=(speed_priority,))
     edges_gdf_copy["greenery_score"] = edges_gdf_copy.apply(calculate_greenery_score, axis=1, args=(greenery_priority,))
-    edges_gdf_copy["weight"] = edges_gdf_copy.apply(calculate_weight, axis=1)
+    edges_gdf_copy["weight"] = edges_gdf_copy.apply(calculate_weight, axis=1, args=(accessible,))
     return edges_gdf_copy

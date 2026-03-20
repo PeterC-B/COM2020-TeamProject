@@ -37,10 +37,10 @@ HS_ATTRIBUTES = {
         "default": 0.5,
         "normalise": True
     },
-    "amenity_proximity": {
-        "description": "Amenity proximity score (0–1)",
-        "default": 0.2,
-        "normalise": True
+    "accessible": {
+        "description": "Is the edge accessible?",
+        "default": True,
+        "normalise": False
     }
 }
 
@@ -52,7 +52,7 @@ DEFAULT_WEIGHTS = {
     "greenery": 1.0,
     "pollution": 1.0,
     "surface_quality": 1.0,
-    "amenity_proximity": 1.0,
+    "accessible": 1.0,
 }
 
 
@@ -77,7 +77,7 @@ def healthy_cost(edge_data, weights=None):
     # Scale distance so it doesn't dominate
     distance = edge.get("distance", 1)
     distance_scaled = distance / 100.0  # convert meters → ~0–10 range
-
+    
     total_cost = 0
 
     for attr, weight in weights.items():

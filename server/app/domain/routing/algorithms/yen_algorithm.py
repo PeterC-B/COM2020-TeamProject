@@ -12,7 +12,6 @@ from app.domain.routing.nearest_node import get_nearest_node
 from app.domain.scoring.cost_functions import healthy_cost
 from app.domain.scoring.weight_utils import (apply_default_weights,
                                                     validate_weights)
-from app.data.convert import build_graph, build_edges_geojson, build_nodes_geojson
 
 
 def parse_coordinates(coords):
@@ -36,14 +35,14 @@ def build_weighted_adjacency(graph: nx.MultiDiGraph, weights):
 
     for from_node, to_node, _edge_key, edge_data in graph.edges(keys=True, data=True):
         edge_cost = healthy_cost(edge_data, weights)
+        #edge_cost = edge_data["weight"]
 
         if from_node not in weighted_graph:
             weighted_graph[from_node] = {}
 
         current = weighted_graph[from_node].get(to_node)
         if current is None or edge_cost < current:
-            weighted_graph[from_node][to_node] = edge_cost
-
+            weighted_graph[from_node][to_node] = edge_data["weight"]
     return weighted_graph
 
 

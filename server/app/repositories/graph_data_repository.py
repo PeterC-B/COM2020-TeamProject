@@ -178,6 +178,7 @@ class GraphDataRepository:
                     pollution=float(properties["pollution"]),
                     surface_quality=float(properties["surface_quality"]),
                     pub_distance=float(properties["pub_distance"]),
+                    is_accessible=properties["is_accessible"]
                 )
             )
 

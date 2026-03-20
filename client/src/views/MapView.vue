@@ -175,7 +175,7 @@ const weightFields = [
     { key: 'lighting', label: 'Lighting' },
     { key: 'greenery', label: 'Greenery' },
     { key: 'surface_quality', label: 'Surface Quality' },
-    { key: 'amenity_proximity', label: 'Amenity Proximity' },
+    { key: 'accessible', label: 'Accessible' },
 ] as const
 
 const weights = ref({
@@ -183,7 +183,7 @@ const weights = ref({
     lighting: 5,
     greenery: 5,
     surface_quality: 5,
-    amenity_proximity: 5,
+    accessible: false,
 })
 
 const defaultPresetLocations: PresetLocation[] = [
@@ -291,8 +291,6 @@ async function selectPresetLocation(preset: PresetLocation) {
     selectingArea.value = true
     try {  
         const graphData = await activateGraphPreset(preset.code)
-        console.log("Graph Data: ")
-        console.log(graphData)
         nodes.value = assertFeatureCollection(graphData.features?.nodes, 'nodes')
         edges.value = assertFeatureCollection(graphData.features?.edges, 'edges')
         locations.value = assertFeatureCollection(graphData.features?.locations, 'locations')
@@ -363,12 +361,13 @@ async function requestRoute() {
 
     loadingRoute.value = true
     routeError.value = null
-    const normalizedWeights = Object.fromEntries(
-        Object.entries(weights.value).map(([key, value]) => [
-            key,
-            Math.max(1, Math.min(10, Number(value) || 1)),
-        ]),
-    )
+    const normalizedWeights = {
+        distance: Math.max(1, Math.min(10, weights.value.distance)),
+        lighting: Math.max(1, Math.min(10, weights.value.lighting)),
+        greenery: Math.max(1, Math.min(10, weights.value.greenery)),
+        surface_quality: Math.max(1, Math.min(10, weights.value.surface_quality)),
+        accessible: weights.value.accessible,
+    }
 
     try {
         routeData.value = await fetchYensRoutes({
@@ -540,8 +539,8 @@ onMounted(async () => {
                     </h3>
 
                     <div class="space-y-5">
-                        <div v-for="field in weightFields" :key="field.key" class="group">
-                            <div class="flex justify-between mb-1.5">
+                        <div v-for="(field, index) in weightFields" :key="field.key" class="group">
+                            <div class="flex justify-between mb-1.5" v-if="index !== weightFields.length - 1">
                                 <label class="text-sm font-semibold text-slate-700">{{
                                     field.label
                                 }}</label>
@@ -551,6 +550,7 @@ onMounted(async () => {
                                 >
                             </div>
                             <input
+                                v-if="index !== weightFields.length - 1"
                                 v-model.number="weights[field.key]"
                                 type="range"
                                 min="1"
@@ -558,6 +558,23 @@ onMounted(async () => {
                                 step="1"
                                 class="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-slate-100 accent-indigo-600 transition-all hover:bg-slate-200"
                             />
+                            <div v-if="index === weightFields.length - 1">
+                                <div class="flex justify-between mb-1.5" >
+                                    <label class="text-sm font-semibold text-slate-700">{{
+                                        field.label
+                                    }}</label>
+                                    <span
+                                        class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 rounded"
+                                        >{{ weights.accessible ? 'True' : 'False' }}</span
+                                    >
+                                </div>
+                                <div class="relative inline-block w-11 h-5">
+                                    <input :id="`accessible-switch-${index}`" v-model="weights.accessible" type="checkbox" class="peer appearance-none w-11 h-5 accent-indigo-600 rounded-full checked:bg-indigo-600 cursor-pointer transition-colors duration-300" />
+                                    <label :for="`accessible-switch-${index}`" class="absolute top-0 left-0 w-5 h-5 bg-white rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-6 peer-checked:border-slate-800 cursor-pointer">
+                                    </label>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 

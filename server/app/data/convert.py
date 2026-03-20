@@ -113,7 +113,8 @@ def build_edges_geojson(
                     "greenery": float(edge.greenery),
                     "pollution": float(edge.pollution),
                     "surface_quality": float(edge.surface_quality),
-                    "pub_distance": float(edge.pub_distance)
+                    "pub_distance": float(edge.pub_distance),
+                    "is_accessible": edge.is_accessible
                 },
             }
         )
@@ -159,7 +160,7 @@ def build_graph(nodes, edges):
             edge.from_node_id,
             edge.to_node_id,
             key=edge.key,
-            length=edge.length,
+            distance=edge.length,
             travel_time=edge.travel_time,
             access_score=edge.access_score,
             geometry=wkt.loads(edge.geometry) if edge.geometry else None,
@@ -167,6 +168,7 @@ def build_graph(nodes, edges):
             greenery=edge.greenery,
             pollution=edge.pollution,
             surface_quality=edge.surface_quality,
+            accessible=edge.is_accessible,
         )
 
     return G
