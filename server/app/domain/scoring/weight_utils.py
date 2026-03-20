@@ -164,7 +164,6 @@ def calculate_greenery_score(edge_data : gpd.GeoDataFrame, greenery_priority : f
     return (1-greenery) * pollution * (1-greenery_priority)
 
 def calculate_weight(edge_data : gpd.GeoDataFrame, accessible : float):
-    print("Accessible:", accessible_ ," : ", accessible)
     accessible_ = edge_data.get("is_accessible")
     if accessible_ == True and accessible == 1.0:
         return 99999999

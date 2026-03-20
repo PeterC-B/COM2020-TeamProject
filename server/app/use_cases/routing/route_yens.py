@@ -13,6 +13,5 @@ class RouteYens:
         keys = list(weights.keys())[:-1]
         for key, weight in zip(keys, all_but_last):
             weights[key] = weight / 10
-        print(weights)
         graph = self.routing_graph_repo.get_cached_graph(weights)
         return process_yens_routing_request(payload, graph=graph)

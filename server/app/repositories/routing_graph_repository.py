@@ -14,8 +14,6 @@ class RoutingGraphRepository:
             nodes_list = self.get_all_nodes()
             edges_list = self.get_all_edges()
 
-            print(weights)
-
             #edge_geometries = load_edge_geometries(geom_csv)
             graph = build_graph(nodes_list, edges_list)
 
