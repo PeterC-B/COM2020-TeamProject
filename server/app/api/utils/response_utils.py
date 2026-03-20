@@ -44,7 +44,13 @@ def compute_indicator_summary(graph:nx.MultiDiGraph, path, weights):
         edge_data = graph.get_edge_data(u, v)
         if not edge_data:
             continue
+            
+        all_weights = []
+        for weights in edge_data.values():
+            all_weights.append(weights["weight"])
 
+        weighted_score += min(all_weights)
+                
         first_key = next(iter(edge_data))
         data = edge_data[first_key]
 
@@ -53,11 +59,11 @@ def compute_indicator_summary(graph:nx.MultiDiGraph, path, weights):
             totals[key] += data.get(key, 0.0)
 
         # Weighted score
-        for key, w in weights.items():
+        '''for key, w in weights.items():
             if key == "distance":
                 continue  # distance handled separately
             if key in data:
-                weighted_score += data[key] * w
+                weighted_score += data[key] * w'''
 
         edge_count += 1
 

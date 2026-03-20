@@ -17,12 +17,12 @@ DISTANCE = 700
 
 # Full set of supported indicators
 DEFAULT_WEIGHTS = {
-    "distance": 1.0,
-    "lighting": 1.0,
-    "greenery": 1.0,
-    "pollution": 1.0,
-    "surface_quality": 1.0,
-    "accessible": 1.0,
+    "distance": 0.5,
+    "lighting": 0.5,
+    "greenery": 0.5,
+    "pollution": 0.5,
+    "surface_quality": 0.5,
+    "accessible": 0.0,
 }
 
 
@@ -178,8 +178,8 @@ def calculate_weight(edge_data : gpd.GeoDataFrame, accessible : float):
 def apply_weights(G, safety_priority=0.5, speed_priority=0.5, greenery_priority=0.5, is_accessible = True):
     for u, v, k, data in G.edges(keys=True, data=True):
 
-        safety_score = (data.get("access_score", 0) or 0) * safety_priority
-        speed_score = (1 / (data.get("travel_time", 1))) * speed_priority
+        safety_score = (data.get("lighting", 0) or 0) * safety_priority
+        speed_score = (10 / (data.get("travel_time", 1))) * (speed_priority)
         greenery_score = (1 - data.get("greenery", 0.5)) * data.get("pollution") * (1-greenery_priority) * 10
         accessible_score = 999999999999 if (is_accessible and not data.get("accessible")) else 0
 
