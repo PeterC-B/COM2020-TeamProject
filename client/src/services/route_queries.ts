@@ -1,6 +1,7 @@
 import { get, type ApiEnvelope } from '@/services/api'
 
 export type RouteQueriesResponse = {
+    query_id: string
     start: string
     end: string
     weights_json: JSON
@@ -10,10 +11,8 @@ export type RouteQueriesResponse = {
     name: string
 }
 
-export async function FetchRouteQueries(){
-    const response = await get<ApiEnvelope<RouteQueriesResponse[]>>(
-        "/routing/queries"
-    )
+export async function FetchRouteQueries() {
+    const response = await get<ApiEnvelope<RouteQueriesResponse[]>>('/routing/queries')
     console.log(`Response:`)
     console.log(response)
     return response.data.data
