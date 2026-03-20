@@ -113,6 +113,7 @@ def build_edges_geojson(
                     "greenery": float(edge.greenery),
                     "pollution": float(edge.pollution),
                     "surface_quality": float(edge.surface_quality),
+                    "pub_distance": float(edge.pub_distance)
                 },
             }
         )
@@ -205,6 +206,20 @@ def main(argv: Iterable[str] | None = None) -> int:
     print(f"Wrote {nodes_out} and {edges_out}")
     return 0
 
+def build_analytics_json(mission_progress_list: list) -> Dict[str, object]:
+    features = []
+    for mission_progress, mission in mission_progress_list:
+        features.append(
+            {
+                "mission_id": str(mission.mission_id),
+                "mission_name": mission.mission_name,
+                "status": mission_progress.status.value,
+                "score": int(mission_progress.score),
+                "user_id": str(mission_progress.user_id),
+                "chosen_answer": mission_progress.chosenAnswer
+            }
+        )
+    return {"mission_analytics": features}
 
 if __name__ == "__main__":
     raise SystemExit(main())

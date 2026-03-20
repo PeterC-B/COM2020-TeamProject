@@ -38,7 +38,7 @@ class GraphDataRepository:
         nodes_geojson = build_nodes_geojson(nodes_list)
         edges_geojson = build_edges_geojson(edges_list)
         location_geojson = build_locations_geojson(locations_list, nodes_list)
-
+    
         return {
             "nodes": nodes_geojson,
             "edges": edges_geojson,
@@ -119,23 +119,23 @@ class GraphDataRepository:
         if not isinstance(features, dict):
             return
 
-        nodes_fc = features.get("nodes")
-        edges_fc = features.get("edges")
-        locations_fc = features.get("locations")
+        nodes_fc = features["nodes"]
+        edges_fc = features["edges"]
+        locations_fc = features["locations"]
 
-        node_features = nodes_fc.get("features", []) if isinstance(nodes_fc, dict) else []
-        edge_features = edges_fc.get("features", []) if isinstance(edges_fc, dict) else []
-        location_features = locations_fc.get("features", []) if isinstance(locations_fc, dict) else []
+        node_features = nodes_fc["features"] if isinstance(nodes_fc, dict) else []
+        edge_features = edges_fc["features"] if isinstance(edges_fc, dict) else []
+        location_features = locations_fc["features"] if isinstance(locations_fc, dict) else []
 
         nodes_to_add = []
         for feature in node_features:
-            geometry = feature.get("geometry", {})
-            coordinates = geometry.get("coordinates", [])
-            properties = feature.get("properties", {})
+            geometry = feature["geometry"]
+            coordinates = geometry["coordinates"]
+            properties = feature["properties"]
             if len(coordinates) < 2:
                 continue
 
-            node_id = properties.get("node_id")
+            node_id = properties["node_id"]
             if node_id is None:
                 continue
 
@@ -144,21 +144,22 @@ class GraphDataRepository:
                     node_id=int(node_id),
                     x_coordinate=float(coordinates[0]),
                     y_coordinate=float(coordinates[1]),
-                    feature=properties.get("highway"),
+                    feature=properties["highway"],
                 )
             )
 
         edges_to_add = []
         for feature in edge_features:
-            geometry = feature.get("geometry", {})
-            coordinates = geometry.get("coordinates", [])
-            properties = feature.get("properties", {})
+            geometry = feature["geometry"]
+            coordinates = geometry["coordinates"]
+            properties = feature["properties"]
+
             if len(coordinates) < 2:
                 continue
 
-            edge_id = properties.get("edge_id")
-            from_node = properties.get("from_node")
-            to_node = properties.get("to_node")
+            edge_id = properties["edge_id"]
+            from_node = properties["from_node"]
+            to_node = properties["to_node"]
             if edge_id is None or from_node is None or to_node is None:
                 continue
 
@@ -167,31 +168,31 @@ class GraphDataRepository:
                     edge_id=int(edge_id),
                     from_node_id=int(from_node),
                     to_node_id=int(to_node),
-                    key=int(properties.get("key", 0)),
-                    length=float(properties.get("length", 0.0)),
-                    travel_time=float(properties.get("travel_time", 0.0)),
-                    access_score=float(properties.get("access_score", 0.0)),
+                    key=int(properties["key"]),
+                    length=float(properties["length"]),
+                    travel_time=float(properties["travel_time"]),
+                    access_score=float(properties["access_score"]),
                     geometry=self._linestring_to_wkt(coordinates),
-                    lighting=float(properties.get("lighting", 0.0)),
-                    greenery=float(properties.get("greenery", 0.0)),
-                    pollution=float(properties.get("pollution", 0.0)),
-                    surface_quality=float(properties.get("surface_quality", 0.0)),
-                    pub_distance=float(properties.get("pub_distance", 0.0)),
+                    lighting=float(properties["lighting"]),
+                    greenery=float(properties["greenery"]),
+                    pollution=float(properties["pollution"]),
+                    surface_quality=float(properties["surface_quality"]),
+                    pub_distance=float(properties["pub_distance"]),
                 )
             )
 
         locations_to_add = []
         for feature in location_features:
-            properties = feature.get("properties", {})
-            node_id = properties.get("node_id")
+            properties = feature["properties"]
+            node_id = properties["node_id"]
             if node_id is None:
                 continue
 
-            name = str(properties.get("name") or "").strip()
+            name = str(properties["name"]).strip()
             if not name:
                 name = "Unnamed Amenity"
 
-            info = properties.get("type")
+            info = properties["type"]
             locations_to_add.append(
                 LocationModel(
                     location_id=uuid.uuid4(),

@@ -26,6 +26,7 @@ const props = defineProps<{
     edges?: GeoJson | null
     center?: coordinates | null
     locations?: GeoJson | null
+    selected_route_index?: number | null
 }>()
 
 const emit = defineEmits<{
@@ -40,6 +41,9 @@ const emit = defineEmits<{
             end_location: string | null
         },
     ): void
+
+    (event: 'show-context', node: any): void
+    (event: 'hide-context'): void
     (
         event: 'center-change',
         payload: [number, number],
@@ -51,8 +55,8 @@ let map: Map | null = null
 
 const nodes = ref<GeoJson | null>(null)
 const edges = ref<GeoJson | null>(null)
-const map_center = ref<LngLatLike | null>(null)
 const locations = ref<GeoJson | null>(null)
+const map_center = ref<LngLatLike | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
 const {
@@ -188,8 +192,6 @@ function renderRoutes(routes: Array<Array<[number, number]>> = []) {
             },
         })
     })
-
-    map.setCenter(map_center.value ? map_center.value : [-2.585757, 51.460498])
 }
 
 // Initialize map and load graph data.
@@ -232,12 +234,12 @@ onMounted(() => {
                 if (!map) return
                 const nodeCollection = assertFeatureCollection(graphData.features?.nodes, 'nodes')
                 const edgeCollection = assertFeatureCollection(graphData.features?.edges, 'edges')
-                const locationCollection = assertFeatureCollection(graphData.features?.locations, 'locations')
+                const locationCollection = assertFeatureCollection(graphData.features.locations, 'locations')
                 nodes.value = nodeCollection
                 edges.value = edgeCollection
                 locations.value = locationCollection
+
                 map_center.value = toMapCoordinates(graphData.features?.center)
-                console.log(locationCollection)
 
                 map.addSource('edges', {
                     type: 'geojson',
@@ -246,6 +248,10 @@ onMounted(() => {
                 map.addSource('nodes', {
                     type: 'geojson',
                     data: nodeCollection,
+                })
+                map.addSource('locations', {
+                    type: 'geojson',
+                    data: locationCollection
                 })
 
                 // Add render layers
@@ -296,6 +302,41 @@ onMounted(() => {
                     map.getCanvas().style.cursor = features.length ? 'pointer' : ''
                 })
 
+                let hoveringNode = false;
+
+                map.on('mousemove', 'nodes-circle', (e) => {
+                    const feature = e.features?.[0]
+                    if (!feature || feature.geometry.type !== 'Point') return
+
+                    console.log(feature)
+
+                    hoveringNode = true
+                    emit('show-context', feature)
+                })
+
+                map.on('mouseleave', 'nodes-circle', () => {
+                    hoveringNode = false
+                })
+
+                map.on('mousemove', 'edges-line-hit', (e) => {
+                    if (hoveringNode) return
+
+                    const feature = e.features?.[0]
+                    if (!feature || feature.geometry.type !== 'LineString') return
+
+                    emit('show-context', feature)
+                })
+
+
+                map.on('click', (e) => {
+                    const features = map?.queryRenderedFeatures(e.point, {
+                        layers: selectableLayerIds,
+                    })
+                    if (!features?.length) {
+                        emit('hide-context')
+                    }
+                })
+
                 const bounds = new maplibregl.LngLatBounds()
                 const nodeFeatures = nodes.value.features
                 for (const feature of nodeFeatures) {
@@ -309,17 +350,8 @@ onMounted(() => {
                 }
                 if (!bounds.isEmpty()) {
                     map.fitBounds(bounds, { padding: 40, maxZoom: 20 })
-                    // Keep camera constrained to the dataset extent.
                     map.setRenderWorldCopies(false)
                 }
-
-                //map.setLayoutProperty('edges-line', 'visibility', 'none')
-                //map.setLayoutProperty('edges-line-hit', 'visibility', 'none')
-                //map.setLayoutProperty('edges-line-highlight', 'visibility', 'none')
-
-                map.setLayoutProperty('nodes-circle', 'visibility', 'visible')
-                map.setLayoutProperty('nodes-circle-hit', 'visibility', 'visible')
-                map.setLayoutProperty('nodes-circle-highlight', 'visibility', 'visible')
         })
     })
 })
@@ -341,16 +373,20 @@ watch(selectedNodeId, (nodeId) => {
 watch(
   () => props.nodes,
   (newNodes) => {
-    if (!map || !newNodes) return;
+    if (!map || !newNodes) return
+    if (newNodes.type !== 'FeatureCollection' || !Array.isArray(newNodes.features)) {
+        console.warn('Invalid nodes FeatureCollection', newNodes)
+        return
+    }
 
     if (map.getLayer('nodes-circle')) map.removeLayer('nodes-circle');
     if (map.getLayer('nodes-circle-hit')) map.removeLayer('nodes-circle-hit');
     if (map.getLayer('nodes-circle-highlight')) map.removeLayer('nodes-circle-highlight');
     if (map.getSource('nodes')) map.removeSource('nodes');
-
+    
     map.addSource('nodes', {
-      type: 'geojson',
-      data: newNodes,
+        type: 'geojson',
+        data: newNodes,
     });
 
     map.addLayer(NODE_BASE_LAYER);
@@ -361,20 +397,20 @@ watch(
 
     const bounds = new maplibregl.LngLatBounds();
     newNodes.features.forEach((f) => {
-      if (f.geometry.type !== 'Point') return;
+        if (f.geometry.type !== 'Point') return;
 
-      const coords = f.geometry.coordinates;
-      if (!Array.isArray(coords) || coords.length < 2) return;
+        const coords = f.geometry.coordinates;
+        if (!Array.isArray(coords) || coords.length < 2) return;
 
-      const [lng, lat] = coords;
+        const [lng, lat] = coords;
 
-      if (typeof lng === 'number' && typeof lat === 'number' && Number.isFinite(lng) && Number.isFinite(lat)) {
-        bounds.extend([lng, lat]);
-      }
+        if (typeof lng === 'number' && typeof lat === 'number' && Number.isFinite(lng) && Number.isFinite(lat)) {
+            bounds.extend([lng, lat]);
+        }
     });
 
     if (!bounds.isEmpty()) {
-      map.fitBounds(bounds, { padding: 40, maxZoom: 16 });
+        map.fitBounds(bounds, { padding: 40, maxZoom: 16 });
     }
   },
   { immediate: true }
@@ -391,25 +427,25 @@ watch(
 
 watch(
     () => props.locations,
-    (newLocations) => {
-        if (!map || !newLocations) return
-        locations.value = newLocations
+    () => {
+        if (!map) return
         applySelectableNodeFilters()
     },
     { immediate: true }
 )
 
 watch(
-  () => props.center,
-  (newCenter) => {
-    if (!map || !newCenter) return
-    map.setCenter(toMapCoordinates(newCenter))
-  },
-  { immediate: true }
+    () => props.center,
+    (newCenter) => {
+        if (!map || !newCenter) return
+        console.log(newCenter)
+        map.setCenter(toMapCoordinates(newCenter))
+    },
+    { immediate: true }
 )
 
 onBeforeUnmount(() => {
-    dispose()
+    dispose()   
     map?.remove()
     map = null
 })
@@ -420,8 +456,31 @@ watch(
         renderRoutes(routes ?? [])
     },
 )
+
+// Grey out the other routes when one is selected
+watch(
+  () => props.selected_route_index,
+  (selectedIndex) => {
+    if (!map) return
+
+    routeLayerIds.forEach((layerId, index) => {
+        console.log(map?.getLayersOrder())
+        if (!map?.getLayer(layerId)) return
+
+        map.setPaintProperty(
+            layerId,
+            'line-opacity',
+            selectedIndex === null
+            ? 0.95                
+            : index === selectedIndex
+            ? 1.0                 
+            : 0.15                
+        )
+        })
+  }
+)
 </script>
 
 <template>
-    <div ref="mapEl" class="h-[calc(100vh-48px)] w-full" />
+    <div ref="mapEl" class="h-[calc(100vh-48px)] w-full">git</div>
 </template>

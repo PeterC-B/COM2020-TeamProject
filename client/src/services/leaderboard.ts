@@ -5,6 +5,7 @@ export interface MissionProgress {
     mission_id: string
     status: 'incorrect' | 'correct'
     score: number
+    chosenAnswer: string
 }
 
 export async function saveMissionProgress(payload: MissionProgress){
@@ -38,6 +39,20 @@ export async function fetchAllMissionProgressForMission(mission_id : string){
 
 export async function fetchAllMissionProgress(): Promise<MissionProgress[]>{
     const response = await get<ApiEnvelope<MissionProgress[]>>(
+        `/leaderboard`
+    )
+    return response.data.data
+}
+
+export interface LeaderboardRow {
+    user_id: string
+    name: string
+    total_score: number
+    missions_completed: number
+}
+
+export async function fetchLeaderboard(): Promise<LeaderboardRow[]> {
+    const response = await get<ApiEnvelope<LeaderboardRow[]>>(
         `/leaderboard`
     )
     return response.data.data

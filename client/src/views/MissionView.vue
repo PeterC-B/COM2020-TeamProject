@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import {
     fetchMissions,
     fetchMission,
@@ -63,10 +63,20 @@ async function selectMission(id: string) {
         const mission = await fetchMission(id)
         editableMission.value = { ...mission }
         selectedAnswer.value = null
-        selectedMission.value = { ...mission}
-        try{
-            missionProgress.value = await fetchMissionProgress(id, mainStore.user_id ? mainStore.user_id : 'n/a')
+        selectedMission.value = { ...mission }
+
+        try {
+            missionProgress.value = await fetchMissionProgress(
+                id,
+                mainStore.user_id ? mainStore.user_id : 'n/a'
+            )
             completedMission.value = true
+
+            // RESTORE SAVED ANSWER
+            if (missionProgress.value?.chosenAnswer) {
+                selectedAnswer.value = missionProgress.value.chosenAnswer
+            }
+
         } catch {
             completedMission.value = false
         }
@@ -103,6 +113,19 @@ function startEditMission() {
     editableMission.value = { ...selectedMission.value }
 }
 
+const answerInputs = ref<string[]>(['', '', '', ''])
+
+function answersToList() {
+    const answers = editableMission.value?.possible_answers
+    answerInputs.value = answers
+        ? answers.split(',').map(a => a.trim())
+        : ['', '', '', '']
+}
+
+function answersToString(){
+    return answerInputs.value.toString()
+}
+
 async function startDeleteMission() {
     if(!canEdit.value){
         error.value = 'You do not have permission to delete missions'
@@ -126,10 +149,12 @@ async function startDeleteMission() {
 async function saveMission() {
     if (!canEdit.value) {
         error.value = 'You do not have permission to modify missions'
-        return
+        return 
     }
 
     if (!editableMission.value) return
+
+    syncAnswersToMission()
 
     saving.value = true
     error.value = null
@@ -196,6 +221,7 @@ const tierProxy = computed({
 })
 
 function pickAnswer(answer: string) {
+    if (completedMission.value) return
     selectedAnswer.value = answer
     saveProgress()
 }
@@ -219,6 +245,7 @@ async function saveProgress(){
         mission_id: selectedMission.value.mission_id!,
         status: status,
         score: get_score_from_tier(selectedMission.value.tier),
+        chosenAnswer: selectedAnswer.value
     }
     try{
         await saveMissionProgress(progress)
@@ -241,6 +268,34 @@ function get_score_from_tier(tier: string): number{
 function capital_case(word: string): string{
     const lower = word.toLowerCase()
     return lower.charAt(0).toUpperCase() + lower.slice(1)
+}
+
+
+watch(
+    () => editableMission.value?.possible_answers,
+    (answers) => {
+        const parsed = answers
+        ? answers.split(',').map(a => a.trim())
+        : []
+
+        answerInputs.value = [
+        parsed[0] ?? '',
+        parsed[1] ?? '',
+        parsed[2] ?? '',
+        parsed[3] ?? '',
+        ]
+    },
+    { immediate: true }
+)
+
+function syncAnswersToMission() {
+    if (!editableMission.value) return
+
+    editableMission.value.possible_answers =
+        answerInputs.value
+        .map(a => a.trim())
+        .filter(Boolean)
+        .join(', ')
 }
 
 onMounted(loadMissions)
@@ -326,9 +381,13 @@ onMounted(loadMissions)
                                 {{ mission.mission_name || 'Untitled Mission' }}
                             </p>
                             <span
-                                class="mt-1 inline-flex rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600"
+                                :class="['mt-1 inline-flex rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600',
+                                    mission.tier === 'EASY' ? 'mission-green' : '',
+                                    mission.tier === 'MEDIUM' ? 'mission-amber' : '',
+                                    mission.tier === 'HARD' ? 'mission-red' : '',
+                                ]"
                             >
-                                Tier: {{ capital_case(mission.tier) }}
+                                {{ capital_case(mission.tier) }}
                             </span>
                         </li>
                     </ul>
@@ -395,15 +454,22 @@ onMounted(loadMissions)
                         <div v-if="(canEdit && isEditing) || isCreating">
                             <label class="mb-1 block text-sm font-semibold text-slate-700">
                                 Possible Answers
-                                <span class="ml-1 text-xs text-slate-400">(comma separated)</span>
                             </label>
 
+                            <!--
                             <textarea
                                 v-model="editableMission.possible_answers"
                                 rows="2"
                                 placeholder="Answer A, Answer B, Answer C"
                                 class="w-full rounded-lg border border-slate-200 p-2 text-sm"
                             />
+                            -->
+                            <div class="answer-grid">
+                                <input type="text" placeholder="Answer A" id="ans_1" v-model="answerInputs[0]"> 
+                                <input type="text" placeholder="Answer B" id="ans_2" v-model="answerInputs[1]">
+                                <input type="text" placeholder="Answer C" id="ans_3" v-model="answerInputs[2]"> 
+                                <input type="text" placeholder="Answer D" id="ans_4" v-model="answerInputs[3]"> 
+                            </div>
 
                             <p class="mt-1 text-xs text-slate-400">
                                 These will be shuffled for travellers.
@@ -451,7 +517,7 @@ onMounted(loadMissions)
                         </div>
 
                         <p
-                            v-if="selectedAnswer && !(isCreating || (canEdit && isEditing))"
+                            v-if="(selectedAnswer && !(isCreating || (canEdit && isEditing))) || missionProgress"
                             class="mt-3 text-sm font-semibold"
                             :class="
                                 selectedAnswer === editableMission.answer
@@ -499,3 +565,32 @@ onMounted(loadMissions)
         </div>
     </section>
 </template>
+
+<style scoped>
+/* mapping mission tiers to appropriate colours */
+.mission-green {
+    color: rgb(255, 255, 255);
+    background-color: #16a34a;
+    font-weight: bold;
+}
+.mission-amber {
+    color: rgb(255, 255, 255);
+    background-color: #cc7b00;
+    font-weight: bold;
+}
+.mission-red {
+    color: rgb(255, 255, 255);
+    background-color: #ec0000;
+    font-weight: bold;
+}
+.answer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.answer-grid input {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px;
+}
+</style>

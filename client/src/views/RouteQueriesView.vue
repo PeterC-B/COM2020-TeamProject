@@ -51,6 +51,28 @@ const downloadRouteQueriesCsv = () => {
     window.URL.revokeObjectURL(url)
 }
 
+function format_weights(weights: JSON): string{
+    const result = Object.entries(weights)
+        .map(([key, value]) => `${format_text(key)}: ${value}`)
+        .join('\n')
+    console.log(result)
+    return result
+}
+
+function format_text(text: string) : string {
+    return to_text(capital_case(text))
+}
+
+function to_text(text:string): string{
+    return text.replace(/_/g, ' ')
+}
+
+function capital_case(word: string): string{
+    const lower = word.toLowerCase()
+    return lower.charAt(0).toUpperCase() + lower.slice(1)
+}
+
+
 onMounted(async () => {
     try {
         queries.value = await FetchRouteQueries()
@@ -92,7 +114,7 @@ onMounted(async () => {
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Start</th>
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">End</th>
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Weights</th>
-                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Rank</th>
+                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Popularity</th>
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Path</th>
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Timestamp</th>
                         </tr>
@@ -100,19 +122,19 @@ onMounted(async () => {
 
                     <tbody class="divide-y divide-slate-100">
                         <tr v-for="q in queries" :key="q.query_id" class="hover:bg-slate-50 transition-colors">
-                            <td class="p-4 text-sm font-bold text-slate-900">{{ q.name ?? 'Anonymous' }}</td>
-                            <td class="p-4 text-sm text-slate-600">{{ q.start }}</td>
-                            <td class="p-4 text-sm text-slate-600">{{ q.end }}</td>
+                            <td class="p-4 text-sm font-bold text-slate-900">{{ capital_case(q.name) ?? 'Anonymous' }}</td>
+                            <td class="p-4 text-sm text-slate-600 max-w-[150px]">{{ q.start }}</td>
+                            <td class="p-4 text-sm text-slate-600 max-w-[150px]">{{ q.end }}</td>
                             <td class="p-4">
-                                <code class="text-[10px] font-mono text-slate-400 truncate block max-w-[150px]">{{ q.weights_json }}</code>
+                                <code class="text-[10px] font-mono text-slate-400 block max-w-[400px] whitespace-pre-line">{{ format_weights(q.weights_json) }}</code>
                             </td>
                             <td class="p-4">
-                                <span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md text-xs font-bold">#{{ q.chosen_route_rank }}</span>
+                                <span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md text-xs font-bold">{{ q.popularity }}</span>
                             </td>
                             <td class="p-4">
                                 <p class="text-[10px] text-slate-400 truncate max-w-[100px]">{{ q.chosen_route_path }}</p>
                             </td>
-                            <td class="p-4 text-xs font-semibold text-slate-500">{{ q.timestamp }}</td>
+                            <td class="p-4 text-xs font-semibold text-slate-500 max-w-[100px]">{{ q.timestamp }}</td>
                         </tr>
                     </tbody>
                 </table>

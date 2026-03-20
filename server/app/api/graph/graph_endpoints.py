@@ -1,5 +1,5 @@
 import requests
-from app.api.error_handlers import NotFoundError, ValidationError
+from app.api.error_handlers import NotFoundError, ValidationError, DataError
 from app.api.responses import ok
 from flask import Blueprint, request
 
@@ -14,6 +14,7 @@ def create_graph_route_blueprint(
     get_graph_preset,
     get_graph_preset_snapshot,
     activate_graph_preset,
+    fetch_node_context_uc
 ):
     bp = Blueprint("graph", __name__, url_prefix="/api/graph")
 
@@ -124,4 +125,14 @@ def create_graph_route_blueprint(
 
         return ok(data=suggestions)
     
+    @bp.route("/node", methods=["GET"])
+    def fetch_node_context():
+        node_id = request.args.get("node_id")
+
+        if node_id is None:
+            return DataError(statement="Node ID is required.")
+        
+        data = fetch_node_context_uc.execute(node_id)
+        return ok(data=data)
+
     return bp

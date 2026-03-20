@@ -10,7 +10,6 @@ class SaveMissionProgress:
         self.uow = uow
         self.leaderboard_repo = leaderboard_repo
 
-
     def execute(self, payload):
         try:
             user_id = uuid.UUID(payload.get("user_id"))
@@ -20,6 +19,7 @@ class SaveMissionProgress:
         
         status = payload.get('status')
         score = payload.get('score')
+        chosen_answer = payload.get('chosenAnswer')
 
         missing = [
             field for field, value in {
@@ -27,12 +27,13 @@ class SaveMissionProgress:
                 "mission_id": mission_id,
                 "status": status,
                 "score": score,
+                "chosen_answer": chosen_answer
             }.items() if not value
         ]
 
         if missing:
             raise ValidationError(
-                message="Missing required fields",
+                message=f"Missing required fields: {missing}",
                 details={"missing": missing}
             )
 
@@ -49,9 +50,11 @@ class SaveMissionProgress:
                 user_id=user_id,
                 mission_id=mission_id,
                 status=status_value,
-                score=score
+                score=score,
+                chosenAnswer=chosen_answer
             )
 
             self.leaderboard_repo.add(progress)
             self.uow.commit()
+
         return progress
