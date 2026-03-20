@@ -24,7 +24,7 @@ const buildCsvContent = () => {
             query.start,
             query.end,
             query.weights_json,
-            query.chosen_route_rank,
+            query.popularity,
             query.chosen_route_path,
             query.timestamp,
         ]
