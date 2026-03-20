@@ -1,13 +1,55 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import { useMainStore } from '@/stores/main'
+import { onMounted, ref } from 'vue'
 import { FetchRouteQueries, type RouteQueriesResponse } from '@/services/route_queries'
 
-const mainStore = useMainStore()
-const queries = ref<any[]>([])
+const queries = ref<RouteQueriesResponse[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
+
+const csvHeaders = ['User', 'Start', 'End', 'Weights', 'Rank', 'Path', 'Timestamp']
+
+const serializeField = (value: unknown) => {
+    if (value === null || value === undefined) {
+        return ''
+    }
+
+    const text = typeof value === 'string' ? value : JSON.stringify(value)
+    return `"${text.replace(/"/g, '""')}"`
+}
+
+const buildCsvContent = () => {
+    const rows = queries.value.map((query) => {
+        const cells = [
+            query.name ?? 'Anonymous',
+            query.start,
+            query.end,
+            query.weights_json,
+            query.chosen_route_rank,
+            query.chosen_route_path,
+            query.timestamp,
+        ]
+
+        return cells.map(serializeField).join(',')
+    })
+
+    return [csvHeaders.join(','), ...rows].join('\r\n')
+}
+
+const downloadRouteQueriesCsv = () => {
+    if (!queries.value.length) {
+        return
+    }
+
+    const blob = new Blob([buildCsvContent()], { type: 'text/csv;charset=utf-8;' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `route-queries-${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+}
 
 function format_weights(weights: JSON): string{
     const result = Object.entries(weights)
@@ -34,18 +76,26 @@ function capital_case(word: string): string{
 onMounted(async () => {
     try {
         queries.value = await FetchRouteQueries()
-    } catch (err: any) {
+    } catch {
         error.value = 'Failed to load route queries.'
     } finally {
         loading.value = false
-        console.log(queries.value)
     }
 })
 </script>
 
 <template>
     <div class="mx-auto max-w-7xl p-6 antialiased">
-        <h1 class="text-3xl font-bold text-slate-900 mb-8">Route Query Analytics</h1>
+        <div class="flex items-center justify-between gap-6 mb-8 flex-wrap">
+            <h1 class="text-3xl font-bold text-slate-900">Route Query Analytics</h1>
+            <button
+                class="rounded-md border border-slate-200 bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:border-slate-900 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+                :disabled="loading || !queries.length"
+                @click="downloadRouteQueriesCsv"
+            >
+                Export CSV
+            </button>
+        </div>
 
         <div v-if="loading" class="p-12 text-center rounded-2xl border border-slate-200 bg-white text-slate-500 font-bold">
             Loading...
