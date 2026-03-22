@@ -3,6 +3,10 @@ from app import create_app
 from app.extensions import db
 from app.models.location_model import LocationModel
 from app.models.route_query_model import RouteQuery
+from app.models.user_account_model import UserAccountModel
+from app.models.enums.ACCESS_TYPE import UserAccessType
+from uuid import uuid4
+from app.security.passwords import hash_password
 
 app = create_app()
 app.app_context().push()
@@ -20,21 +24,39 @@ def to_coord_string(loc):
 
 def random_weights():
     return {
-        "distance": round(random.uniform(0.5, 1.0), 2),
-        "lighting": round(random.uniform(0.0, 1.0), 2),
-        "greenery": round(random.uniform(0.0, 1.0), 2),
-        "pollution": round(random.uniform(0.0, 1.0), 2),
-        "surface_quality": round(random.uniform(0.0, 1.0), 2),
-        "amenity_proximity": round(random.uniform(0.0, 1.0), 2),
+        "distance": round(random.uniform(0.5, 1.0), 1),
+        "lighting": round(random.uniform(0.0, 1.0), 1),
+        "greenery": round(random.uniform(0.0, 1.0), 1),
+        "pollution": round(random.uniform(0.0, 1.0), 1),
+        "surface_quality": round(random.uniform(0.0, 1.0), 1),
+        "is_accessible": random.choice([True, False]),
     }
 
 entries = []
+seeded_user_id = uuid4()
 
+def insert_seeded_user():
+    user = UserAccountModel(
+        user_id=seeded_user_id,
+        username="Seeded_Data",
+        email="seeding@CAE.com",
+        password_hash=hash_password("seeding"),
+        role=UserAccessType.ADMINS,
+    )
+    db.session.add(user)
+    db.session.commit()
+    print(f"Seeding user created\n\nUsername: Seeded Data\nPassword: seeding")    
+
+def delete_data():
+    db.session.query(RouteQuery).delete()
+    db.session.commit()
+
+insert_seeded_user()
 for _ in range(200):
     start, end = random.sample(locations, 2)
 
     q = RouteQuery(
-        user_id=None,
+        user_id=seeded_user_id,
         start=to_coord_string(start),
         end=to_coord_string(end),
         weights_json=random_weights(),

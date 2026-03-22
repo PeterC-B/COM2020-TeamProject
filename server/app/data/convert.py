@@ -71,23 +71,16 @@ def edges_from_db_to_gdf(edges):
 
 def build_nodes_geojson(nodes_list: list) -> Dict[str, object]:
     features = []
-    for node, location in nodes_list:
+    for node in nodes_list:
         node_id = int(node.node_id)
         x = float(node.x_coordinate)
         y = float(node.y_coordinate)
         highway = node.feature
-        name = location.name
-        information = location.information
         features.append(
             {
                 "type": "Feature",
                 "geometry": {"type": "Point", "coordinates": [x, y]},
-                "properties": {
-                    "node_id": node_id, 
-                    "highway": highway,
-                    "name": name,
-                    "type": information,
-                },
+                "properties": {"node_id": node_id, "highway": highway},
             }
         )
     return {"type": "FeatureCollection", "features": features}
@@ -120,6 +113,8 @@ def build_edges_geojson(
                     "greenery": float(edge.greenery),
                     "pollution": float(edge.pollution),
                     "surface_quality": float(edge.surface_quality),
+                    "pub_distance": float(edge.pub_distance),
+                    "is_accessible": edge.is_accessible
                 },
             }
         )
@@ -165,7 +160,7 @@ def build_graph(nodes, edges):
             edge.from_node_id,
             edge.to_node_id,
             key=edge.key,
-            length=edge.length,
+            distance=edge.length,
             travel_time=edge.travel_time,
             access_score=edge.access_score,
             geometry=wkt.loads(edge.geometry) if edge.geometry else None,
@@ -173,6 +168,7 @@ def build_graph(nodes, edges):
             greenery=edge.greenery,
             pollution=edge.pollution,
             surface_quality=edge.surface_quality,
+            accessible=edge.is_accessible,
         )
 
     return G

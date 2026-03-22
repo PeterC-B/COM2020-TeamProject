@@ -6,7 +6,7 @@ from scripts.visualisation.visualisation_utils import add_lighting_tag, add_surf
 
 from app.domain.errors import InfrastructureError, NotFoundError
 from app.domain.indicators.attribute_extraction import attach_edge_indicators
-from app.domain.scoring.weight_utils import add_pub_distance, normalize_pub_distance
+from app.domain.scoring.weight_utils import add_pub_distance, normalize_pub_distance, check_if_accessible
 from app.models.edges_model import EdgesModel
 from app.models.enums.LOCATION_TYPE import LocationType
 from app.models.location_model import LocationModel
@@ -44,6 +44,7 @@ class FetchDataForCoordinates:
     def __init__(self, uow, graph_data_repo=None):
         self.uow = uow
         self.graph_data_repo = graph_data_repo
+        
 
     def execute(self, coords: tuple[float, float]):
         # Added counter in for debugging purposes and helping us keep track of whether it is hanging or it is just taking a while to finish
@@ -149,6 +150,10 @@ class FetchDataForCoordinates:
         )
         mark("edge indicators + scoring")
 
+        edges_gdf["accessible?"] = (
+            edges_gdf["highway"].apply(check_if_accessible)
+        )
+
         nodes_df = nodes_gdf.reset_index().rename(columns={"osmid": "node_id"})
         edges_df = edges_gdf.reset_index()
         edges_df["geometry"] = edges_df["geometry"].apply(
@@ -167,7 +172,7 @@ class FetchDataForCoordinates:
             ]
             self.graph_data_repo.bulk_add(nodes)
             self.uow.commit()
-            
+
             edges = [
                 EdgesModel(
                     edge_id=i,
@@ -182,7 +187,8 @@ class FetchDataForCoordinates:
                     greenery=row["greenery"],
                     pollution=row["pollution"],
                     surface_quality=row["surface_quality"],
-                    pub_distance=row["normalised_pub_distance"]
+                    pub_distance=row["normalised_pub_distance"],
+                    is_accessible=row.get("accessible?")
                 )
                 for i, row in edges_df.iterrows()
             ]
@@ -234,9 +240,6 @@ class FetchDataForCoordinates:
         mark("db write locations")
 
         result = {"features": self.graph_data_repo.get_graph_features()}
-        mark("build response payload")
-        print(f"[FetchDataForCoordinates] done total={(time.perf_counter() - started_at):.2f}s")
-        return result
         mark("build response payload")
         print(f"[FetchDataForCoordinates] done total={(time.perf_counter() - started_at):.2f}s")
         return result

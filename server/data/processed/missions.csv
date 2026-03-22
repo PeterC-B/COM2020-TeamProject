@@ -1,0 +1,19 @@
+Mission Name,Tier,Question:,4 answers (comma seperated),Correct Answer
+Safe Route Selection,Easy,Which route choice is most safe when walking alone at night?,"Poorly lit alleyways,Crowded nightlife streets,Lit main roads,Unlit roads",Lit main roads
+Smooth Operator,Easy,You are cycling. Which route is the best?,"Cobblestoned,Uneven path,Smooth asphalt,Through a park",Smooth asphalt
+Tree Hugger,Easy,You want the most greenery. Which route do you pick?,"Through the city centre,Through a park,Through an industrial estate,Through the shopping centre",Through a park
+Snack Stop Sprint,Easy,You want to stop off for some food on the way to your destination. Which route do you pick?,"High street,Park trail,Quay walk,Industrial road",High Street
+Mobility Mission,Easy,Which route is most suitable for a wheelchair user?,"Shorter route with stairs,Route with a stairs-only pedestrian subway,Longer route marked step-free,Route with multiple curbs",Route marked step-free
+To the MAX,Easy,The distance weighting is set to maximum. What indicator drives ranking? ,"Lighting,Greenery,Time,Distance",Distance
+Environmental Awareness,Medium,Which route will minimise air pollution exposure?,"Busy roads,Industrial areas,Green spaces,Motorways",Green spaces
+Night Owl,Medium,Lighting is more important than distance. What ranks the highest?,"Dark shortcut,Well-lit longer route,Greenest route,Route with the most shops",Well-lit longer route
+Green Thumb,Medium,A route passes through a park but has rough surface. You increase the greenery weight. What happens to this route's scoring?,"Increases,Decreases,Stays the same,Cannot determine",Increases
+Surface Detection,Medium,What type of street contributes most negatively to a route score with a high surface quality weight?,"Smooth asphalt,Uneven cobblestones.Green parks,Well-lit streets",Uneven cobblestones
+Shop Til You Drop,Medium,A user wants to prioritise shopping. What weighting should they increase?,"Distance,Time,Amenity Proximity,Surface Quality",Amenity Proximity
+Glow and Go,Medium,You want a route that balances distance and lighting. What approach will find this?,"Increase distance weighting,Increase lighting weighting,Make both weights equal,Ignore all indicators",Make both weights equal
+Multi Factor Trade-Off,Hard,"Route A has lots of greenery but severely poor surface quality. Route B has some greenery and a smooth surface. If greenery and surface quality were equally weighted, what matters most?","Route A,Route B,Both routes are equally ranked,Cannot be determined",Route B
+Shine Bright like a Diamond,Hard,"Route A is bright but no amenities are nearby. Route B has lots of amenities, but is dark. Lighting is weighted higher. Which route is the best?","Route A,Route B,Both routes are equally ranked,Cannot be determined",Route A
+Moonlit Marathon,Hard,"Route A is short but dark. Route B is long but well-lit. If distance and lighting are weighted equally, which route ranks higher?","Route A,Route B,Both routes are equally ranked,Cannot be determined",Cannot be determined
+Weight Up,Hard,"You want a route that balances greenery and surface quality. If you increase the weight for surface quality, what happens to the ranking of routes with rough surface?","Rank improves,Rank decreases,Rank stays the same,Rank cannot be determined",Rank decreases
+No Weight Gain,Hard,You want a route with the best balance of indicators without changin the weightings. Which feature will show you the most useful information?,"Distance,Map only,Route ranks,Route score breakdown",Route score breakdown
+Short n Sweet on Tour,Hard,You want to find a route with lots of amenities that isn't too long. Which route should you pick if distance and amenity proximity are weighted equally?,"Short route with few amenioties,Slightly longer route with many amenities,Medium route with no amenities,None",Slightly longer route with many amenities

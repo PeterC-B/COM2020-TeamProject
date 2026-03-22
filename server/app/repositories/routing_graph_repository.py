@@ -9,7 +9,7 @@ class RoutingGraphRepository:
         self.session = session
         self._graph = None
 
-    def get_cached_graph(self):
+    def get_cached_graph(self, weights : dict):
         if self._graph is None:
             nodes_list = self.get_all_nodes()
             edges_list = self.get_all_edges()
@@ -17,7 +17,12 @@ class RoutingGraphRepository:
             #edge_geometries = load_edge_geometries(geom_csv)
             graph = build_graph(nodes_list, edges_list)
 
-            apply_weights(graph)
+            safety_score = weights["lighting"]
+            speed_score = weights["distance"]
+            greenery_score = weights["surface_quality"]
+            is_accessible = weights["accessible"]
+
+            apply_weights(graph, safety_score, speed_score, greenery_score, is_accessible)
             return graph
         return self._graph
 

@@ -18,7 +18,7 @@ type ContextPayload =
     | {
         kind: 'edge'
         id: number
-        access_score: number
+        is_accessible: boolean
         greenery: number
         lighting: number
         surface_quality: number
@@ -28,14 +28,33 @@ const emit = defineEmits<{
     (e: 'close'): void
 }>()
 
-function to_text(text:string): string{
-    return text.replace(/_/g, ' ')
+function to_text_values(type : string, value : number) : string{
+    if(type === 'lighting'){
+        if (value === 0.9){
+            return "Yes"
+        } else {
+            return "No"
+        }
+    } else if (type === 'greenery'){
+        if (value === 0.6){
+            return "Good"
+        } else if (value === 0.5){
+            return "Average"
+        } else {
+            return "Poor"
+        }
+    } else if (type === 'surface'){
+        if (value === 0.9){
+            return "Good"
+        } else if (value == 1.0){
+            return "Average"
+        } else {
+            return "Poor"
+        }
+    }
+    return ''
 }
 
-function capital_case(word: string): string{
-    const lower = word.toLowerCase()
-    return lower.charAt(0).toUpperCase() + lower.slice(1)
-}
 </script>
 
 <template>
@@ -67,10 +86,11 @@ function capital_case(word: string): string{
 
         <!-- EDGE -->
         <div v-else class="p-5">
-            <p class="text-sm leading-relaxed text-slate-600">Access Score: {{ payload.access_score }}</p>
-            <p class="text-sm leading-relaxed text-slate-600">Greenery: {{ payload.greenery }}</p>
-            <p class="text-sm leading-relaxed text-slate-600">Lighting: {{ payload.lighting }}</p>
-            <p class="text-sm leading-relaxed text-slate-600">Surface Quality: {{ payload.surface_quality }}</p>
+            <p class="text-sm leading-relaxed text-slate-600">Edge ID: {{ payload.id }}</p>
+            <p class="text-sm leading-relaxed text-slate-600">Is it accessible?: {{ payload.is_accessible ? "Yes" : "No" }}</p>
+            <p class="text-sm leading-relaxed text-slate-600">Proximity to greenery: {{ to_text_values("greenery", payload.greenery) }}</p>
+            <p class="text-sm leading-relaxed text-slate-600">Sufficiently lit?: {{ to_text_values("lighting", payload.lighting) }}</p>
+            <p class="text-sm leading-relaxed text-slate-600">Surface Quality: {{ to_text_values("surface" ,payload.surface_quality) }}</p>
         </div>
 
         <!--<div class="p-5">

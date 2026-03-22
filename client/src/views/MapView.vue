@@ -13,6 +13,7 @@ import {
     fetchGraphData,
     fetchGraphPresets,
     fetchLikeLocations,
+    fetchNodeContext
 } from '@/services/graph'
 import { fetchYensRoutes, type YensRoutesResponse } from '@/services/routing'
 import { useMainStore } from '@/stores/main'
@@ -30,7 +31,7 @@ type ContextPayload =
     | {
         kind: 'edge'
         id: number
-        access_score: number
+        is_accessible: boolean
         greenery: number
         lighting: number
         surface_quality: number
@@ -68,8 +69,10 @@ const contextPayload = ref<ContextPayload | null>(null)
 let contextTimer: number | null = null;
 let isHovering = false;
 const hoveredFeatureId = ref<number | null>(null);
+const lastNodeContextFetch = ref(0);
 
 function to_text(text:string): string{
+    if (typeof text !== 'string') return ''
     return text.replace(/_/g, ' ')
 }
 
@@ -78,45 +81,11 @@ function capital_case(word: string): string{
     return lower.charAt(0).toUpperCase() + lower.slice(1)
 }
 
-function buildContextPayload(feature: any): ContextPayload | null {
-    const geomType = feature._geometry?.type
-
-    if (geomType === 'Point') {
-        return {
-            kind: 'node',
-            id: feature.properties.node_id,
-            name:
-                feature.properties.name !== 'NaN'
-                    ? feature.properties.name
-                    : capital_case(to_text(feature.properties.type)),
-            nodeType: capital_case(to_text(feature.properties.type)),
-            coordinates: feature._geometry.coordinates,
-            extra:
-                feature.properties.highway !== 'NaN'
-                    ? capital_case(to_text(feature.properties.highway))
-                    : undefined,
-        }
-    }
-
-    if (geomType === 'LineString') {
-        return {
-            kind: 'edge',
-            id: feature.properties.edge_id,
-            access_score: feature.properties.access_score,
-            greenery: feature.properties.greenery,
-            lighting: feature.properties.lighting,
-            surface_quality: feature.properties.surface_quality,
-        }
-    }
-
-    return null
-}
 
 function onShowContext(feature: any) {
-    const payload = buildContextPayload(feature)
-    if (!payload) return
+    const geomType = feature._geometry?.type
 
-    const id = payload.id
+    const id = geomType === 'Point' ? feature.properties.node_id : feature.properties.edge_id
     isHovering = true
 
     if (hoveredFeatureId.value === id) return
@@ -124,12 +93,80 @@ function onShowContext(feature: any) {
 
     if (contextTimer) clearTimeout(contextTimer)
 
-    contextTimer = window.setTimeout(() => {
+    contextTimer = window.setTimeout(async () => {
         if (!isHovering) return
         if (hoveredFeatureId.value !== id) return
 
-        contextPayload.value = payload
-        showContext.value = true
+        let payload: ContextPayload | null = null
+
+        if (geomType === 'Point') {
+            if (Date.now() - lastNodeContextFetch.value >= 3000) {
+                lastNodeContextFetch.value = Date.now()
+                try {
+                    const nodeData = await fetchNodeContext(feature.properties.node_id)
+                    payload = {
+                        kind: 'node',
+                        id: nodeData.node_id || feature.properties.node_id,
+                        name:
+                            nodeData.name !== 'NaN'
+                                ? nodeData.name
+                                : capital_case(to_text(nodeData.nodeType || feature.properties.type)),
+                        nodeType: capital_case(to_text(nodeData.nodeType || feature.properties.type)),
+                        coordinates: nodeData.coordinates || feature._geometry.coordinates,
+                        extra:
+                            nodeData.highway !== 'NaN'
+                                ? capital_case(to_text(nodeData.highway))
+                                : feature.properties.highway !== 'NaN'
+                                ? capital_case(to_text(feature.properties.highway))
+                                : undefined,
+                    }
+                } catch (e) {
+                    payload = {
+                        kind: 'node',
+                        id: feature.properties.node_id,
+                        name:
+                            feature.properties.name !== 'NaN'
+                                ? feature.properties.name
+                                : capital_case(to_text(feature.properties.type)),
+                        nodeType: capital_case(to_text(feature.properties.type)),
+                        coordinates: feature._geometry.coordinates,
+                        extra:
+                            feature.properties.highway !== 'NaN'
+                                ? capital_case(to_text(feature.properties.highway))
+                                : undefined,
+                    }
+                }
+            } else {
+                payload = {
+                    kind: 'node',
+                    id: feature.properties.node_id,
+                    name:
+                        feature.properties.name !== 'NaN'
+                            ? feature.properties.name
+                            : capital_case(to_text(feature.properties.type)),
+                    nodeType: capital_case(to_text(feature.properties.type)),
+                    coordinates: feature._geometry.coordinates,
+                    extra:
+                        feature.properties.highway !== 'NaN'
+                            ? capital_case(to_text(feature.properties.highway))
+                            : undefined,
+                }
+            }
+        } else if (geomType === 'LineString') {
+            payload = {
+                kind: 'edge',
+                id: feature.properties.edge_id,
+                is_accessible: feature.properties.is_accessible,
+                greenery: feature.properties.greenery,
+                lighting: feature.properties.lighting,
+                surface_quality: feature.properties.surface_quality,
+            }
+        }
+
+        if (payload) {
+            contextPayload.value = payload
+            showContext.value = true
+        }
     }, 1000)
 }
 
@@ -174,7 +211,7 @@ const weightFields = [
     { key: 'lighting', label: 'Lighting' },
     { key: 'greenery', label: 'Greenery' },
     { key: 'surface_quality', label: 'Surface Quality' },
-    { key: 'amenity_proximity', label: 'Amenity Proximity' },
+    { key: 'accessible', label: 'Accessible' },
 ] as const
 
 const weights = ref({
@@ -182,7 +219,7 @@ const weights = ref({
     lighting: 5,
     greenery: 5,
     surface_quality: 5,
-    amenity_proximity: 5,
+    accessible: false,
 })
 
 const defaultPresetLocations: PresetLocation[] = [
@@ -288,7 +325,7 @@ async function selectPresetLocation(preset: PresetLocation) {
     mapCenter.value = [preset.lat, preset.lon]
 
     selectingArea.value = true
-    try {
+    try {  
         const graphData = await activateGraphPreset(preset.code)
         nodes.value = assertFeatureCollection(graphData.features?.nodes, 'nodes')
         edges.value = assertFeatureCollection(graphData.features?.edges, 'edges')
@@ -360,12 +397,13 @@ async function requestRoute() {
 
     loadingRoute.value = true
     routeError.value = null
-    const normalizedWeights = Object.fromEntries(
-        Object.entries(weights.value).map(([key, value]) => [
-            key,
-            Math.max(1, Math.min(10, Number(value) || 1)),
-        ]),
-    )
+    const normalizedWeights = {
+        distance: Math.max(1, Math.min(10, weights.value.distance)),
+        lighting: Math.max(1, Math.min(10, weights.value.lighting)),
+        greenery: Math.max(1, Math.min(10, weights.value.greenery)),
+        surface_quality: Math.max(1, Math.min(10, weights.value.surface_quality)),
+        accessible: weights.value.accessible,
+    }
 
     try {
         routeData.value = await fetchYensRoutes({
@@ -537,8 +575,8 @@ onMounted(async () => {
                     </h3>
 
                     <div class="space-y-5">
-                        <div v-for="field in weightFields" :key="field.key" class="group">
-                            <div class="flex justify-between mb-1.5">
+                        <div v-for="(field, index) in weightFields" :key="field.key" class="group">
+                            <div class="flex justify-between mb-1.5" v-if="index !== weightFields.length - 1">
                                 <label class="text-sm font-semibold text-slate-700">{{
                                     field.label
                                 }}</label>
@@ -548,6 +586,7 @@ onMounted(async () => {
                                 >
                             </div>
                             <input
+                                v-if="index !== weightFields.length - 1"
                                 v-model.number="weights[field.key]"
                                 type="range"
                                 min="1"
@@ -555,6 +594,23 @@ onMounted(async () => {
                                 step="1"
                                 class="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-slate-100 accent-indigo-600 transition-all hover:bg-slate-200"
                             />
+                            <div v-if="index === weightFields.length - 1">
+                                <div class="flex justify-between mb-1.5" >
+                                    <label class="text-sm font-semibold text-slate-700">{{
+                                        field.label
+                                    }}</label>
+                                    <span
+                                        class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 rounded"
+                                        >{{ weights.accessible ? 'True' : 'False' }}</span
+                                    >
+                                </div>
+                                <div class="relative inline-block w-11 h-5">
+                                    <input :id="`accessible-switch-${index}`" v-model="weights.accessible" type="checkbox" class="peer appearance-none w-11 h-5 accent-indigo-600 rounded-full checked:bg-indigo-600 cursor-pointer transition-colors duration-300" />
+                                    <label :for="`accessible-switch-${index}`" class="absolute top-0 left-0 w-5 h-5 bg-white rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-6 peer-checked:border-slate-800 cursor-pointer">
+                                    </label>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
@@ -611,6 +667,7 @@ onMounted(async () => {
                         @selection-change="onSelectionChange"
                         @show-context="onShowContext"
                         @hide-context="onHideContext"
+                        @center-change="onMapCenterChange"
                         class="h-[700px] rounded-xl" 
                     />
 
@@ -636,21 +693,6 @@ onMounted(async () => {
                             {{ preset.name }}
                         </button>
                     </div>
-                </div>
-
-                <div
-                    class="overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-sm ring-1 ring-slate-100"
-                >
-                    <SimpleMap
-                        :routes="routeGeometries"
-                        :nodes="nodes"
-                        :edges="edges"
-                        :center="mapCenter"
-                        :locations="locations"
-                        @selection-change="onSelectionChange"
-                        @center-change="onMapCenterChange"
-                        class="h-[700px] rounded-xl"
-                    />
                 </div>
 
                 <div
