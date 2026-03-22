@@ -18,7 +18,7 @@ class GetEdgeAnalytics:
                     "to_node": e.to_node_id,
                     "length": e.length,
                     "travel_time": e.travel_time,
-                    "access_score": e.access_score,
+                    "is_accessible": e.is_accessible,
                     "lighting": e.lighting,
                     "greenery": e.greenery,
                     "pollution": e.pollution,

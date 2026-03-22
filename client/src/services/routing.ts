@@ -23,6 +23,7 @@ export type RouteResponse = {
         surface_quality?: number
         amenity_proximity?: number
         weighted_score?: number
+        accessible?: boolean
     }
     metadata?: Record<string, unknown>
     path?: number[]
@@ -55,6 +56,5 @@ export function fetchYensRoutes({ start, end, k, weights, user_id }: YensRouteRe
         ({ data }) => data.data,
     )
 
-    console.log(response)
     return response
 }

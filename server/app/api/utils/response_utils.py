@@ -39,6 +39,7 @@ def compute_indicator_summary(graph:nx.MultiDiGraph, path, weights):
 
     edge_count = 0
     weighted_score = 0.0
+    accessible = True
 
     for u, v in zip(path[:-1], path[1:]):
         edge_data = graph.get_edge_data(u, v)
@@ -53,6 +54,9 @@ def compute_indicator_summary(graph:nx.MultiDiGraph, path, weights):
                 
         first_key = next(iter(edge_data))
         data = edge_data[first_key]
+
+        if(data.get("accessible") == False):
+            accessible = False
 
         # Sum indicators
         for key in totals:
@@ -73,6 +77,7 @@ def compute_indicator_summary(graph:nx.MultiDiGraph, path, weights):
     # Compute averages
     averages = {k: v / edge_count for k, v in totals.items()}
     averages["weighted_score"] = weighted_score
+    averages["accessible"] = accessible
 
     return averages
 

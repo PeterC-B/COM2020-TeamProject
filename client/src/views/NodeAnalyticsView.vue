@@ -4,8 +4,6 @@ import { useMainStore } from '@/stores/main'
 import { FetchNodeAnalytics } from '@/services/node_analytics.ts'
 import { buildCsvContent, downloadCsv } from '@/lib/csv'
 
-const mainStore = useMainStore()
-
 const rows = ref<any[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)

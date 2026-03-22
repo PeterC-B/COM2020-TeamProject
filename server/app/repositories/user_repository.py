@@ -16,7 +16,7 @@ class UserRepository:
 
     @map_db_errors("user:get")
     def get(self):
-        stmt = select(UserAccountModel)
+        stmt = select(UserAccountModel).where(UserAccountModel.username != 'Seeded_Data')
 
         results = self.session.execute(stmt).scalars().all()
 

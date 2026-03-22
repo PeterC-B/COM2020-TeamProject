@@ -718,7 +718,7 @@ onMounted(async () => {
                                     <th class="px-2 py-2 text-center">Light</th>
                                     <th class="px-2 py-2 text-center">Green</th>
                                     <th class="px-2 py-2 text-center">Surface</th>
-                                    <th class="px-2 py-2 text-center">Amenity</th>
+                                    <th class="px-2 py-2 text-center">Accessible</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -755,7 +755,7 @@ onMounted(async () => {
                                         {{ formatScore(route.indicators?.surface_quality) }}
                                     </td>
                                     <td class="px-2 py-3 text-center text-slate-500 rounded-r-lg">
-                                        {{ formatScore(route.indicators?.amenity_proximity) }}
+                                        {{ route.indicators?.accessible ? "YES" : "NO" }}
                                     </td>
                                 </tr>
                             </tbody>

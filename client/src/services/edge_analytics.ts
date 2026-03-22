@@ -6,7 +6,7 @@ export interface EdgeAnalyticsRow {
     to_node: number
     length: number
     travel_time: number
-    access_score: number
+    is_accessible: boolean
     lighting: number
     greenery: number
     pollution: number

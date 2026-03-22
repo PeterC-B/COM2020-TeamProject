@@ -7,17 +7,17 @@ const rows = ref<EdgeAnalyticsRow[]>([])
 const loading = ref(true)
 
 const csvHeaders = [
-  'Edge ID',
-  'From',
-  'To',
-  'Length (m)',
-  'Travel Time (s)',
-  'Access Score',
-  'Lighting',
-  'Greenery',
-  'Pollution',
-  'Surface Quality',
-  'Pub Distance',
+    'Edge ID',
+    'From',
+    'To',
+    'Length (m)',
+    'Travel Time (s)',
+    'Is accessible?',
+    'Lighting',
+    'Greenery',
+    'Pollution',
+    'Surface Quality',
+    'Pub Distance',
 ]
 
 const buildEdgeAnalyticsCsvContent = () => {
@@ -27,7 +27,7 @@ const buildEdgeAnalyticsCsvContent = () => {
     row.to_node,
     row.length.toFixed(2),
     row.travel_time.toFixed(2),
-    row.access_score.toFixed(2),
+    row.is_accessible,
     row.lighting.toFixed(2),
     row.greenery.toFixed(2),
     row.pollution.toFixed(2),
@@ -78,7 +78,7 @@ onMounted(async () => {
             <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">TO</th>
             <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">LENGTH (m)</th>
             <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">TRAVEL TIME (s)</th>
-            <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">ACCESS SCORE</th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">IS ACCESSIBLE?</th>
             <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">LIGHTING</th>
             <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">GREENERY</th>
             <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">POLLUTION</th>
@@ -94,7 +94,7 @@ onMounted(async () => {
             <td class="px-4 py-2 text-sm text-gray-800">{{ row.to_node }}</td>
             <td class="px-4 py-2 text-sm text-gray-800">{{ row.length.toFixed(2) }}</td>
             <td class="px-4 py-2 text-sm text-gray-800">{{ row.travel_time.toFixed(2) }}</td>
-            <td class="px-4 py-2 text-sm text-gray-800">{{ row.access_score.toFixed(2) }}</td>
+            <td class="px-4 py-2 text-sm text-gray-800">{{ row.is_accessible ? "YES" : "NO" }}</td>
             <td class="px-4 py-2 text-sm text-gray-800">{{ row.lighting.toFixed(2) }}</td>
             <td class="px-4 py-2 text-sm text-gray-800">{{ row.greenery.toFixed(2) }}</td>
             <td class="px-4 py-2 text-sm text-gray-800">{{ row.pollution.toFixed(2) }}</td>
