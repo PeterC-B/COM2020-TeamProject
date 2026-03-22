@@ -13,6 +13,7 @@ import {
     fetchGraphData,
     fetchGraphPresets,
     fetchLikeLocations,
+    fetchNodeContext
 } from '@/services/graph'
 import { fetchYensRoutes, type YensRoutesResponse } from '@/services/routing'
 import { useMainStore } from '@/stores/main'
@@ -30,7 +31,7 @@ type ContextPayload =
     | {
         kind: 'edge'
         id: number
-        access_score: number
+        is_accessible: boolean
         greenery: number
         lighting: number
         surface_quality: number
@@ -68,6 +69,7 @@ const contextPayload = ref<ContextPayload | null>(null)
 let contextTimer: number | null = null;
 let isHovering = false;
 const hoveredFeatureId = ref<number | null>(null);
+const lastNodeContextFetch = ref(0);
 
 function to_text(text:string): string{
     if (typeof text !== 'string') return ''
@@ -79,45 +81,11 @@ function capital_case(word: string): string{
     return lower.charAt(0).toUpperCase() + lower.slice(1)
 }
 
-function buildContextPayload(feature: any): ContextPayload | null {
-    const geomType = feature._geometry?.type
-
-    if (geomType === 'Point') {
-        return {
-            kind: 'node',
-            id: feature.properties.node_id,
-            name:
-                feature.properties.name !== 'NaN'
-                    ? feature.properties.name
-                    : capital_case(to_text(feature.properties.type)),
-            nodeType: capital_case(to_text(feature.properties.type)),
-            coordinates: feature._geometry.coordinates,
-            extra:
-                feature.properties.highway !== 'NaN'
-                    ? capital_case(to_text(feature.properties.highway))
-                    : undefined,
-        }
-    }
-
-    if (geomType === 'LineString') {
-        return {
-            kind: 'edge',
-            id: feature.properties.edge_id,
-            access_score: feature.properties.access_score,
-            greenery: feature.properties.greenery,
-            lighting: feature.properties.lighting,
-            surface_quality: feature.properties.surface_quality,
-        }
-    }
-
-    return null
-}
 
 function onShowContext(feature: any) {
-    const payload = buildContextPayload(feature)
-    if (!payload) return
+    const geomType = feature._geometry?.type
 
-    const id = payload.id
+    const id = geomType === 'Point' ? feature.properties.node_id : feature.properties.edge_id
     isHovering = true
 
     if (hoveredFeatureId.value === id) return
@@ -125,12 +93,80 @@ function onShowContext(feature: any) {
 
     if (contextTimer) clearTimeout(contextTimer)
 
-    contextTimer = window.setTimeout(() => {
+    contextTimer = window.setTimeout(async () => {
         if (!isHovering) return
         if (hoveredFeatureId.value !== id) return
 
-        contextPayload.value = payload
-        showContext.value = true
+        let payload: ContextPayload | null = null
+
+        if (geomType === 'Point') {
+            if (Date.now() - lastNodeContextFetch.value >= 3000) {
+                lastNodeContextFetch.value = Date.now()
+                try {
+                    const nodeData = await fetchNodeContext(feature.properties.node_id)
+                    payload = {
+                        kind: 'node',
+                        id: nodeData.node_id || feature.properties.node_id,
+                        name:
+                            nodeData.name !== 'NaN'
+                                ? nodeData.name
+                                : capital_case(to_text(nodeData.nodeType || feature.properties.type)),
+                        nodeType: capital_case(to_text(nodeData.nodeType || feature.properties.type)),
+                        coordinates: nodeData.coordinates || feature._geometry.coordinates,
+                        extra:
+                            nodeData.highway !== 'NaN'
+                                ? capital_case(to_text(nodeData.highway))
+                                : feature.properties.highway !== 'NaN'
+                                ? capital_case(to_text(feature.properties.highway))
+                                : undefined,
+                    }
+                } catch (e) {
+                    payload = {
+                        kind: 'node',
+                        id: feature.properties.node_id,
+                        name:
+                            feature.properties.name !== 'NaN'
+                                ? feature.properties.name
+                                : capital_case(to_text(feature.properties.type)),
+                        nodeType: capital_case(to_text(feature.properties.type)),
+                        coordinates: feature._geometry.coordinates,
+                        extra:
+                            feature.properties.highway !== 'NaN'
+                                ? capital_case(to_text(feature.properties.highway))
+                                : undefined,
+                    }
+                }
+            } else {
+                payload = {
+                    kind: 'node',
+                    id: feature.properties.node_id,
+                    name:
+                        feature.properties.name !== 'NaN'
+                            ? feature.properties.name
+                            : capital_case(to_text(feature.properties.type)),
+                    nodeType: capital_case(to_text(feature.properties.type)),
+                    coordinates: feature._geometry.coordinates,
+                    extra:
+                        feature.properties.highway !== 'NaN'
+                            ? capital_case(to_text(feature.properties.highway))
+                            : undefined,
+                }
+            }
+        } else if (geomType === 'LineString') {
+            payload = {
+                kind: 'edge',
+                id: feature.properties.edge_id,
+                is_accessible: feature.properties.is_accessible,
+                greenery: feature.properties.greenery,
+                lighting: feature.properties.lighting,
+                surface_quality: feature.properties.surface_quality,
+            }
+        }
+
+        if (payload) {
+            contextPayload.value = payload
+            showContext.value = true
+        }
     }, 1000)
 }
 

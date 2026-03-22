@@ -125,14 +125,19 @@ def create_graph_route_blueprint(
 
         return ok(data=suggestions)
     
-    @bp.route("/node", methods=["GET"])
+    @bp.route("/node_context", methods=["GET"])
     def fetch_node_context():
         node_id = request.args.get("node_id")
 
         if node_id is None:
             return DataError(statement="Node ID is required.")
         
-        data = fetch_node_context_uc.execute(node_id)
-        return ok(data=data)
+        try:
+            data = fetch_node_context_uc.execute(node_id)
+            return ok(data=data)
+        except Exception as e:
+            print("Error:", e)
+            raise NotFoundError(e)
+        
 
     return bp

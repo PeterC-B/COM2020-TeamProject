@@ -15,8 +15,10 @@ export type GraphDataResponse = {
 
 export type NodeContextResponse = {
     name: string
-    type: string
-    opening_hours: string
+    node_id: number
+    coordinates: [number, number]
+    nodeType: string
+    highway: string
 }
 
 export type LocationNameResponse = {
@@ -102,7 +104,7 @@ export async function fetchLikeLocations(start: string) {
 
 export async function fetchNodeContext(node_id: number){
     const response = await get<ApiEnvelope<NodeContextResponse>>(
-        `/graph/node?node_id=${node_id}`
+        `/graph/node_context?node_id=${node_id}`
     )
 
     console.log(response.data.data)
@@ -118,8 +120,5 @@ export async function fetchEdgeContext(edge_id: number){
     if (!response.ok) {
         throw new Error(`Failed to fetch edge data`)
     }  
-
-    console.log(response)
-
     return response.json()
 }

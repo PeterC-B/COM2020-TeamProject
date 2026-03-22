@@ -105,6 +105,14 @@ class GraphDataRepository:
         )
         return self.session.execute(stmt).scalars().all()
 
+    def fetch_node_context(self, node_id):
+        stmt = (
+            select(NodesModel, LocationModel)
+            .join(LocationModel, NodesModel.node_id == LocationModel.node_id)
+            .where(NodesModel.node_id == node_id)
+        )
+        return self.session.execute(stmt).first()
+
     def get_node_by_id(self, node_id):
         stmt = select(NodesModel).where(NodesModel.node_id == node_id)
         return self.session.execute(stmt).scalars().first()

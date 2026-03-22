@@ -308,8 +308,6 @@ onMounted(() => {
                     const feature = e.features?.[0]
                     if (!feature || feature.geometry.type !== 'Point') return
 
-                    console.log(feature)
-
                     hoveringNode = true
                     emit('show-context', feature)
                 })
