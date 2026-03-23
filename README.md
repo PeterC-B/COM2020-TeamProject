@@ -8,35 +8,45 @@
 #### Role: Project Lead
 
 Responsibilites:
- - Creating the scrum board
- - Organising group responsibilities 
- - Managing the team
- - Creating the ERD
- - Creating the location and mission progress models
- - Compiling the meeting minutes into a document
- - Creating the risk register document
+ - Created and managed the scrum board
+ - Organised group meetings twice a week
+ - Managed the teams responsibilities
+ - Assigned tasks to group members based on individual stregths and availability
+ - Created the ERD
+ - Created the location, mission progress, and user account models for the database
+ - Compiled the meeting minutes into a document
+ - Created the risk register document
+ - Created edit / create mission view
 
 ### Max Chambers
 #### Role: Technical Lead
 
 Responsibilites:
- - Organising the team with technical aspects and bringing the code together
+ - Organised the team with technical aspects and bringing the code together
  - Started with finding OSMNx for creating and fetching maps for use
- - Creating the edges, nodes, missions and user account database models
- - Creating functions to run the algorithms created by James
- - Adding the coding documentation to the report
- - Creating helper functions to link the front and back-ends together
+ - Created the edges, nodes, missions and user account database models
+ - Created functions to run the algorithms created by James
+ - Added the coding documentation to the report
+ - Created helper functions to link the front and back-ends together
  - Finalised the scoring / weighting algorithms for routing
+ - Added features to improve functionality:  
+    - Map auto-centres on chosen location
+    - Able to select a route and other routes are greyed out
+    - Added pop-up box to show the context of edges
+ - Linked leaderboard to database
+ - Created handover pack: deployment & operations, maintenance & troubleshooting
 
 ### Peter Compton-Burnett
 #### Role: Software Engineer
 
 Responsibilites:
- - Creating the VueJS app for the front-end
- - Helping to link the back-end code into the front-end
- - Creating the Docker container and helping implement the database
- - Initialising the front-end code
+ - Created the VueJS app for the front-end
+ - Helped to link the back-end code into the front-end
+ - Created the Docker container and helping implement the database
+ - Initialised the front-end code
  - Created the file structure and organised the files into it
+ - Created handover pack: deployment & operations, maintenance & troubleshooting
+ - Created analytics views with export functions across the system
 
 ### James Ellis
 #### Role: Routing Algorithms and Testing
@@ -50,32 +60,54 @@ Responsibilites:
  - Created 111 automated testing algorithms for the back-end
  - Created a confusion matrix for the testing suite
  - Created endpoints
+ - Created forgotten password view and functionality
+ - Added 200 pre-seeded route queries
+ - Optimised area selection
+ - Created handover pack: deployment & operations, maintenance & troubleshooting
 
 ### Sophie Barrell
 #### Role: UI / UX Designer
 
 Responsibilites:
  - Created the initial website design aesthetics
- - Created the demo slides
+ - Created the demo slides:
    - The Problem
    - Our Solution
    - How it works
    - Major Risks
    - Plans for sprint 2
  - Explored Tailwind CSS for possible use in our program
- - Writing CSS files for use on the front-end
+ - Wrote CSS files for use on the front-end 
+ - Created the final slides:
+   - Recap of the problem
+   - What we delivered in sprint 2
+   - Demonstration of product
+   - Deployment handover docs
+   - Evaluation
+   - Next steps
+
 
 ### Hayley Gray
 #### Role: Documentation and Communication
 
 Responsibilites:
- - Created the report
-   - Executive Summary
-   - Prioritised Requirements
+ - Wrote the Sprint 1 report
+   - Executive summary
+   - Prioritised requirements
    - Evaluation evidence
    - Sprint 2 Plan
- - Communicating with the team to help get everything sorted
+ - Communicated with the team to help get everything sorted
  - Created the Ethical and Legal Considerations document
+ - Wrote the Sprint 2 final report
+   - Executive summary
+   - Problem framing and project requirements
+   - Requirements and success criteria
+   - System architecture and design
+   - Algorithm design
+   - Prototype implementation and analytics 
+   - Ethics, legal, and licencing considerations
+   - Testing evidence
+   - Final evaluation
  
 ### Eleanor Breheny
 #### Role: Development / Operations Engineer
@@ -85,6 +117,8 @@ Responsibilites:
  - Using Amazon Web Services (AWS) to get a deployable version
    - Created an AWS instance for deploying our website
    - Compiled our project into AWS to be deployed by it
+ - Wrote tests for the front-end
+
 
 <br>
 
