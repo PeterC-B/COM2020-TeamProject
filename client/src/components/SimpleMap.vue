@@ -55,6 +55,7 @@ let map: Map | null = null
 
 const nodes = ref<GeoJson | null>(null)
 const edges = ref<GeoJson | null>(null)
+const locations = ref<GeoJson | null>(null)
 const map_center = ref<LngLatLike | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
@@ -191,8 +192,6 @@ function renderRoutes(routes: Array<Array<[number, number]>> = []) {
             },
         })
     })
-
-    map.setCenter(map_center.value ? map_center.value : [-2.585757, 51.460498])
 }
 
 // Initialize map and load graph data.
@@ -235,8 +234,11 @@ onMounted(() => {
                 if (!map) return
                 const nodeCollection = assertFeatureCollection(graphData.features?.nodes, 'nodes')
                 const edgeCollection = assertFeatureCollection(graphData.features?.edges, 'edges')
+                const locationCollection = assertFeatureCollection(graphData.features.locations, 'locations')
                 nodes.value = nodeCollection
                 edges.value = edgeCollection
+                locations.value = locationCollection
+
                 map_center.value = toMapCoordinates(graphData.features?.center)
 
                 map.addSource('edges', {
@@ -246,6 +248,10 @@ onMounted(() => {
                 map.addSource('nodes', {
                     type: 'geojson',
                     data: nodeCollection,
+                })
+                map.addSource('locations', {
+                    type: 'geojson',
+                    data: locationCollection
                 })
 
                 // Add render layers
@@ -365,16 +371,20 @@ watch(selectedNodeId, (nodeId) => {
 watch(
   () => props.nodes,
   (newNodes) => {
-    if (!map || !newNodes) return;
+    if (!map || !newNodes) return
+    if (newNodes.type !== 'FeatureCollection' || !Array.isArray(newNodes.features)) {
+        console.warn('Invalid nodes FeatureCollection', newNodes)
+        return
+    }
 
     if (map.getLayer('nodes-circle')) map.removeLayer('nodes-circle');
     if (map.getLayer('nodes-circle-hit')) map.removeLayer('nodes-circle-hit');
     if (map.getLayer('nodes-circle-highlight')) map.removeLayer('nodes-circle-highlight');
     if (map.getSource('nodes')) map.removeSource('nodes');
-
+    
     map.addSource('nodes', {
-      type: 'geojson',
-      data: newNodes,
+        type: 'geojson',
+        data: newNodes,
     });
 
     map.addLayer(NODE_BASE_LAYER);
@@ -385,20 +395,20 @@ watch(
 
     const bounds = new maplibregl.LngLatBounds();
     newNodes.features.forEach((f) => {
-      if (f.geometry.type !== 'Point') return;
+        if (f.geometry.type !== 'Point') return;
 
-      const coords = f.geometry.coordinates;
-      if (!Array.isArray(coords) || coords.length < 2) return;
+        const coords = f.geometry.coordinates;
+        if (!Array.isArray(coords) || coords.length < 2) return;
 
-      const [lng, lat] = coords;
+        const [lng, lat] = coords;
 
-      if (typeof lng === 'number' && typeof lat === 'number' && Number.isFinite(lng) && Number.isFinite(lat)) {
-        bounds.extend([lng, lat]);
-      }
+        if (typeof lng === 'number' && typeof lat === 'number' && Number.isFinite(lng) && Number.isFinite(lat)) {
+            bounds.extend([lng, lat]);
+        }
     });
 
     if (!bounds.isEmpty()) {
-      map.fitBounds(bounds, { padding: 40, maxZoom: 16 });
+        map.fitBounds(bounds, { padding: 40, maxZoom: 16 });
     }
   },
   { immediate: true }
@@ -423,16 +433,17 @@ watch(
 )
 
 watch(
-  () => props.center,
-  (newCenter) => {
-    if (!map || !newCenter) return
-    map.setCenter(toMapCoordinates(newCenter))
-  },
-  { immediate: true }
+    () => props.center,
+    (newCenter) => {
+        if (!map || !newCenter) return
+        console.log(newCenter)
+        map.setCenter(toMapCoordinates(newCenter))
+    },
+    { immediate: true }
 )
 
 onBeforeUnmount(() => {
-    dispose()
+    dispose()   
     map?.remove()
     map = null
 })

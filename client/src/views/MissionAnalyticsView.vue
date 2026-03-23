@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useMainStore } from '@/stores/main'
+import { ref, onMounted, computed } from 'vue'
 import { FetchMissionAnalytics } from '@/services/route_queries'
-import { computed } from 'vue'
+import { buildCsvContent, downloadCsv } from '@/lib/csv'
 
-const mainStore = useMainStore()
 const queries = ref<any[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
@@ -70,10 +68,32 @@ const missionAccuracy = computed<MissionAccuracy[]>(() => {
     .sort((a, b) => b.percentage - a.percentage)
 })
 
+const csvHeaders = ['Mission', 'Times Correct', 'Times Completed', 'Percentage', 'Most Common Answer']
+
+const buildMissionAnalyticsCsvContent = () => {
+  const rows = missionAccuracy.value.map((entry) => [
+    entry.mission_name,
+    entry.correct,
+    entry.total,
+    entry.percentage,
+    entry.most_chosen_answer,
+  ])
+
+  return buildCsvContent(csvHeaders, rows)
+}
+
+const downloadMissionAnalyticsCsv = () => {
+  if (!missionAccuracy.value.length) {
+    return
+  }
+
+  downloadCsv(buildMissionAnalyticsCsvContent(), `mission-analytics-${new Date().toISOString().slice(0, 10)}.csv`)
+}
+
 
 onMounted(async () => {
     try {
-        queries.value = await FetchMissionAnalytics()
+        queries.value = (await FetchMissionAnalytics())
     } catch (err: any) {
         error.value = 'Failed to load mission progress.'
     } finally {
@@ -84,7 +104,16 @@ onMounted(async () => {
 
 <template>
     <div class="mx-auto max-w-7xl p-6 antialiased">
-        <h1 class="text-3xl font-bold text-slate-900 mb-8">Mission Analytics</h1>
+        <div class="flex items-center justify-between gap-6 mb-8 flex-wrap">
+            <h1 class="text-3xl font-bold text-slate-900">Mission Analytics</h1>
+            <button
+                class="rounded-md border border-slate-200 bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:border-slate-900 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+                :disabled="loading || !missionAccuracy.length"
+                @click="downloadMissionAnalyticsCsv"
+            >
+                Export CSV
+            </button>
+        </div>
 
         <div v-if="loading" class="p-12 text-center rounded-2xl border border-slate-200 bg-white text-slate-500 font-bold">
             Loading...
@@ -104,8 +133,6 @@ onMounted(async () => {
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Times completed</th>
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Percentage</th>
                             <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Most common answer</th>
-                            <!--<th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Path</th>
-                            <th class="border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Timestamp</th>-->
                         </tr>
                     </thead>
 
@@ -118,10 +145,6 @@ onMounted(async () => {
                                 <span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md text-xs font-bold">{{ q.percentage }}%</span>
                             </td>
                             <td class="p-4 text-sm text-slate-600 max-w-[150px]">{{ q.most_chosen_answer ?? 'NaN' }}</td>
-                            <!--<td class="p-4">
-                                <p class="text-[10px] text-slate-400 truncate max-w-[100px]">{{ q.chosen_route_path }}</p>
-                            </td>
-                            <td class="p-4 text-xs font-semibold text-slate-500 max-w-[100px]">{{ q.timestamp }}</td>-->
                         </tr>
                     </tbody>
                 </table>

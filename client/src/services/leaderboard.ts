@@ -43,3 +43,17 @@ export async function fetchAllMissionProgress(): Promise<MissionProgress[]>{
     )
     return response.data.data
 }
+
+export interface LeaderboardRow {
+    user_id: string
+    name: string
+    total_score: number
+    missions_completed: number
+}
+
+export async function fetchLeaderboard(): Promise<LeaderboardRow[]> {
+    const response = await get<ApiEnvelope<LeaderboardRow[]>>(
+        `/leaderboard`
+    )
+    return response.data.data
+}

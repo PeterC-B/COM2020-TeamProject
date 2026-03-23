@@ -15,8 +15,7 @@ const navItems = computed(() => {
     ]
 
     if (mainStore.userRole === 'administrators' || mainStore.userRole === 'developers') {
-        items.push({ label: 'Route Query Analytics', path: '/analytics/route-queries'});
-        items.push({ label: 'Mission Analytics', path: '/analytics/missions'})
+        items.push({ label: 'Analytics', path: '/analytics'});
     }
     if (mainStore.userRole === 'developers') {
         //items.push({ label: 'Context Pop Up', path: '/context_box_dev'})
@@ -30,7 +29,9 @@ const navItems = computed(() => {
     <div class="min-h-screen">
         <header class="border-b">
             <nav class="mx-auto max-w-5xl px-4 py-3 flex items-center gap-4">
-                <div class="font-semibold">COM2020 Team Project</div>
+                <div class="font-semibold"><span class="text-lg font-bold tracking-tight text-slate-900 hidden sm:block">
+                    Healthy<span class="text-indigo-600">Streets</span>
+                </span></div>
 
                 <div class="flex gap-3">
                     <RouterLink

@@ -21,7 +21,7 @@ def compute_path_distance(graph: nx.MultiDiGraph, path):
 
         # Use the first edge key (OSMnx graphs rarely have parallel edges)
         first_key = next(iter(edge_data))
-        total += edge_data[first_key].get("length", 0.0)
+        total += edge_data[first_key].get("distance", 0.0)
 
     return total
 
@@ -35,30 +35,39 @@ def compute_indicator_summary(graph:nx.MultiDiGraph, path, weights):
         "greenery": 0.0,
         "pollution": 0.0,
         "surface_quality": 0.0,
-        "amenity_proximity": 0.0,
     }
 
     edge_count = 0
     weighted_score = 0.0
+    accessible = True
 
     for u, v in zip(path[:-1], path[1:]):
         edge_data = graph.get_edge_data(u, v)
         if not edge_data:
             continue
+            
+        all_weights = []
+        for weights in edge_data.values():
+            all_weights.append(weights["weight"])
 
+        weighted_score += min(all_weights)
+                
         first_key = next(iter(edge_data))
         data = edge_data[first_key]
+
+        if(data.get("accessible") == False):
+            accessible = False
 
         # Sum indicators
         for key in totals:
             totals[key] += data.get(key, 0.0)
 
         # Weighted score
-        for key, w in weights.items():
+        '''for key, w in weights.items():
             if key == "distance":
                 continue  # distance handled separately
             if key in data:
-                weighted_score += data[key] * w
+                weighted_score += data[key] * w'''
 
         edge_count += 1
 
@@ -68,6 +77,7 @@ def compute_indicator_summary(graph:nx.MultiDiGraph, path, weights):
     # Compute averages
     averages = {k: v / edge_count for k, v in totals.items()}
     averages["weighted_score"] = weighted_score
+    averages["accessible"] = accessible
 
     return averages
 
@@ -165,7 +175,6 @@ def compare_routes(routes):
             - longest_distance
             - average_distance
     """
-
     if not routes:
         return {
             "count": 0,

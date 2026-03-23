@@ -19,7 +19,7 @@ class SaveMissionProgress:
         
         status = payload.get('status')
         score = payload.get('score')
-        chosen_answer = payload.get('chosen_answer')
+        chosen_answer = payload.get('chosenAnswer')
 
         missing = [
             field for field, value in {
@@ -33,7 +33,7 @@ class SaveMissionProgress:
 
         if missing:
             raise ValidationError(
-                message="Missing required fields",
+                message=f"Missing required fields: {missing}",
                 details={"missing": missing}
             )
 

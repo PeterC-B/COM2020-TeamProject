@@ -34,6 +34,31 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true, requiresAdmin: true }
     },
 
+    {
+        path: '/analytics/leaderboard',
+        component: () => import('@/views/LeaderboardAnalyticsView.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true }
+    },
+
+    {
+        path: '/analytics/node-analytics',
+        component: () => import('@/views/NodeAnalyticsView.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true }
+    },
+
+    {
+        path: '/analytics/edge-analytics',
+        component: () => import('@/views/EdgeAnalyticsView.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true }
+    },
+
+    {
+        path: '/analytics',
+        component: () => import('@/views/AnalyticsHomeView.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true }
+    },
+
+
 ]
 
 const router = createRouter({
