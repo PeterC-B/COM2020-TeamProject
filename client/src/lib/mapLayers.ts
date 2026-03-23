@@ -28,7 +28,7 @@ export const EDGE_BASE_LAYER: LineLayer = {
     paint: {
         'line-color': '#1f4e5f',
         'line-width': 2,
-        'line-opacity': 0.75,
+        'line-opacity': 0.0001,
     },
 }
 
