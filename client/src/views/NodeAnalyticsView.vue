@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { useMainStore } from '@/stores/main'
 import { FetchNodeAnalytics } from '@/services/node_analytics'
 import { buildCsvContent, downloadCsv } from '@/lib/csv'
 
