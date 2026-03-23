@@ -312,6 +312,13 @@ function selectLocationSuggestion(suggestion: LocationSuggestion) {
 }
 
 function onMapCenterChange(value: [number, number]) {
+    if (
+        mapCenter.value &&
+        Math.abs(mapCenter.value[0] - value[0]) < 1e-7 &&
+        Math.abs(mapCenter.value[1] - value[1]) < 1e-7
+    ) {
+        return
+    }
     mapCenter.value = value
 }
 
