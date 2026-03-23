@@ -55,8 +55,8 @@ const leaderboard = computed(() => {
         avg_score: u.missions_attempted > 0
             ? Math.round((u.total_score / u.missions_attempted) * 100) / 100
             : 0,
-        tier: u.total_score >= 100 ? 'Gold'
-        : u.total_score >= 50 ? 'Silver'
+        tier: u.total_score >= 300 ? 'Gold'
+        : u.total_score >= 150 ? 'Silver'
             : 'Bronze'
     }))
 })
