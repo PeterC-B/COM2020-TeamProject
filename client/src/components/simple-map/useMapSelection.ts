@@ -73,7 +73,7 @@ export function useMapSelection(emitSelectionChange: (payload: SelectionPayload)
 
         let location_name = locationNameFromMap ?? null
         if (!location_name) {
-            location_name = await fetchLocationName(nodeId)
+            location_name = (await fetchLocationName(nodeId)).name
         }
 
         // First click sets start, second sets destination; third click starts a new pair.
