@@ -54,7 +54,7 @@ describe('Route Queries Service', () => {
       vi.mocked(api.get).mockResolvedValue(mockResponse as any)
       const result = await FetchMissionAnalytics()
       expect(api.get).toHaveBeenCalledWith('/analytics/missions')
-      expect(Array.isArray(result)).toBe(false)
+      expect(Array.isArray(result)).toBe(true)
       expect(result).toHaveLength(2)
       expect(result[0].mission_id).toBe('m1')
     })
