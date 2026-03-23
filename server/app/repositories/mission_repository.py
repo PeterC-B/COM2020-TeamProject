@@ -18,6 +18,13 @@ class MissionsRepository:
     def get_by_id(self, mission_id):
         stmt = select(MissionsModel).where(MissionsModel.mission_id == mission_id)
         return self.session.execute(stmt).scalars().first()
+    
+    def get_mission_progress_for_mission(self, mission_id):
+        try:
+            stmt = select(MissionProgressModel).where(MissionProgressModel.mission_id == mission_id)
+            return self.session.execute(stmt).scalars().all()
+        except:
+            return None
 
     def add(self, mission: MissionsModel):
         self.session.add(mission)
