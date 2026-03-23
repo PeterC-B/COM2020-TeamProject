@@ -7,6 +7,7 @@
 ### Charlotte Beardsall
 #### Role: Project Lead
 
+**Sprint 1**\
 Responsibilites:
  - Creating the scrum board
  - Organising group responsibilities 
@@ -16,9 +17,12 @@ Responsibilites:
  - Compiling the meeting minutes into a document
  - Creating the risk register document
 
+**Sprint 2**\
+
 ### Max Chambers
 #### Role: Technical Lead
 
+**Sprint 1**\
 Responsibilites:
  - Organising the team with technical aspects and bringing the code together
  - Started with finding OSMNx for creating and fetching maps for use
@@ -28,9 +32,12 @@ Responsibilites:
  - Creating helper functions to link the front and back-ends together
  - Finalised the scoring / weighting algorithms for routing
 
+**Sprint 2**\
+
 ### Peter Compton-Burnett
 #### Role: Software Engineer
 
+**Sprint 1**\
 Responsibilites:
  - Creating the VueJS app for the front-end
  - Helping to link the back-end code into the front-end
@@ -38,9 +45,12 @@ Responsibilites:
  - Initialising the front-end code
  - Created the file structure and organised the files into it
 
+**Sprint 2**\
+
 ### James Ellis
 #### Role: Routing Algorithms and Testing
 
+**Sprint 1**\
 Responsibilites:
  - Created the routing algorithms for use
    - Yens
@@ -51,9 +61,12 @@ Responsibilites:
  - Created a confusion matrix for the testing suite
  - Created endpoints
 
+**Sprint 2**\
+
 ### Sophie Barrell
 #### Role: UI / UX Designer
 
+**Sprint 1**\
 Responsibilites:
  - Created the initial website design aesthetics
  - Created the demo slides
@@ -65,9 +78,12 @@ Responsibilites:
  - Explored Tailwind CSS for possible use in our program
  - Writing CSS files for use on the front-end
 
+**Sprint 2**\
+
 ### Hayley Gray
 #### Role: Documentation and Communication
 
+**Sprint 1**\
 Responsibilites:
  - Created the report
    - Executive Summary
@@ -77,14 +93,19 @@ Responsibilites:
  - Communicating with the team to help get everything sorted
  - Created the Ethical and Legal Considerations document
  
+**Sprint 2**\
+
 ### Eleanor Breheny
 #### Role: Development / Operations Engineer
 
+**Sprint 1**\
 Responsibilites:
  - Create the initial mission needed for sprint 1
  - Using Amazon Web Services (AWS) to get a deployable version
    - Created an AWS instance for deploying our website
    - Compiled our project into AWS to be deployed by it
+
+**Sprint 2**\
 
 <br>
 
