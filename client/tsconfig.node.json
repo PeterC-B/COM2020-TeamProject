@@ -1,5 +1,4 @@
 {
-  "extends": "../node_modules/@tsconfig/node24/tsconfig.json",
   "include": [
     "vite.config.*",
     "vitest.config.*",
