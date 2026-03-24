@@ -1,11 +1,18 @@
 import random
+import sys
+from pathlib import Path
+from uuid import uuid4
+
+SERVER_ROOT = Path(__file__).resolve().parents[1]
+if str(SERVER_ROOT) not in sys.path:
+    sys.path.insert(0, str(SERVER_ROOT))
+
 from app import create_app
 from app.extensions import db
+from app.models.enums.ACCESS_TYPE import UserAccessType
 from app.models.location_model import LocationModel
 from app.models.route_query_model import RouteQuery
 from app.models.user_account_model import UserAccountModel
-from app.models.enums.ACCESS_TYPE import UserAccessType
-from uuid import uuid4
 from app.security.passwords import hash_password
 
 app = create_app()
@@ -45,7 +52,7 @@ def insert_seeded_user():
     )
     db.session.add(user)
     db.session.commit()
-    print(f"Seeding user created\n\nUsername: Seeded Data\nPassword: seeding")    
+    print("Seeding user created\n\nUsername: Seeded Data\nPassword: seeding")    
 
 def delete_data():
     db.session.query(RouteQuery).delete()

@@ -1,4 +1,11 @@
 import random
+import sys
+from pathlib import Path
+
+SERVER_ROOT = Path(__file__).resolve().parents[1]
+if str(SERVER_ROOT) not in sys.path:
+    sys.path.insert(0, str(SERVER_ROOT))
+
 from app import create_app
 from app.extensions import db
 from app.domain.routing.graph_loader import load_graph_from_disk
