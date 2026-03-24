@@ -39,6 +39,10 @@ def create_user_route_blueprint(
         }
         return ok(data=data, meta=meta)
 
+    @bp.route("/ping", methods=["GET"])
+    def ping():
+        return ok(data={"status": "ok"})
+
     @bp.route("/login", methods=["POST"])
     def login_user():
         payload = request.get_json(silent=True) or {}
