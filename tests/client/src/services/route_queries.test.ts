@@ -45,14 +45,14 @@ describe('Route Queries Service', () => {
 
       const mockResponse = {
         data: {
-          data: {
-            mission_analytics: mockAnalyticsItems
-          }
+          data: mockAnalyticsItems
         }
       }
 
       vi.mocked(api.get).mockResolvedValue(mockResponse as any)
+
       const result = await FetchMissionAnalytics()
+
       expect(api.get).toHaveBeenCalledWith('/analytics/missions')
       expect(Array.isArray(result)).toBe(true)
       expect(result).toHaveLength(2)
